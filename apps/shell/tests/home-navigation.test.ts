@@ -94,14 +94,17 @@ describe('Home sidebar navigation', () => {
   // The Ask-AI nav entry and the Genspark cloud entry are gone from this build:
   // the sidebar only switches between Recent and Starred, and the type filter
   // survives the trip in both directions.
-  it.each(['Recent', 'Starred'])('selects only %s and keeps the other entry unselected', async (from) => {
-    await click(nav(from))
-    expect(selected()).toEqual([from])
-    expect(nav(from).getAttribute('aria-current')).toBe('page')
-    const other = from === 'Recent' ? 'Starred' : 'Recent'
-    expect(nav(other).hasAttribute('aria-current')).toBe(false)
-    expect(fetch).not.toHaveBeenCalled()
-  })
+  it.each(['Recent', 'Starred'])(
+    'selects only %s and keeps the other entry unselected',
+    async (from) => {
+      await click(nav(from))
+      expect(selected()).toEqual([from])
+      expect(nav(from).getAttribute('aria-current')).toBe('page')
+      const other = from === 'Recent' ? 'Starred' : 'Recent'
+      expect(nav(other).hasAttribute('aria-current')).toBe(false)
+      expect(fetch).not.toHaveBeenCalled()
+    },
+  )
 
   it('offers no Ask-AI or cloud nav entry', () => {
     expect(nav('Ask AI')).toBeUndefined()

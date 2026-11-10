@@ -204,7 +204,7 @@ export function Ribbon(p: Props) {
         >
           {t('saveAs')}
         </button>
-        
+
         <button
           type="button"
           className="qa-btn"
@@ -251,7 +251,6 @@ export function Ribbon(p: Props) {
       </div>
 
       <div className="ribbon-body" data-ribbon-body="">
-
         <div className="ribbon-group">
           <div className="ribbon-group-items">
             {/* the ribbon has no Insert tab: the row itself says what these buttons do */}

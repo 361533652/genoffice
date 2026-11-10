@@ -363,4 +363,3 @@ describe('ribbon direction buttons carry translated aria-labels', () => {
     }
   })
 })
-

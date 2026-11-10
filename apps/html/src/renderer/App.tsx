@@ -23,10 +23,7 @@ import { PreviewFrame, type PreviewFrameHandle } from './preview/PreviewFrame'
 import { instrumentForPreview } from './preview/instrument'
 import type { ComputedSnapshot, ElementRect, FromInspector } from './preview/inspector-protocol'
 import inspectorSource from './preview/inspector.js?raw'
-import {
-  resolveQueueItem,
-  type EditQueueItem,
-} from './ai/edit-queue'
+import { resolveQueueItem, type EditQueueItem } from './ai/edit-queue'
 import { buildProjection } from './ai/redact'
 import { Breadcrumb, type NodeState } from './components/Breadcrumb'
 import {

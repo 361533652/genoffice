@@ -5,10 +5,7 @@ import {
   type MarkdownSourceSnapshot,
 } from './markdown/roundtripSerializer'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import {
-  ImageViewer,
-  useAutoSavePref,
-} from '@genoffice/ui'
+import { ImageViewer, useAutoSavePref } from '@genoffice/ui'
 import {
   pollUntilReady,
   runHeadlessRendererExport,

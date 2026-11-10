@@ -3427,7 +3427,6 @@ function RibbonInner({
           </div>
         ) : tab === 'home' ? (
           <>
-
             <div className="ribbon-group">
               <div className="ribbon-group-items">
                 <div className="rb-split-wrap">

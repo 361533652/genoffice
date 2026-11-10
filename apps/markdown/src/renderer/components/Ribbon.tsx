@@ -116,7 +116,6 @@ const toggleStyle = (editor: Editor | null, style: StylableMark) =>
 const toggleList = (editor: Editor | null, list: ListKind) =>
   editor && uiOp(editor, { op: 'toggleList', target: 'selection', list })
 
-
 const MARKDOWN_THEME_LABELS: Record<Exclude<MarkdownTheme, 'default'>, string> = {
   'notion-light': 'Notion Light',
   'notion-dark': 'Notion Dark',
@@ -310,7 +309,6 @@ export function Ribbon({
   // (pinned stroke paints 1.5px at this size per the suite-wide icon rules)
   const ICON = 20
 
-
   return (
     <div className={`ribbon ${collapse.rootClass}`} ref={collapse.rootRef}>
       {/* quick-access row above the toolbar (save / undo / redo / autosave), same as the docs QAT row */}
@@ -337,7 +335,7 @@ export function Ribbon({
         >
           {t('saveAs')}
         </button>
-        
+
         <button
           type="button"
           className="qa-btn"
@@ -388,7 +386,6 @@ export function Ribbon({
       </div>
 
       <div className="ribbon-body" data-ribbon-body="">
-
         {!sourceMode && (
           <div className="ribbon-group">
             <div className="ribbon-group-items">

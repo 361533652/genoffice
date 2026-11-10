@@ -2850,8 +2850,6 @@ export default function App() {
     )
   }
 
-
-
   /** Markup types the whole current selection already carries — shown as pressed
       buttons in the bar (clicking one removes the markup) */
   const activeMarkupTypes = useMemo(() => {
@@ -7672,7 +7670,6 @@ export default function App() {
 
   /** Ribbon AI buttons: expand the dock and auto-run the prompt in the assistant */
 
-
   /** Converter dropdown → the shell's local conversion flows (save dialog, password prompt) */
   const convertTo = async (format: PdfConvertFormat): Promise<void> => {
     setConvertOpen(false)
@@ -8992,7 +8989,7 @@ export default function App() {
       <div className="app-main">
         {/* dock wrapper animates the width between panel and rail (docs-style 180ms ease);
               the panel stays mounted while collapsed so the chat history survives */}
-                <div className="app-content">
+        <div className="app-content">
           {digitalSignatures.length > 0 && (
             <div className={`pdf-sig-banner ${overallSignatureStatus(digitalSignatures)}`}>
               <IconSignatures />
@@ -9319,7 +9316,7 @@ export default function App() {
               onScroll={() => {
                 handleScroll()
                 setSelPopup(null)
-                        setSelected(null)
+                setSelected(null)
                 clearLineHover()
                 clearBlockHover()
               }}
@@ -10757,7 +10754,6 @@ export default function App() {
                     <span className="pdf-sel-popup-sep" aria-hidden />
                   </>
                 )}
-                
               </div>
             )}
             {selected && (

@@ -2792,16 +2792,10 @@ export function Home() {
         </div>
       </aside>
       <div className="sidebar-resizer" onPointerDown={onSidebarResizeStart} />
-      {selectedFolder && rootOf(selectedFolder, roots)?.readable ? (
-        renderFolderContent()
-      ) : (
-        renderGlobalContent()
-      )}
-      {settingsOpen && (
-        <SettingsModal
-          onClose={() => setSettingsOpen(false)}
-        />
-      )}
+      {selectedFolder && rootOf(selectedFolder, roots)?.readable
+        ? renderFolderContent()
+        : renderGlobalContent()}
+      {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
       {confirmDelete && (
         <div className="modal-overlay" onClick={() => setConfirmDelete(null)}>
           <div
