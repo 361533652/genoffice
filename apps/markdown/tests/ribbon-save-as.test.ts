@@ -25,7 +25,6 @@ function renderRibbon(disabled = false) {
   })
   const onSave = vi.fn()
   const onSaveAs = vi.fn()
-  const onNameWithAi = vi.fn()
   const container = document.createElement('div')
   document.body.appendChild(container)
   const root = createRoot(container)
@@ -34,13 +33,9 @@ function renderRibbon(disabled = false) {
     dirty: false,
     onSave,
     onSaveAs,
-    onNameWithAi,
     onFind: vi.fn(),
     autoSave: false,
     onToggleAutoSave: vi.fn(),
-    aiOpen: false,
-    onToggleAi: vi.fn(),
-    onAiPreset: vi.fn(),
     editor,
     imageEnabled: true,
     onInsertImage: vi.fn(),
@@ -56,13 +51,7 @@ function renderRibbon(disabled = false) {
     editor.destroy()
     container.remove()
   })
-  return { container, onSave, onSaveAs, onNameWithAi }
-}
-
-function nameWithAiButton(container: HTMLElement): HTMLButtonElement {
-  const button = container.querySelector<HTMLButtonElement>('.ribbon-tabs .qa-name-with-ai')
-  expect(button, 'Name with AI must be available in the quick-access row').not.toBeNull()
-  return button!
+  return { container, onSave, onSaveAs }
 }
 
 function saveAsButton(container: HTMLElement): HTMLButtonElement {
@@ -93,23 +82,11 @@ describe('Save As quick-access button', () => {
   })
 })
 
-describe('Name with AI quick-access button', () => {
-  it('asks for a name without also saving the document', () => {
-    // The reader asked for a name, not for a write: the click must not double
-    // as a save, which would land the file under the old name first.
-    const { container, onNameWithAi, onSave } = renderRibbon()
-    const button = nameWithAiButton(container)
-    expect(button.textContent).toBe('\u7528 AI \u8d77\u540d\u2026')
-    act(() => button.click())
-    expect(onNameWithAi).toHaveBeenCalledOnce()
-    expect(onSave).not.toHaveBeenCalled()
-  })
-
-  it('is unavailable while the document is unavailable', () => {
-    const { container, onNameWithAi } = renderRibbon(true)
-    const button = nameWithAiButton(container)
-    expect(button.disabled).toBe(true)
-    act(() => button.click())
-    expect(onNameWithAi).not.toHaveBeenCalled()
+describe('AI entries are gone from the ribbon', () => {
+  it('offers no Name with AI button and no AI assistant group', () => {
+    const { container } = renderRibbon()
+    expect(container.querySelector('.qa-name-with-ai')).toBeNull()
+    expect(container.querySelector('.ai-entry')).toBeNull()
+    expect(container.textContent).not.toContain('Genspark')
   })
 })

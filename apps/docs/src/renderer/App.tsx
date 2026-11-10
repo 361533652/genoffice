@@ -1,5 +1,5 @@
 import { scriptFontHtml } from './editor/script-fonts'
-import { carryDocSeen } from './ai/tools'
+import { carryDocSeen } from './doc-baseline'
 import { DOC_CSS_COMMITTED_EVENT, WRAP_WIDTHS_COMMITTED_EVENT } from './editor/cjk-punct-shrink'
 import { justifyShrinkPluginKey } from './editor/justify-shrink'
 import { tabReflowMeta } from './editor/decoration-extensions'
@@ -112,7 +112,7 @@ import {
   type MailMergeResponse,
 } from './mail-merge/output'
 import { ZoteroDocumentController } from './zotero/controller'
-import { AiPanel, aiRevisionAuthor } from './ai/AiPanel'
+import { aiRevisionAuthor } from './ai/revision-author'
 import type { AiCommentsAccess, AiDocExtras, AiHeaderFooterAccess } from './ai/tools'
 import type { AiStyleInfo } from './ai/style-ops'
 import { applyResolvedPageSetup, describeSection, type AiPageSetupAccess } from './ai/page-setup'
@@ -141,7 +141,6 @@ import { installHfFloatEdit, tagHfFloatEl } from './editor/hf-float-edit'
 import { hfFooterLine, hfLayoutResolved, hfPhantomSpec, hfWithPhantom } from './hf-phantom'
 import { hfVariantHeightsPx, sectionHfHeights } from './hf-heights'
 import { makeGapNotesEl, measureNoteHeightDom, noteRowMetrics } from './editor/note-dom'
-import { AiAskPopover } from './components/AiAskPopover'
 import { EDIT_QUEUE_MAX, selectionForAnchor, type DocsEditQueueItem } from './ai/edit-queue'
 import { addQueueAnchor, clearQueueAnchors, removeQueueAnchors } from './editor/ai-queue-anchors'
 import {
@@ -542,7 +541,6 @@ const FOLLOW_UP_PASS_DELAY_MS = 100
 const WORD_COUNT_THROTTLE_MS = 400
 /** consecutive follow-up passes a pass may schedule for itself */
 import { runHeadlessDocumentExport } from './headless-export'
-import { installMcpBridge } from './mcp-bridge'
 import {
   clampDocsZoom,
   DOCS_ZOOM_MAX,
@@ -2159,13 +2157,6 @@ export function App() {
     }, 30_000)
     return () => window.clearInterval(timer)
   }, [tornDown])
-
-  // MCP bridge: let an external agent drive this visible editor. Commands arrive
-  // from the shell main process and run against the live ctx (refs refresh per render).
-  useEffect(() => {
-    if (tornDown || !editor) return
-    return installMcpBridge({ getCtx: () => fileCtxRef.current })
-  }, [tornDown, editor])
 
   // Recompute the document-level line-height factor while editing:
   // docStyleCss decides it once at parse time, so typing CJK into a blank document
@@ -8330,55 +8321,6 @@ export function App() {
       />
 
       <div className="app-main">
-        {doc && (
-          <div
-            className={`ai-dock${showAi ? '' : ' collapsed'}${
-              !aiSidebarEnabled && !showAi ? ' ai-dock-off' : ''
-            }`}
-          >
-            {/* always mounted: collapse must not drop state or in-flight runs */}
-            <AiPanel
-              key={aiPanelKey}
-              editor={editor}
-              blocks={doc.parsed.blocks}
-              settings={settings}
-              docEmpty={wordCount === 0}
-              numIdFallback={
-                doc.isBlank ? { bullet: BLANK_BULLET_NUM_ID, ordered: BLANK_ORDERED_NUM_ID } : null
-              }
-              preset={aiPreset}
-              open={showAi}
-              hideRail={!aiSidebarEnabled}
-              onExpand={() => setShowAi(true)}
-              onCollapse={() => setShowAi(false)}
-              filePath={doc?.filePath ?? null}
-              editQueue={editQueue}
-              onQueueEditInstruction={queueUpdate}
-              onQueueRemove={queueRemove}
-              onQueueClear={queueClear}
-              onQueueFocus={queueFocus}
-              onQueueConsume={queueConsume}
-              commentsAccess={aiCommentsAccess}
-              hfAccess={aiHfAccess}
-              pageSetupAccess={aiPageSetupAccess}
-              docExtras={aiDocExtras}
-              notesAccess={aiNotesAccess}
-              trackChanges={trackChanges}
-              trackChangesLocked={isProtected || trackChangesForced}
-              onTrackChangesToggle={() => setTrackChanges((v) => !v)}
-              revisionCount={revisionCount}
-              onRevisions={(action) => {
-                if (!isProtected && !trackChangesForced) handleRevision(action, 'all')
-              }}
-              reviewEntries={allReviewEntries}
-              activeReviewIndex={activeAllReviewIndex}
-              onRevisionSelect={showRevision}
-              onRevisionRange={(action, rev) => {
-                if (!isProtected && !trackChangesForced) handleRevisionRange(action, rev)
-              }}
-            />
-          </div>
-        )}
         <div className="app-content">
           <div className={workspaceClass}>
             {doc && showFind && (
@@ -8405,17 +8347,6 @@ export function App() {
                 pageInfo={pageInfo}
                 onClose={closeNav}
                 cuts={cutsNow}
-              />
-            )}
-            {doc && (
-              <AiAskPopover
-                editor={editor}
-                queueFull={editQueue.length >= EDIT_QUEUE_MAX}
-                getItem={getQueueItem}
-                onSendNow={askSendNow}
-                onQueueAdd={queueAdd}
-                onQueueUpdate={queueUpdate}
-                onQueueRemove={queueRemove}
               />
             )}
             {doc && <PasteOptionsChip editor={editor} />}

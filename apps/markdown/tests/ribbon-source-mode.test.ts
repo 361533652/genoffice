@@ -5,9 +5,6 @@ import { Editor } from '@tiptap/core'
 import { buildExtensions } from '../src/renderer/editor/extensions'
 import { Ribbon } from '../src/renderer/components/Ribbon'
 
-// The assistant is unrelated to the formatting buttons under test.
-vi.mock('../src/renderer/ai/AiPanel', () => ({ GensparkMark: () => null }))
-
 beforeEach(() => vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true))
 const cleanups: Array<() => void> = []
 afterEach(() => {
@@ -39,7 +36,6 @@ function renderRibbon(sourceMode: boolean, sourceViewOpen = false) {
         dirty: false,
         onSave: vi.fn(),
         onSaveAs: vi.fn(),
-        onNameWithAi: vi.fn(),
         onFind: vi.fn(),
         autoSave: false,
         onToggleAutoSave: vi.fn(),
@@ -52,9 +48,6 @@ function renderRibbon(sourceMode: boolean, sourceViewOpen = false) {
         hasOutline: false,
         spellcheck: true,
         onToggleSpellcheck: vi.fn(),
-        aiOpen: false,
-        onToggleAi: vi.fn(),
-        onAiPreset: vi.fn(),
         sourceMode,
         sourceViewOpen,
         onToggleSource: vi.fn(),
@@ -109,9 +102,8 @@ describe('Ribbon source mode', () => {
 
   it('keeps the actions that still apply to source text', () => {
     const container = renderRibbon(true)
-    // the quick-access row is untouched: save, save-as, name-with-ai, undo,
-    // redo, find
-    expect(container.querySelectorAll('.ribbon-tabs .qa-btn').length).toBe(6)
+    // the quick-access row is untouched: save, save-as, undo, redo, find
+    expect(container.querySelectorAll('.ribbon-tabs .qa-btn').length).toBe(5)
     expect(container.querySelector('.autosave-toggle')).not.toBeNull()
   })
 

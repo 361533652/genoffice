@@ -6,8 +6,6 @@ import type { CSSProperties, MouseEvent as ReactMouseEvent } from 'react'
 import { GlobalWorkerOptions, getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs'
 import type { PDFDocumentProxy } from 'pdfjs-dist'
 import workerUrl from 'pdfjs-dist/legacy/build/pdf.worker.min.mjs?url'
-import { AiPanel, GensparkMark } from './ai/AiPanel'
-import { AiAskPopover, type AskAnchorRect } from './AiAskPopover'
 import {
   createSavedAnnotCountsLoader,
   loadSavedAnnots,
@@ -1026,8 +1024,6 @@ export default function App() {
     lastPage: number
     text: string
   } | null>(null)
-  /** Ask-AI popover opened from the markup bar; the anchor rect is captured at open */
-  const [askPop, setAskPop] = useState<{ rect: AskAnchorRect; excerpt: string } | null>(null)
   /** Whole-document saved-annotation counts per original page for the AI context.
       The scan starts on first AI use, not when the document opens. */
   const [aiAnnotCounts, setAiAnnotCounts] = useState<SavedAnnotCounts | null>(null)
@@ -1467,7 +1463,6 @@ export default function App() {
       if (renderedPages) await renderedPages
       if (!saved) {
         setAiSelection(null)
-        setAskPop(null)
         setMarkups([])
         setRedactions([])
         redactionApplyConfirmedRef.current = false
@@ -2855,24 +2850,7 @@ export default function App() {
     )
   }
 
-  /** Ask-AI entry on the markup bar: capture the selection box as the popover
-      anchor now (the bar's mousedown preventDefault kept the selection alive up
-      to this click; the popover input will collapse it) */
-  const openAskPopover = () => {
-    const sel = window.getSelection()
-    const box =
-      sel && !sel.isCollapsed && sel.rangeCount > 0
-        ? sel.getRangeAt(0).getBoundingClientRect()
-        : null
-    const rect: AskAnchorRect | null = box
-      ? { left: box.left, top: box.top, right: box.right, bottom: box.bottom }
-      : selPopup
-        ? { left: selPopup.x, top: selPopup.y, right: selPopup.x, bottom: selPopup.y + 36 }
-        : null
-    if (!rect) return
-    setSelPopup(null)
-    setAskPop({ rect, excerpt: aiSelection?.text ?? sel?.toString() ?? '' })
-  }
+
 
   /** Markup types the whole current selection already carries — shown as pressed
       buttons in the bar (clicking one removes the markup) */
@@ -7501,8 +7479,7 @@ export default function App() {
       if (e.key === 'Escape') {
         // Modal dialogs own Escape; the states behind them must not react too
         if (signDlg || stampDlg || propsDlg) return
-        if (askPop) setAskPop(null)
-        else if (textDraft) setTextDraft(null)
+        if (textDraft) setTextDraft(null)
         else if (pendingTextInsert) setPendingTextInsert(null)
         else if (imagePick) setImagePick(null)
         else if (editTextMode) setEditTextMode(false)
@@ -7694,10 +7671,7 @@ export default function App() {
   const menuInsertAfter = menuInGap ? (thumbMenu.afterOrigIdx ?? -1) : menuOrig
 
   /** Ribbon AI buttons: expand the dock and auto-run the prompt in the assistant */
-  const runAiPreset = (text: string): void => {
-    setAiCollapsed(false)
-    setAiPreset({ text, nonce: Date.now() })
-  }
+
 
   /** Converter dropdown → the shell's local conversion flows (save dialog, password prompt) */
   const convertTo = async (format: PdfConvertFormat): Promise<void> => {
@@ -8207,54 +8181,6 @@ export default function App() {
         <div className="ribbon-body" data-ribbon-body="">
           {ribbonTab === 'home' && (
             <>
-              {/* ---- Genspark AI (first slot: entry + one-click AI actions, docs parity) ---- */}
-              <div className="ribbon-group">
-                <div className="ribbon-group-items">
-                  <button
-                    className={`rb-big ai-entry${aiCollapsed ? '' : ' active'}`}
-                    data-tip={t('aiOpenAssistant')}
-                    onClick={() => setAiCollapsed((v) => !v)}
-                  >
-                    <span className="rb-big-icon">
-                      <GensparkMark size={26} />
-                    </span>
-                    <span>Genspark AI</span>
-                  </button>
-                  <button
-                    className="rb-big ai-entry"
-                    data-tip={t('aiSummarizeBtn')}
-                    onClick={() =>
-                      runAiPreset(
-                        t(aiSelection ? 'aiQuickSummarySelPrompt' : 'aiQuickSummaryPrompt'),
-                      )
-                    }
-                  >
-                    <span className="rb-big-icon">
-                      <span className="ai-feature-icon" aria-hidden="true">
-                        <IconAiSummarize />
-                      </span>
-                    </span>
-                    <span>{t('aiSummarizeBtn')}</span>
-                  </button>
-                  <button
-                    className="rb-big ai-entry"
-                    data-tip={t('aiKeyPointsBtn')}
-                    onClick={() =>
-                      runAiPreset(
-                        t(aiSelection ? 'aiQuickKeyPointsSelPrompt' : 'aiQuickKeyPointsPrompt'),
-                      )
-                    }
-                  >
-                    <span className="rb-big-icon">
-                      <span className="ai-feature-icon" aria-hidden="true">
-                        <IconAiKeyPoints />
-                      </span>
-                    </span>
-                    <span>{t('aiKeyPointsBtn')}</span>
-                  </button>
-                </div>
-              </div>
-              <div className="ribbon-sep" />
               {markupGroup}
               <div className="ribbon-sep" />
               {/* Edit entries lead; Search moved after page/zoom (⌘F is the common path) */}
@@ -8348,36 +8274,6 @@ export default function App() {
           )}
           {ribbonTab === 'annotate' && (
             <>
-              <div className="ribbon-group">
-                <div className="ribbon-group-items">
-                  <button
-                    className="rb-big ai-entry"
-                    data-tip={t('aiReviewSummaryBtn')}
-                    onClick={() => runAiPreset(t('aiReviewSummaryPrompt'))}
-                  >
-                    <span className="rb-big-icon">
-                      <span className="ai-feature-icon" aria-hidden="true">
-                        <IconAiSummarize />
-                      </span>
-                    </span>
-                    <span>{t('aiReviewSummaryBtn')}</span>
-                  </button>
-                  <button
-                    className="rb-big ai-entry"
-                    disabled={readOnly}
-                    data-tip={t('aiProcessNotesBtn')}
-                    onClick={() => runAiPreset(t('aiProcessNotesPrompt'))}
-                  >
-                    <span className="rb-big-icon">
-                      <span className="ai-feature-icon" aria-hidden="true">
-                        <GensparkMark size={20} />
-                      </span>
-                    </span>
-                    <span>{t('aiProcessNotesBtn')}</span>
-                  </button>
-                </div>
-              </div>
-              <div className="ribbon-sep" />
               {markupGroup}
               <div className="ribbon-sep" />
               <div className="ribbon-group">
@@ -8604,17 +8500,6 @@ export default function App() {
             <>
               <div className="ribbon-group">
                 <div className="ribbon-group-items">
-                  <button
-                    className="rb-big ai-entry"
-                    disabled={readOnly}
-                    data-tip={t('aiFillFormBtn')}
-                    onClick={() => runAiPreset(t('aiFillFormPrompt'))}
-                  >
-                    <span className="rb-big-icon">
-                      <IconFormAiFill />
-                    </span>
-                    <span>{t('aiFillFormBtn')}</span>
-                  </button>
                   <button
                     className={`rb-big${pendingStaticFill === 'text' ? ' active' : ''}`}
                     disabled={readOnly}
@@ -9107,31 +8992,7 @@ export default function App() {
       <div className="app-main">
         {/* dock wrapper animates the width between panel and rail (docs-style 180ms ease);
               the panel stays mounted while collapsed so the chat history survives */}
-        <div
-          className={`ai-dock${aiCollapsed ? ' collapsed' : ''}${
-            !aiSidebarEnabled && aiCollapsed ? ' ai-dock-off' : ''
-          }`}
-        >
-          {aiCollapsed && aiSidebarEnabled && (
-            <button
-              className="ai-rail"
-              data-tip={t('aiOpenAssistant')}
-              aria-label={t('aiOpenAssistant')}
-              onClick={() => setAiCollapsed(false)}
-            >
-              <GensparkMark size={22} />
-            </button>
-          )}
-          <AiPanel
-            api={aiApi}
-            filePath={filePath}
-            preset={aiPreset}
-            onCollapse={() => setAiCollapsed(true)}
-            onRunDone={() => void autoSaveAfterAiRun()}
-            onClearSelection={() => setAiSelection(null)}
-          />
-        </div>
-        <div className="app-content">
+                <div className="app-content">
           {digitalSignatures.length > 0 && (
             <div className={`pdf-sig-banner ${overallSignatureStatus(digitalSignatures)}`}>
               <IconSignatures />
@@ -9458,8 +9319,7 @@ export default function App() {
               onScroll={() => {
                 handleScroll()
                 setSelPopup(null)
-                setAskPop(null)
-                setSelected(null)
+                        setSelected(null)
                 clearLineHover()
                 clearBlockHover()
               }}
@@ -10897,34 +10757,8 @@ export default function App() {
                     <span className="pdf-sel-popup-sep" aria-hidden />
                   </>
                 )}
-                <button
-                  type="button"
-                  className="pdf-sel-ask"
-                  data-tip={t('aiAskTitle')}
-                  aria-label={t('aiAskBtn')}
-                  onClick={openAskPopover}
-                >
-                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden>
-                    <path
-                      d="M12 3l1.7 4.6L18 9.3l-4.3 1.7L12 15.6l-1.7-4.6L6 9.3l4.3-1.7L12 3zM19 15l.85 2.3L22 18.15l-2.15.85L19 21.3l-.85-2.3-2.15-.85 2.15-.85L19 15z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                  {t('aiAskBtn')}
-                </button>
+                
               </div>
-            )}
-            {askPop && (
-              <AiAskPopover
-                rect={askPop.rect}
-                excerpt={askPop.excerpt}
-                readOnly={readOnly}
-                onSend={(text) => {
-                  setAskPop(null)
-                  runAiPreset(text)
-                }}
-                onClose={() => setAskPop(null)}
-              />
             )}
             {selected && (
               <div

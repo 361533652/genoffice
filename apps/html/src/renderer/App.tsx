@@ -3,13 +3,9 @@ import {
   Dropdown,
   FindPanel,
   type FindFocusRequest,
-  type AiScopeQuoteData,
   useAutoSavePref,
   type FindPanelStrings,
   type FindTarget,
-  aiPanelInitiallyOpen,
-  rememberAiPanelOpen,
-  useAiSidebarEnabled,
 } from '@genoffice/ui'
 import {
   pollUntilReady,
@@ -27,11 +23,7 @@ import { PreviewFrame, type PreviewFrameHandle } from './preview/PreviewFrame'
 import { instrumentForPreview } from './preview/instrument'
 import type { ComputedSnapshot, ElementRect, FromInspector } from './preview/inspector-protocol'
 import inspectorSource from './preview/inspector.js?raw'
-import { AiPanel, GensparkMark, type AiPreset, type HtmlAiDeps } from './ai/AiPanel'
-import { AiAskPopover, type AnchorRect, type AskMode } from './components/AiAskPopover'
 import {
-  EDIT_QUEUE_MAX,
-  buildSelectionInstruction,
   resolveQueueItem,
   type EditQueueItem,
 } from './ai/edit-queue'
@@ -147,12 +139,7 @@ export default function App() {
   const [previewNonce, setPreviewNonce] = useState(0)
   const [draftHtml, setDraftHtml] = useState<string | null>(null)
   const [historyState, setHistoryState] = useState({ undo: false, redo: false })
-  const [aiOpen, setAiOpen] = useState(() => aiPanelInitiallyOpen('htmlapp.showAi'))
   // the sidebar switch is a soft hide; it closes the panel when it turns off
-  const aiSidebarEnabled = useAiSidebarEnabled(setAiOpen)
-  const [aiPreset, setAiPreset] = useState<AiPreset | null>(null)
-  const [editQueue, setEditQueue] = useState<EditQueueItem[]>([])
-  const [askMode, setAskMode] = useState<AskMode | null>(null)
   const [selectedSid, setSelectedSid] = useState<number | null>(null)
   const [selectedState, setSelectedState] = useState<NodeState>('static')
   const [textSel, setTextSel] = useState<TextSel | null>(null)
@@ -242,7 +229,6 @@ export default function App() {
   const mapSourceRef = useRef('')
   const pathRef = useRef<string | null>(null)
   const selectedSidRef = useRef<number | null>(null)
-  const editQueueRef = useRef<EditQueueItem[]>([])
   const canvasModeRef = useRef<CanvasMode>('edit')
   const queueSeqRef = useRef(0)
   /** brief confirmed on the AI card; pinned into the head of the next generated document */
@@ -256,7 +242,6 @@ export default function App() {
   const barRef = useRef<HTMLDivElement>(null)
   pathRef.current = path
   textRef.current = text
-  editQueueRef.current = editQueue
   canvasModeRef.current = canvasMode
   savedTextRef.current = savedText
   statusRef.current = status
@@ -368,10 +353,6 @@ export default function App() {
     prevCanvasModeRef.current = canvasMode
     previewRef.current?.post({ type: 'gx:setMode', mode: frameMode(canvasMode) })
   }, [canvasMode])
-
-  useEffect(() => {
-    rememberAiPanelOpen('htmlapp.showAi', aiOpen)
-  }, [aiOpen])
 
   useEffect(() => {
     localStorage.setItem('htmlapp.device', device)
@@ -647,24 +628,6 @@ export default function App() {
   )
   selectSidRef.current = selectSid
 
-  /** numbered pins for queued edits; stale items (element gone) get no pin */
-  const postMarks = useCallback(() => {
-    const items = canvasModeRef.current === 'present' ? [] : editQueueRef.current
-    // no getMap() before the document is loaded: it would cache an empty map under version 0
-    const map = items.length ? getMap() : null
-    const src = textRef.current
-    // one pin per element; several queued edits on the same element share it and list their ordinals
-    const bySid = new Map<number, string[]>()
-    const proj = map && buildProjection(src, map)
-    items.forEach((item, i) => {
-      const target = proj && resolveQueueItem(proj, map, item).target
-      if (target) bySid.set(target.sid, [...(bySid.get(target.sid) ?? []), String(i + 1)])
-    })
-    const marks = [...bySid].map(([sid, ordinals]) => ({ sid, label: ordinals.join('·') }))
-    previewRef.current?.post({ type: 'gx:mark', marks })
-  }, [getMap])
-  useEffect(postMarks, [editQueue, canvasMode, postMarks])
-
   const onInspectorMessage = useCallback(
     (msg: FromInspector) => {
       // a click that lands while the frame is reloading carries sids from the previous copy
@@ -681,19 +644,6 @@ export default function App() {
           if (editAfterLoadRef.current !== null && editAfterLoadRef.current === sid)
             previewRef.current?.post({ type: 'gx:beginTextEdit', sid })
           editAfterLoadRef.current = null
-          postMarks()
-          return
-        }
-        case 'gx:markClick': {
-          const map = getMap()
-          const proj = buildProjection(textRef.current, map)
-          // a shared pin opens the most recent edit on that element; the others stay reachable from the queue card
-          const item = editQueueRef.current
-            .filter((q) => resolveQueueItem(proj, map, q).target?.sid === msg.sid)
-            .at(-1)
-          if (!item) return
-          selectSid(item.sid, { reveal: true })
-          setAskMode({ kind: 'edit', qid: item.qid })
           return
         }
         case 'gx:select': {
@@ -800,7 +750,6 @@ export default function App() {
             moveSelectedRef.current(msg.command === 'moveUp' ? -1 : 1)
           else if (msg.command === 'delete') runManual([{ op: 'remove', sid }], 'clear')
           else if (msg.command === 'escape') selectSid(null)
-          else if (msg.command === 'askAi') setAskMode({ kind: 'new' })
           else if (msg.command === 'bold') wrapSelectionRef.current('strong')
           else if (msg.command === 'italic') wrapSelectionRef.current('em')
           else if (msg.command === 'parent' && e.parentSid !== null) {
@@ -836,7 +785,7 @@ export default function App() {
           return
       }
     },
-    [getMap, postMarks, runManual, selectSid, t, flushPending],
+    [getMap, runManual, selectSid, t, flushPending],
   )
 
   // the source cursor picks the covering element (no reveal: the user is already there)
@@ -870,9 +819,6 @@ export default function App() {
       setTextSel(null)
   }
   wrapSelectionRef.current = wrapSelection
-  const askAi = () => {
-    if (selectedEntry) setAskMode({ kind: 'new' })
-  }
   const setAttr = (name: string, value: string | null) => {
     // may run from the panel's unmount after the element was deleted
     if (selectedEntry && getMap().bySid.has(selectedEntry.sid))
@@ -998,74 +944,6 @@ export default function App() {
     cropHint: t('imageCropHint'),
   }
 
-  // ── element-scoped AI edits: queue them on the selected element or run one right away ──
-  const askTarget = useMemo(() => {
-    if (!selectedEntry || STRUCTURAL.has(selectedEntry.tag)) return null
-    return {
-      sid: selectedEntry.sid,
-      tag: selectedEntry.tag,
-      // user-facing popover: the raw source text, unlike the queue's model-facing excerpt
-      excerpt: sourceText(text, selectedEntry).trim() || `<${selectedEntry.tag}>`,
-      start: selectedEntry.range[0],
-    }
-  }, [selectedEntry, text])
-  const queueAdd = (instruction: string) => {
-    setAskMode(null)
-    if (!askTarget || editQueue.length >= EDIT_QUEUE_MAX) return
-    const qid = `q${++queueSeqRef.current}`
-    setEditQueue((prev) => [
-      ...prev,
-      { qid, sid: askTarget.sid, tag: askTarget.tag, capturedText: askTarget.excerpt, instruction },
-    ])
-    setAiOpen(true)
-  }
-  const queueUpdate = (qid: string, instruction: string) => {
-    setAskMode(null)
-    setEditQueue((prev) => prev.map((q) => (q.qid === qid ? { ...q, instruction } : q)))
-  }
-  const queueRemove = (qid: string) => {
-    setAskMode(null)
-    setEditQueue((prev) => prev.filter((q) => q.qid !== qid))
-  }
-  const queueConsume = (qids: string[]) =>
-    setEditQueue((prev) => prev.filter((q) => !qids.includes(q.qid)))
-  const queueFocus = (qid: string) => {
-    const item = editQueue.find((q) => q.qid === qid)
-    const target = item && resolveQueueItem(buildProjection(text, getMap()), getMap(), item).target
-    if (target) selectSid(target.sid, { reveal: true })
-  }
-  const askSendNow = (instruction: string) => {
-    setAskMode(null)
-    if (!askTarget) return
-    flushPending()
-    setAiOpen(true)
-    const scope: AiScopeQuoteData = {
-      label: t('aiScopeElement', { tag: askTarget.tag }),
-      ...(askTarget.excerpt.trim() ? { text: askTarget.excerpt.trim() } : {}),
-    }
-    setAiPreset({
-      text: buildSelectionInstruction(askTarget, instruction),
-      displayText: instruction,
-      nonce: Date.now(),
-      scope,
-    })
-  }
-  /** viewport rect of the selected element, clipped to the stage; identity changes whenever the geometry does */
-  const getAskAnchorRect = useCallback((): AnchorRect | null => {
-    // stageTick: the stage moved or resized (AI dock, split view, device recentre) without the frame-local rect changing
-    void stageTick
-    const stage = stageRef.current?.getBoundingClientRect()
-    const host = stageRef.current?.querySelector('.preview-host')?.getBoundingClientRect()
-    if (!selRect || !stage || !host) return null
-    const z = zoom / 100
-    const left = Math.max(stage.left, host.left + selRect.x * z)
-    const top = Math.max(stage.top, host.top + selRect.y * z)
-    const right = Math.min(stage.right, host.left + (selRect.x + selRect.width) * z)
-    const bottom = Math.min(stage.bottom, host.top + (selRect.y + selRect.height) * z)
-    if (right <= left || bottom <= top) return null
-    return { left, top, right, bottom, viewTop: stage.top, viewBottom: stage.bottom }
-  }, [selRect, zoom, stageTick])
-
   // ── live style editing: poke the preview DOM now, write one set_style op to the source shortly after ──
   const flushStyles = useCallback(() => {
     if (styleTimerRef.current !== null) window.clearTimeout(styleTimerRef.current)
@@ -1114,7 +992,6 @@ export default function App() {
         return mode
       })
       flushPending()
-      setAskMode(null)
     },
     [flushPending, selectSid],
   )
@@ -1593,49 +1470,6 @@ export default function App() {
     }
   }, [autoSave, path, doSave, flushPending])
 
-  const aiDeps: HtmlAiDeps = {
-    access: {
-      getText: () => textRef.current,
-      getVersion: () => versionRef.current,
-      getMap,
-      getLastManualVersion: () => lastManualVersionRef.current,
-      getFilePath: () => pathRef.current,
-      getSelectedSid: () => selectedSidRef.current,
-      applyOps: (ops) => {
-        flushPending()
-        return applyOps(ops, false)
-      },
-      replaceAll: (html) => replaceAll(html, true),
-    },
-    getSnapshot: () => ({ text: textRef.current }),
-    restoreSnapshot: (snapshot) => replaceAll(snapshot.text, false),
-    onPrompt: (text) => {
-      if (pathRef.current || provisionalNameRef.current) return
-      const name = deriveNameFromPrompt(text)
-      if (!name) return
-      provisionalNameRef.current = name
-      window.htmlApi.setProvisionalTitle(name)
-    },
-    onRunDone: (mutated) => {
-      // AI wrote into a never-saved document: save it silently under the page's own title,
-      // falling back to the name of the request that started it
-      if (!mutated || pathRef.current) return
-      const text = textRef.current
-      const name = localFileName(text, provisionalNameRef.current)
-      if (name) void doSave('save', name)
-    },
-    clearHighlights: () => editorRef.current?.clearHighlights(),
-    onBriefConfirmed: (brief) => {
-      briefRef.current = brief
-    },
-    previewDraft: setDraftHtml,
-    navigateTo: (sid) => {
-      const e = getMap().bySid.get(sid)
-      if (!e) return
-      selectSid(sid, { reveal: true })
-    },
-  }
-
   const statusText = useMemo(() => {
     if (saveState === 'saving') return t('saving')
     if (saveState === 'failed') return t('saveFailedStatus')
@@ -1688,7 +1522,6 @@ export default function App() {
         dirty={dirty}
         onSave={() => void doSave('save')}
         onSaveAs={() => void doSave('saveAs')}
-        onNameWithAi={() => void nameWithAi()}
         onFind={() => openFind(false)}
         canUndo={historyState.undo}
         canRedo={historyState.redo}
@@ -1704,51 +1537,15 @@ export default function App() {
         onToggleAutoSave={setAutoSave}
         view={view}
         onView={setView}
-        aiOpen={aiOpen}
-        onToggleAi={() => setAiOpen((v) => !v)}
         canInsert={canvasMode === 'edit'}
         onInsert={(kind, opts) => void insertElement(kind, opts)}
         onInsertSkeleton={insertSkeleton}
         canInsertSkeleton={canvasMode === 'edit' && isDocEmpty(textRef.current)}
-        onAiPreset={(text) => {
-          flushPending()
-          setAiOpen(true)
-          setAiPreset({ text, nonce: Date.now() })
-        }}
         canvasMode={canvasMode}
         onPresent={startPresent}
       />
 
       <div className="app-main">
-        <div
-          className={`ai-dock${aiOpen ? '' : ' collapsed'}${
-            !aiSidebarEnabled && !aiOpen ? ' ai-dock-off' : ''
-          }`}
-        >
-          {!aiOpen && aiSidebarEnabled && (
-            <button
-              className="ai-rail"
-              data-tip={t('aiOpenAssistant')}
-              aria-label={t('aiOpenAssistant')}
-              onClick={() => setAiOpen(true)}
-            >
-              <GensparkMark size={18} />
-            </button>
-          )}
-          {/* stays mounted while collapsed: an in-flight run, its snapshots and the loop context survive */}
-          <AiPanel
-            deps={aiDeps}
-            filePath={path}
-            preset={aiPreset}
-            editQueue={editQueue}
-            onQueueEditInstruction={queueUpdate}
-            onQueueRemove={queueRemove}
-            onQueueClear={() => setEditQueue([])}
-            onQueueFocus={queueFocus}
-            onQueueConsume={queueConsume}
-            onCollapse={() => setAiOpen(false)}
-          />
-        </div>
         <div className="app-content">
           {diskNotice && (
             <div className="disk-notice" role="status">
@@ -1828,8 +1625,6 @@ export default function App() {
                       onReplaceImage={replaceImage}
                       onCropImage={() => void openPictureDialog('crop')}
                       onCutoutImage={() => void openPictureDialog('cutout')}
-                      canAskAi={askTarget !== null}
-                      onAskAi={askAi}
                       tag={selectedEntry.tag}
                       onMove={moveSelected}
                       onDuplicate={duplicateSelected}
@@ -1948,26 +1743,6 @@ export default function App() {
           </footer>
         </div>
       </div>
-      {askTarget && askMode && canvasMode !== 'present' && (
-        <AiAskPopover
-          key={askMode.kind === 'edit' ? askMode.qid : 'new'}
-          target={askTarget}
-          mode={askMode}
-          initialText={
-            askMode.kind === 'edit'
-              ? editQueue.find((q) => q.qid === askMode.qid)?.instruction
-              : undefined
-          }
-          getAnchorRect={getAskAnchorRect}
-          onSubmit={(instruction) =>
-            askMode.kind === 'edit' ? queueUpdate(askMode.qid, instruction) : queueAdd(instruction)
-          }
-          onCancel={() => setAskMode(null)}
-          onSendNow={askSendNow}
-          onRemove={() => askMode.kind === 'edit' && queueRemove(askMode.qid)}
-          queueFull={editQueue.length >= EDIT_QUEUE_MAX}
-        />
-      )}
       {redactDialog && (
         <RedactDialog
           seed={redactDialog.seed}

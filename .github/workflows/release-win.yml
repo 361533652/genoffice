@@ -1,0 +1,104 @@
+name: Release Windows
+
+# Build the NSIS .exe installer on every push to main and attach it to a
+# GitHub Release. Fork-friendly: no signing certs, no update feed, no GA4 —
+# electron-builder.cjs omits all of those when the env vars are unset.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: release-win-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  build-win:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo (xlsx-sidecar)
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/sheets/native/xlsx-engine
+
+      - name: Cache electron binaries
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~\AppData\Local\electron\Cache
+            ~\AppData\Local\electron-builder\Cache
+          key: electron-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: electron-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Unique 3-part semver per push: major.minor from apps/shell/package.json,
+      # patch = run number. electron-builder validates semver (a 4-segment
+      # 0.12.0.N is rejected), and run numbers only ever increase, so NSIS
+      # upgrades and release tags stay monotonic.
+      - name: Compute version
+        id: ver
+        shell: pwsh
+        run: |
+          $base = (Get-Content apps/shell/package.json -Raw | ConvertFrom-Json).version
+          $p = $base.Split('.')
+          $v = "$($p[0]).$($p[1]).${{ github.run_number }}"
+          "version=$v" >> $env:GITHUB_OUTPUT
+          "tag=v$v" >> $env:GITHUB_OUTPUT
+          Write-Host "Release version: $v"
+
+      # The shell workspace's dist:win runs notices -> electron-vite build ->
+      # electron-builder, but the six module out/ trees and the CLI bundle are
+      # extraResources: build them first or beforePack refuses to pack.
+      - name: Build all apps + CLI
+        run: npm run build:all
+
+      # dist:win re-runs the shell build (cheap); beforePack compiles win-ocr.exe
+      # (windows-latest ships the SDK metadata csc needs) and checks the sidecar.
+      # Host-native MSVC output is an accepted candidate for an x64 package.
+      - name: Build xlsx-sidecar
+        run: npm run native:build -w @genoffice/sheets
+
+      - name: Package NSIS installer
+        run: npm run dist:win -w @genoffice/shell -- -c.extraMetadata.version=${{ steps.ver.outputs.version }} --publish never
+
+      - name: Collect artifacts
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem apps/shell/release -Filter '*.exe' | Select-Object -First 1
+          if (-not $exe) { throw 'no installer produced' }
+          Get-ChildItem apps/shell/release -File |
+            Select-Object Name, @{n='MB';e={[math]::Round($_.Length/1MB,1)}} |
+            Format-Table -AutoSize
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: GenOffice ${{ steps.ver.outputs.version }} (Windows x64)
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          # Only the installer: latest.yml / blockmap are produced only when
+          # GENOFFICE_UPDATE_URL injects a publish config, which fork builds
+          # deliberately leave unset.
+          files: |
+            apps/shell/release/*.exe

@@ -91,33 +91,33 @@ function selected(): string[] {
 }
 
 describe('Home sidebar navigation', () => {
-  it.each(['Recent', 'Starred'])('shows only Ask AI as selected after leaving %s', async (from) => {
-    await click(nav(from))
-    expect(selected()).toEqual([from])
-    await click(nav('Ask AI'))
-    expect(container.querySelector('.kb-ask')).not.toBeNull()
-    expect(selected()).toEqual(['Ask AI'])
-    expect(nav('Ask AI').getAttribute('aria-current')).toBe('page')
-    expect(nav(from).hasAttribute('aria-current')).toBe(false)
-    expect(fetch).not.toHaveBeenCalled()
+  // The Ask-AI nav entry and the Genspark cloud entry are gone from this build:
+  // the sidebar only switches between Recent and Starred, and the type filter
+  // survives the trip in both directions.
+  it.each(['Recent', 'Starred'])('selects only %s and keeps the other entry unselected', async (from) => {
     await click(nav(from))
     expect(selected()).toEqual([from])
     expect(nav(from).getAttribute('aria-current')).toBe('page')
-    expect(container.querySelector('.kb-ask')).toBeNull()
-    expect(container.querySelector('.content')?.textContent).toContain('brief.docx')
-    if (from === 'Starred')
-      expect(container.querySelector('.content')?.textContent).not.toContain('budget.xlsx')
+    const other = from === 'Recent' ? 'Starred' : 'Recent'
+    expect(nav(other).hasAttribute('aria-current')).toBe(false)
+    expect(fetch).not.toHaveBeenCalled()
   })
 
-  it('keeps the file-type filter when returning from Ask AI', async () => {
+  it('offers no Ask-AI or cloud nav entry', () => {
+    expect(nav('Ask AI')).toBeUndefined()
+    expect(nav('Cloud Projects')).toBeUndefined()
+    expect(container.querySelectorAll('.sidebar-nav .nav-item')).toHaveLength(2)
+  })
+
+  it('keeps the file-type filter while switching views', async () => {
     const docs = [...container.querySelectorAll<HTMLButtonElement>('.filter-pill')].find(
       (button) => button.textContent === 'Docs',
     )!
     await click(docs)
     expect(container.querySelector('.content')?.textContent).toContain('brief.docx')
     expect(container.querySelector('.content')?.textContent).not.toContain('budget.xlsx')
-    await click(nav('Ask AI'))
-    expect(selected()).toEqual(['Ask AI'])
+    await click(nav('Starred'))
+    expect(selected()).toEqual(['Starred'])
     await click(nav('Recent'))
     expect(container.querySelector('.filter-pill.active')?.textContent).toBe('Docs')
     expect(container.querySelector('.content')?.textContent).toContain('brief.docx')

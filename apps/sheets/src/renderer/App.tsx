@@ -56,7 +56,6 @@ import {
   type SheetPasswordHash,
 } from '@genoffice/xlsx-gateway/gateway/xlsx-protection-hash'
 import { applyChangePlan, planFromOps, type OpExecutorContext } from './op-executor'
-import { installSheetsMcpBridge, type McpSheetHandlers } from './mcp-bridge'
 import { renameChartRefsForSheet } from './workbook-ops'
 import {
   proposeOperations as proposeOperationsImpl,
@@ -1042,8 +1041,6 @@ export function App({
       explicitTarget?: { path: string; overwrite: boolean },
     ) => Promise<SaveOutcome>
   >(() => Promise.resolve({ ok: false }))
-  /// Latest MCP bridge handlers (assigned each render; see the install below).
-  const mcpSheetHandlersRef = useRef<McpSheetHandlers | null>(null)
   const closeSaveRef = useRef<() => Promise<void>>(() => Promise.resolve())
   const commitActiveEditor = useCallback(async (): Promise<boolean> => {
     const editor = univerRef.current?.univerAPI.getActiveWorkbook() as
@@ -5573,127 +5570,6 @@ export function App({
   }
   handleSaveRef.current = handleSave
 
-  // MCP visible-grid session (planning/mcp-server.md phase 2): the shell pushes
-  // read/apply/save commands; they run through the same executors the built-in
-  // AI uses. Handlers go through a ref so the bridge never sees stale closures.
-  mcpSheetHandlersRef.current = {
-    hasWorkbook: () =>
-      univerRef.current?.univerAPI.getActiveWorkbook() != null && lazyWorkbookRef.current != null,
-    context: () => getActiveSheetInfo(),
-    // The MCP read is machine-facing: `value` is the model value, not the
-    // rendered text a number format or a narrow column produced. The rendered
-    // text rides along as `display` when the two differ, so a caller can still
-    // see what the user sees (see modelCellValue).
-    readCells: (addresses, sheetId) => {
-      const cells = readCellsImpl(readContext(), addresses, sheetId)
-      return Object.fromEntries(
-        Object.entries(cells).map(([address, cell]) => {
-          const value = modelCellValue(cell)
-          return [
-            address,
-            {
-              value,
-              ...(cell.value !== value ? { display: cell.value } : {}),
-              ...(cell.formula === undefined ? {} : { formula: cell.formula }),
-            },
-          ]
-        }),
-      )
-    },
-    sheets: () => getActiveSheetInfo().sheets.map((sheet) => ({ id: sheet.id, name: sheet.name })),
-    // The user is watching this grid, so an edit to a sheet the view is not
-    // showing would otherwise land invisibly. Switch the tab and bring the
-    // first cell of the batch (or the sheet's top-left) into view — the same
-    // jump the find bar performs on a hit.
-    focusSheet: (sheetId, address) => {
-      const runtime = univerRef.current
-      if (!runtime) return
-      const workbook = runtime.univerAPI.getActiveWorkbook()
-      const worksheet = workbook?.getSheetBySheetId(sheetId)
-      if (!workbook || !worksheet) return
-      focusWorksheet(worksheet, () => {
-        if (worksheet.getSheetId() !== workbook.getActiveSheet()?.getSheetId()) {
-          workbook.setActiveSheet(worksheet)
-        }
-      })
-      if (address === undefined) return
-      try {
-        const { row, column } = parseAddress(address)
-        void ensureLazyRangeLoaded(
-          runtime,
-          lazyWorkbookRef,
-          worksheet,
-          { startRow: row, endRow: row, startColumn: column, endColumn: column },
-          setMessage,
-        )
-        worksheet.getRange(row, column, 1, 1).activate()
-      } catch {
-        /* the address is malformed, or the workbook closed mid-jump */
-      }
-    },
-    applyOps: async (ops, dryRun) => {
-      const runtime = univerRef.current
-      const state = lazyWorkbookRef.current
-      const workbook = runtime?.univerAPI.getActiveWorkbook()
-      if (!runtime || !state || !workbook) {
-        return { ok: false, reason: t('appNoWorkbookOpen') }
-      }
-      if (dryRun) {
-        try {
-          const plan = planFromOps(ops, workbook, 'mcp')
-          return {
-            ok: true,
-            dryRun: true,
-            structuralChanges: plan.structuralChanges.map((change) => change.label),
-            formatChanges: plan.formatChanges.map((change) => change.label),
-            cellChanges: plan.cellChanges
-              .slice(0, 100)
-              .map((change) => ({ address: change.address, after: change.after.value })),
-            cellChangeCount: plan.cellChanges.length,
-            sheetRenames: plan.sheetRenames.map((rename) => `${rename.before} -> ${rename.after}`),
-          }
-        } catch (error: unknown) {
-          return { ok: false, reason: error instanceof Error ? error.message : String(error) }
-        }
-      }
-      const outcome = await runUiOps(ops)
-      if (!outcome.ok) return outcome
-      // A formula's text lands synchronously but its result is computed
-      // asynchronously, so an immediate read of the cells this batch targeted
-      // would show null and an agent could read that as a failed edit. Report
-      // the computed values with the result (see formula-values.ts).
-      const targets = formulaTargetsFromOps(ops)
-      if (targets.length === 0) return outcome
-      const values = await awaitFormulaValues(targets, (addresses, sheetId) =>
-        readCellsImpl(readContext(), [...addresses], sheetId),
-      )
-      // Remember which cells settled so the next save can write a real cached
-      // <v> for them (the overlay skips the very cells a batch just wrote); the
-      // value itself is read live at save time, see formula-values.ts.
-      for (const cell of values) {
-        rememberFormulaValue(cell.sheetId, cell.address, { formula: cell.formula ?? '' })
-      }
-      return { ...outcome, formulaValues: values }
-    },
-    saveTo: async (path, overwrite) => handleSave('save-as', true, { path, overwrite }),
-  }
-  useEffect(() => {
-    const handlers = mcpSheetHandlersRef
-    return installSheetsMcpBridge({
-      hasWorkbook: () => handlers.current?.hasWorkbook() ?? false,
-      context: () => handlers.current?.context(),
-      readCells: (addresses, sheetId) => handlers.current?.readCells(addresses, sheetId) ?? {},
-      sheets: () => handlers.current?.sheets() ?? [],
-      focusSheet: (sheetId, address) => handlers.current?.focusSheet(sheetId, address),
-      applyOps: async (ops, dryRun) =>
-        (await handlers.current?.applyOps(ops, dryRun)) ?? { ok: false, reason: 'not ready' },
-      saveTo: async (path, overwrite) =>
-        (await handlers.current?.saveTo(path, overwrite)) ?? {
-          ok: false,
-          error: 'the spreadsheet is not ready',
-        },
-    })
-  }, [])
   /// Re-renders the floating visuals after a journal mutation (edits and
   /// their undo/redo closures share it).
   function refreshLazyVisuals(state: LazyWorkbookState): void {

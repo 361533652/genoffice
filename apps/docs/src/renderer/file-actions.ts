@@ -85,7 +85,7 @@ import {
 } from './editor/ink'
 import { t, getLang } from './i18n/locale'
 import { isBlankDocument, parseHtmlFragment, replaceBlockRange } from './ai/protocol'
-import { carryDocSeen } from './ai/tools'
+import { carryDocSeen } from './doc-baseline'
 import { isDocDirty, resetCrossDocEditState } from './doc-dirty'
 import { pruneUnreferencedNumbering } from './numbering-actions'
 import { applySectPrRewrites, type SectPrRewrite } from './sectpr-rewrite'

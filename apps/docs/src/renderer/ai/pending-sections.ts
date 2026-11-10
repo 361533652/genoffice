@@ -1,7 +1,7 @@
 import type { Editor } from '@tiptap/core'
 import type { Node as PmDocNode } from '@tiptap/pm/model'
 import type { SectionInfo } from '@genoffice/docx-engine'
-import { markDocSeen } from './tools'
+import { markDocSeen } from '../doc-baseline'
 
 /**
  * Section owning a top-level block. Blocks are mapped by the docxIndex of the

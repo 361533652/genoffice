@@ -6458,13 +6458,6 @@ export function buildDocsMenu(): void {
         },
         { type: 'separator' },
         {
-          id: 'docs-menu-ai-sidebar',
-          type: 'checkbox',
-          checked: activeViewMenuState().aiSidebar,
-          label: tm('menuAiSidebar'),
-          click: () => sendCommand('toggle-ai'),
-        },
-        {
           id: 'docs-menu-dark-mode',
           type: 'checkbox',
           checked: activeViewMenuState().darkCanvas,
@@ -6615,9 +6608,6 @@ export function buildDocsMenu(): void {
         { label: tm('menuAutoCorrect'), click: () => sendCommand('autocorrect-options') },
         // Word for Mac keeps Settings in the application menu
         ...(isMac ? [] : [settingsMenuItem(labels, () => sendCommand('preferences'))]),
-        { type: 'separator' },
-        // Runs the same AI proofread as Review > Editor (renderer shows the one-time ack)
-        { label: tm('menuAiProofread'), click: () => sendCommand('ai-proofread') },
       ],
     },
     windowMenuTemplate(process.platform, appMenuLabels(getUiLang())),
