@@ -1,54 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
-import {
-  AI_CUSTOM_FONT_MAX_PX,
-  AI_CUSTOM_FONT_MIN_PX,
-  DEFAULT_AI_PANEL_PREFS,
-  Dropdown,
-  aiPanelFontPx,
-  clampAiCustomFontSize,
-} from '@genoffice/ui'
-import type { AiFontSize, AiPanelPrefs, AiPanelSide } from '@genoffice/ui'
-import { getProviderAdapter, thinkingShapeFor } from '@genoffice/ai-provider/browser'
-import type { DecisionEndpoint, DefaultAppStatus, FileSearchSettings } from '../../shared/home-api'
-import { AUTHOR_NAME_MAX, isCloudflareEndpoint } from '../../shared/home-api'
+import { Dropdown } from '@genoffice/ui'
+import type { DefaultAppStatus } from '../../shared/home-api'
+import { AUTHOR_NAME_MAX } from '../../shared/home-api'
 import type { UpdateUiState } from '../../shared/update-api'
-import {
-  DEFAULT_MAX_OUTPUT_TOKENS,
-  MAX_MAX_OUTPUT_TOKENS,
-  MIN_MAX_OUTPUT_TOKENS,
-  activeCustomEndpoint,
-  clampMaxOutputTokens,
-  customEndpointLabel,
-  newCustomEndpointId,
-  removeCustomEndpoint,
-  selectCustomEndpoint,
-  upsertCustomEndpoint,
-  AI_CUSTOM_PROTOCOLS,
-} from '@genoffice/ai-provider/browser'
-import type {
-  AiCustomCompat,
-  AiCustomEndpoint,
-  AiCustomModelProfile,
-  AiCustomProtocol,
-  AiMediaProviderId,
-  AiMediaProviderMeta,
-  AiMediaSettings,
-  AiProtocol,
-  AiSearchProviderMeta,
-  AiSearchSettings,
-  AiSettings,
-} from '@genoffice/ai-provider'
 import { useI18n } from './locale'
-import type { StringKey, TFunc } from './locale'
-import type {
-  AccountStatus,
-  AiCatalogEntry,
-  AuthorNameSetting,
-  DocTheme,
-  UiTheme,
-} from '../../shared/home-api'
-import { ProviderLogo } from './provider-logos'
+import type { StringKey } from './locale'
+import type { AuthorNameSetting, DocTheme, UiTheme } from '../../shared/home-api'
 import './settings.css'
 
 // ── Settings modal (opened from the account menu) ─────────
@@ -97,13 +55,6 @@ const DOC_THEME_OPTIONS = [
   { value: 'dark', labelKey: 'themeDark' },
 ] as const satisfies readonly { value: DocTheme; labelKey: StringKey }[]
 
-const AI_FONT_SIZE_OPTIONS = [
-  { value: 'default', labelKey: 'aiFontSizeDefault' },
-  { value: 'large', labelKey: 'aiFontSizeLarge' },
-  { value: 'xlarge', labelKey: 'aiFontSizeXLarge' },
-  { value: 'custom', labelKey: 'aiFontSizeCustom' },
-] as const satisfies readonly { value: AiFontSize; labelKey: StringKey }[]
-
 const CHANNEL_OPTIONS = [
   { value: 'stable', labelKey: 'channelStable' },
   { value: 'beta', labelKey: 'channelBeta' },
@@ -115,58 +66,6 @@ function formatStars(n: number): string {
   if (n < 1000) return String(n)
   const k = n / 1000
   return `${k >= 100 ? Math.round(k) : (Math.round(k * 10) / 10).toString().replace(/\.0$/, '')}k`
-}
-
-/** px stepper for the custom AI panel text size; in-range values apply live,
- * out-of-range or partial input is clamped on blur */
-function CustomFontSizeInput({
-  value,
-  label,
-  onCommit,
-}: {
-  value: number
-  label: string
-  onCommit: (px: number) => void
-}) {
-  const [draft, setDraft] = useState(String(value))
-  const [editing, setEditing] = useState(false)
-  const shown = editing ? draft : String(value)
-  const commit = (raw: string) => {
-    const px = clampAiCustomFontSize(raw)
-    if (px !== null && px !== value) onCommit(px)
-  }
-  return (
-    <label className="set-num">
-      <input
-        type="number"
-        className="set-input set-num-input"
-        aria-label={label}
-        min={AI_CUSTOM_FONT_MIN_PX}
-        max={AI_CUSTOM_FONT_MAX_PX}
-        step={1}
-        value={shown}
-        onFocus={() => {
-          setDraft(String(value))
-          setEditing(true)
-        }}
-        onChange={(e) => {
-          setDraft(e.target.value)
-          const n = Number(e.target.value)
-          if (Number.isInteger(n) && n >= AI_CUSTOM_FONT_MIN_PX && n <= AI_CUSTOM_FONT_MAX_PX) {
-            onCommit(n)
-          }
-        }}
-        onBlur={() => {
-          commit(draft)
-          setEditing(false)
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') e.currentTarget.blur()
-        }}
-      />
-      <span className="set-num-unit">px</span>
-    </label>
-  )
 }
 
 export type SectionId = 'general' | 'about'
@@ -245,7 +144,6 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
   const [defaultApp, setDefaultApp] = useState<DefaultAppStatus | null>(null)
   const [defaultAppBusy, setDefaultAppBusy] = useState(false)
   const [defaultAppFailed, setDefaultAppFailed] = useState(false)
-  const [aiPrefs, setAiPrefs] = useState<AiPanelPrefs>(DEFAULT_AI_PANEL_PREFS)
   const [authorName, setAuthorName] = useState<AuthorNameSetting>({ value: '', fallback: '' })
   const [legacyImportPrompt, setLegacyImportPrompt] = useState(true)
   const [channel, setChannel] = useState<'stable' | 'beta'>('stable')
@@ -278,9 +176,6 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
     })
     void window.aiOffice.getDefaultAppStatus?.().then((st) => {
       if (alive) setDefaultApp(st)
-    })
-    void window.aiOffice.getAiPanelPrefs?.().then((prefs) => {
-      if (alive) setAiPrefs(prefs)
     })
     void window.aiOffice.getLegacyImportPrompt?.().then((v) => {
       if (alive) setLegacyImportPrompt(v)
@@ -345,11 +240,6 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
 
   const commitAuthorName = () => {
     void window.aiOffice.setAuthorName?.(authorName.value).then(setAuthorName)
-  }
-
-  const updateAiPrefs = (patch: Partial<AiPanelPrefs>) => {
-    setAiPrefs((prev) => ({ ...prev, ...patch }))
-    void window.aiOffice.setAiPanelPrefs(patch).then(setAiPrefs)
   }
 
   const changeSaveDir = () => {
@@ -473,51 +363,6 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                 </div>
                 <div className="set-field">
                   <div className="set-field-text">
-                    <label className="set-field-label">{t('setAiPanelSide')}</label>
-                  </div>
-                  <Dropdown
-                    className="set-dd"
-                    value={aiPrefs.side}
-                    ariaLabel={t('setAiPanelSide')}
-                    options={[
-                      { value: 'left', label: t('aiPanelSideLeft') },
-                      { value: 'right', label: t('aiPanelSideRight') },
-                    ]}
-                    onPick={(side) => updateAiPrefs({ side: side as AiPanelSide })}
-                  />
-                </div>
-                <div className="set-field">
-                  <div className="set-field-text">
-                    <label className="set-field-label">{t('setAiFontSize')}</label>
-                  </div>
-                  {aiPrefs.fontSize === 'custom' && (
-                    <CustomFontSizeInput
-                      value={aiPrefs.customFontSize}
-                      label={t('aiFontSizeCustom')}
-                      onCommit={(px) => updateAiPrefs({ customFontSize: px })}
-                    />
-                  )}
-                  <Dropdown
-                    className="set-dd"
-                    value={aiPrefs.fontSize}
-                    ariaLabel={t('setAiFontSize')}
-                    options={AI_FONT_SIZE_OPTIONS.map((opt) => ({
-                      value: opt.value,
-                      label: t(opt.labelKey),
-                    }))}
-                    onPick={(v) => {
-                      const fontSize = v as AiFontSize
-                      // start the custom size from the preset being left so nothing jumps
-                      updateAiPrefs(
-                        fontSize === 'custom' && aiPrefs.fontSize !== 'custom'
-                          ? { fontSize, customFontSize: aiPanelFontPx(aiPrefs) }
-                          : { fontSize },
-                      )
-                    }}
-                  />
-                </div>
-                <div className="set-field">
-                  <div className="set-field-text">
                     <div className="set-field-stack">
                       <label className="set-field-label" htmlFor="set-author-name">
                         {t('setAuthorName')}
@@ -558,51 +403,6 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                       setLegacyImportPrompt(next)
                       void window.aiOffice.setLegacyImportPrompt?.(next).then(setLegacyImportPrompt)
                     }}
-                  />
-                </div>
-                <div className="set-field">
-                  <div className="set-field-text">
-                    <div className="set-field-stack">
-                      <div className="set-field-label">{t('setAiSpellcheck')}</div>
-                      <div className="set-field-desc">{t('setAiSpellcheckDesc')}</div>
-                    </div>
-                  </div>
-                  <button
-                    className="set-switch"
-                    role="switch"
-                    aria-checked={aiPrefs.spellcheck}
-                    aria-label={t('setAiSpellcheck')}
-                    onClick={() => updateAiPrefs({ spellcheck: !aiPrefs.spellcheck })}
-                  />
-                </div>
-                <div className="set-field">
-                  <div className="set-field-text">
-                    <div className="set-field-stack">
-                      <div className="set-field-label">{t('setAiShowSidebar')}</div>
-                      <div className="set-field-desc">{t('setAiShowSidebarDesc')}</div>
-                    </div>
-                  </div>
-                  <button
-                    className="set-switch"
-                    role="switch"
-                    aria-checked={aiPrefs.showAiSidebar}
-                    aria-label={t('setAiShowSidebar')}
-                    onClick={() => updateAiPrefs({ showAiSidebar: !aiPrefs.showAiSidebar })}
-                  />
-                </div>
-                <div className="set-field">
-                  <div className="set-field-text">
-                    <div className="set-field-stack">
-                      <div className="set-field-label">{t('setAiOpenInNewDocs')}</div>
-                      <div className="set-field-desc">{t('setAiOpenInNewDocsDesc')}</div>
-                    </div>
-                  </div>
-                  <button
-                    className="set-switch"
-                    role="switch"
-                    aria-checked={aiPrefs.openInNewDocs}
-                    aria-label={t('setAiOpenInNewDocs')}
-                    onClick={() => updateAiPrefs({ openInNewDocs: !aiPrefs.openInNewDocs })}
                   />
                 </div>
                 {defaultApp && defaultApp.state !== 'unsupported' && (
@@ -823,182 +623,6 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
           </div>
         </div>
       </div>
-    </div>
-  )
-}
-
-/** Friendly label per declared protocol; the wire ids stay the stored value. */
-const PROTOCOL_LABEL_KEYS: Record<AiCustomProtocol, StringKey> = {
-  'openai-compatible': 'setAiApiOpenai',
-  anthropic: 'setAiApiAnthropic',
-  gemini: 'setAiApiGemini',
-}
-
-/** Placeholder for the model-declaration blob: one entry per declared capability. */
-const MODEL_DECLARATION_PLACEHOLDER = ['{', '  "id": "m",', '  "vision": true', '}'].join('\n')
-
-/** Apply one endpoint compat switch: undefined clears it so the heuristic answers again. */
-function applySwitch<K extends keyof AiCustomCompat>(
-  compat: AiCustomCompat,
-  key: K,
-  value: boolean | undefined,
-): AiCustomCompat {
-  if (value === undefined) {
-    if (!(key in compat)) return compat
-    const next = { ...compat }
-    delete next[key]
-    return next
-  }
-  return { ...compat, [key]: value }
-}
-
-/** Parse the header textarea: one "Name: Value" per line; false when a line is malformed. */
-function parseHeaderLines(text: string): Record<string, string> | undefined {
-  const out: Record<string, string> = {}
-  for (const raw of text.split('\n')) {
-    const line = raw.trim()
-    if (!line) continue
-    const at = line.indexOf(':')
-    if (at <= 0) return undefined
-    const name = line.slice(0, at).trim()
-    const value = line.slice(at + 1).trim()
-    if (!name || !value) return undefined
-    out[name] = value
-  }
-  return out
-}
-
-/** A tri-state switch: off = never, on = always, unset (middle) = the shipped heuristic. */
-function ProfileSwitch({
-  label,
-  value,
-  onChange,
-  texts,
-}: {
-  label: string
-  value: boolean | undefined
-  onChange: (value: boolean | undefined) => void
-  texts: { on: string; off: string; auto: string }
-}) {
-  return (
-    <div className="set-ai-profile-row">
-      <span className="set-ai-profile-label">{label}</span>
-      {/* one radio group per switch: three buttons without the group role is
-          three unrelated toggles to a screen reader */}
-      <div className="set-ai-profile-tri" role="radiogroup" aria-label={label}>
-        {(
-          [
-            { option: false, text: texts.off },
-            { option: undefined, text: texts.auto },
-            { option: true, text: texts.on },
-          ] as const
-        ).map(({ option, text }) => (
-          <button
-            key={text}
-            type="button"
-            className={'set-ai-profile-tri-btn' + (value === option ? ' is-active' : '')}
-            role="radio"
-            aria-checked={value === option}
-            onClick={() => onChange(option)}
-          >
-            {text}
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-/**
- * A free-text blob (headers / model declarations) committed on blur: the draft
- * lives in component state so a partially typed JSON is never written, and a
- * rejected parse keeps the red border plus the reason until the next edit.
- */
-function ProfileBlobField({
-  fieldId,
-  label,
-  hint,
-  bad,
-  text,
-  placeholder,
-  multiline,
-  onCommit,
-}: {
-  fieldId: string
-  label: string
-  hint: string
-  bad: string
-  text: string
-  placeholder: string
-  multiline?: boolean
-  onCommit: (text: string) => boolean
-}) {
-  const [draft, setDraft] = useState(text)
-  const [invalid, setInvalid] = useState(false)
-  const lastCommitted = useRef(text)
-  // A settings change from elsewhere (another window, a saved reload) replaces
-  // the draft; our own commit updates lastCommitted so the effect stays quiet.
-  useEffect(() => {
-    if (text === lastCommitted.current) return
-    lastCommitted.current = text
-    setDraft(text)
-    setInvalid(false)
-  }, [text])
-  return (
-    <div className={'set-field' + (multiline ? ' set-ai-profile-blob' : '')}>
-      <div className="set-field-text">
-        <div className="set-field-stack">
-          <label className="set-field-label" htmlFor={fieldId}>
-            {label}
-          </label>
-          <div className="set-field-desc">{invalid ? bad : hint}</div>
-        </div>
-      </div>
-      {multiline ? (
-        <textarea
-          id={fieldId}
-          className={'set-input-multiline' + (invalid ? ' set-input-invalid' : '')}
-          value={draft}
-          rows={4}
-          spellCheck={false}
-          placeholder={placeholder}
-          onChange={(e) => {
-            setDraft(e.target.value)
-            setInvalid(false)
-          }}
-          onBlur={() => {
-            if (draft === lastCommitted.current) return
-            if (onCommit(draft)) {
-              lastCommitted.current = draft
-              setInvalid(false)
-            } else {
-              setInvalid(true)
-            }
-          }}
-        />
-      ) : (
-        <input
-          id={fieldId}
-          className={'set-input' + (invalid ? ' set-input-invalid' : '')}
-          type="text"
-          value={draft}
-          spellCheck={false}
-          placeholder={placeholder}
-          onChange={(e) => {
-            setDraft(e.target.value)
-            setInvalid(false)
-          }}
-          onBlur={() => {
-            if (draft === lastCommitted.current) return
-            if (onCommit(draft)) {
-              lastCommitted.current = draft
-              setInvalid(false)
-            } else {
-              setInvalid(true)
-            }
-          }}
-        />
-      )}
     </div>
   )
 }
