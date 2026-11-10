@@ -78,8 +78,17 @@ jobs:
       - name: Build xlsx-sidecar
         run: npm run native:build -w @genoffice/sheets
 
+      # Call electron-builder directly: forwarding -c.extraMetadata.version
+      # through "npm run --" makes npm/cmd eat the leading "-c" on Windows
+      # (it arrived as ".extraMetadata.version=..." and was read as a config
+      # FILE path). notices + shell build mirror the dist:win script.
       - name: Package NSIS installer
-        run: npm run dist:win -w @genoffice/shell -- -c.extraMetadata.version=${{ steps.ver.outputs.version }} --publish never
+        shell: pwsh
+        working-directory: apps/shell
+        run: |
+          npm run notices
+          npx electron-vite build
+          npx electron-builder --win --publish never -c.extraMetadata.version=${{ steps.ver.outputs.version }}
 
       - name: Collect artifacts
         shell: pwsh
