@@ -399,14 +399,6 @@ const homeApi: HomeApi = {
     ipcRenderer.on('update:state-changed', listener)
     return () => ipcRenderer.removeListener('update:state-changed', listener)
   },
-  async onboardingSeen() {
-    const result: unknown = await ipcRenderer.invoke(HOME_CHANNELS.onboardingSeen)
-    return result === true
-  },
-  async setOnboardingSeen() {
-    const result: unknown = await ipcRenderer.invoke(HOME_CHANNELS.setOnboardingSeen)
-    return result === true
-  },
   async getTheme() {
     const result: unknown = await ipcRenderer.invoke(HOME_CHANNELS.getTheme)
     return result === 'dark' || result === 'light' ? result : 'system'
@@ -581,10 +573,6 @@ const homeApi: HomeApi = {
   },
   async openGitHubRepo() {
     await ipcRenderer.invoke(HOME_CHANNELS.openGitHubRepo)
-  },
-  async githubStars() {
-    const result: unknown = await ipcRenderer.invoke(HOME_CHANNELS.githubStars)
-    return typeof result === 'number' && Number.isFinite(result) ? result : null
   },
   async starPromptShouldShow() {
     const result: unknown = await ipcRenderer.invoke(HOME_CHANNELS.starPromptShouldShow)

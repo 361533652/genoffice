@@ -72,7 +72,6 @@ async function renderModal(
     getAiPanelPrefs: async () => ({ fontSize: 'default', spellcheck: true }),
     getUpdateChannel: async () => 'stable',
     getAppVersion: async () => '1.0.0',
-    githubStars: async () => null,
     getMcpStatus: async () => mcpStatus,
     setMcpSettings,
     getMcpLogs,

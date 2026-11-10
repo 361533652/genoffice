@@ -55,19 +55,6 @@ const DOC_THEME_OPTIONS = [
   { value: 'dark', labelKey: 'themeDark' },
 ] as const satisfies readonly { value: DocTheme; labelKey: StringKey }[]
 
-const CHANNEL_OPTIONS = [
-  { value: 'stable', labelKey: 'channelStable' },
-  { value: 'beta', labelKey: 'channelBeta' },
-] as const satisfies readonly { value: 'stable' | 'beta'; labelKey: StringKey }[]
-
-/** GitHub-style abbreviated stargazer count (2591 → "2.6k") — the number is
- * social proof, not a metric; the cached/exact value would only look stale */
-function formatStars(n: number): string {
-  if (n < 1000) return String(n)
-  const k = n / 1000
-  return `${k >= 100 ? Math.round(k) : (Math.round(k * 10) / 10).toString().replace(/\.0$/, '')}k`
-}
-
 export type SectionId = 'general' | 'about'
 
 const SECTIONS: readonly { id: SectionId; labelKey: StringKey }[] = [
@@ -146,9 +133,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
   const [defaultAppFailed, setDefaultAppFailed] = useState(false)
   const [authorName, setAuthorName] = useState<AuthorNameSetting>({ value: '', fallback: '' })
   const [legacyImportPrompt, setLegacyImportPrompt] = useState(true)
-  const [channel, setChannel] = useState<'stable' | 'beta'>('stable')
   const [appVersion, setAppVersion] = useState('')
-  const [githubStars, setGithubStars] = useState<number | null>(null)
   const [updateState, setUpdateState] = useState<UpdateUiState | null>(null)
 
   useEffect(() => {
@@ -183,9 +168,6 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
     void window.aiOffice.getAuthorName?.().then((v) => {
       if (alive) setAuthorName(v)
     })
-    void window.aiOffice.getUpdateChannel?.().then((ch) => {
-      if (alive) setChannel(ch)
-    })
     void window.aiOffice.getAutoUpdateCheck?.().then((on) => {
       if (alive) setAutoUpdateCheckOn(on)
     })
@@ -204,9 +186,6 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
         if (alive) setUpdateState(s)
       })
       .catch(() => undefined)
-    void window.aiOffice.githubStars?.().then((n) => {
-      if (alive && n !== null) setGithubStars(n)
-    })
     return () => {
       alive = false
     }
@@ -547,25 +526,6 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                 )}
                 <div className="set-field">
                   <div className="set-field-text">
-                    <label className="set-field-label">{t('updateChannel')}</label>
-                  </div>
-                  <Dropdown
-                    className="set-dd"
-                    value={channel}
-                    ariaLabel={t('updateChannel')}
-                    options={CHANNEL_OPTIONS.map((opt) => ({
-                      value: opt.value,
-                      label: t(opt.labelKey),
-                    }))}
-                    onPick={(v) => {
-                      const next = v === 'beta' ? 'beta' : 'stable'
-                      setChannel(next)
-                      void window.aiOffice.setUpdateChannel(next)
-                    }}
-                  />
-                </div>
-                <div className="set-field">
-                  <div className="set-field-text">
                     <div className="set-field-stack">
                       <div className="set-field-label">{t('setAutoUpdateCheck')}</div>
                       <div className="set-field-desc">{t('setAutoUpdateCheckDesc')}</div>
@@ -602,22 +562,6 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                     }}
                   />
                 </div>
-                <Field
-                  label={t('setGithub')}
-                  value={
-                    githubStars === null
-                      ? 'github.com/genspark-ai/genoffice'
-                      : `github.com/genspark-ai/genoffice · ★ ${formatStars(githubStars)}`
-                  }
-                  action={
-                    <button
-                      className="set-btn"
-                      onClick={() => void window.aiOffice.openGitHubRepo?.()}
-                    >
-                      {t('starOnGitHub')}
-                    </button>
-                  }
-                />
               </>
             )}
           </div>

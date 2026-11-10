@@ -402,10 +402,6 @@ export interface HomeApi {
   /** re-open the (minimized) update dialog; a not-yet-started download also starts */
   openUpdateDialog(): Promise<boolean>
   onUpdateStateChanged(handler: (state: UpdateUiState) => void): () => void
-  /** whether the first-run onboarding has been completed or skipped (persisted in userData/app-settings.json) */
-  onboardingSeen(): Promise<boolean>
-  /** mark onboarding done; analytics remains enabled unless separately opted out */
-  setOnboardingSeen(): Promise<boolean>
   /** current UI theme preference (persisted in userData/app-settings.json) */
   getTheme(): Promise<UiTheme>
   /** switch + persist the UI theme; broadcasts 'app:theme-changed' to all web contents */
@@ -471,8 +467,6 @@ export interface HomeApi {
   openCreditUsage(): Promise<void>
   /** open the public GitHub repository in the default browser */
   openGitHubRepo(): Promise<void>
-  /** current stargazer count of the public repo (null while offline / rate-limited) */
-  githubStars(): Promise<number | null>
   /** whether the one-time "star us" prompt should show now (show:true also counts as shown);
    * docOpens personalizes the card copy ("you've opened N documents") */
   starPromptShouldShow(): Promise<StarPromptShow>
@@ -696,8 +690,6 @@ export const HOME_CHANNELS = {
   accountLoginOpenUrl: 'home:account-login-open-url',
   accountLogout: 'home:account-logout',
   getAppVersion: 'home:get-app-version',
-  onboardingSeen: 'home:onboarding-seen',
-  setOnboardingSeen: 'home:set-onboarding-seen',
   getTheme: 'home:get-theme',
   setTheme: 'home:set-theme',
   getDocumentTheme: 'home:get-document-theme',
@@ -728,7 +720,6 @@ export const HOME_CHANNELS = {
   openGenTeam: 'home:open-genteam',
   openCreditUsage: 'home:open-credit-usage',
   openGitHubRepo: 'home:open-github-repo',
-  githubStars: 'home:github-stars',
   starPromptShouldShow: 'home:star-prompt-should-show',
   starPromptAction: 'home:star-prompt-action',
   cloudProjects: 'home:cloud-projects',

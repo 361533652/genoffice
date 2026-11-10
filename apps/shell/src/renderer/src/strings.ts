@@ -196,9 +196,6 @@ export const strings = {
     setSilentInstall: '静默安装更新',
     setSilentInstallDesc:
       '开启后，后台检查到新版本会静默下载，并在你退出应用时安装，使用过程中不会打扰或重启。关闭则弹出更新提示，由你决定何时更新。',
-    updateChannel: '更新通道',
-    channelStable: '稳定版',
-    channelBeta: 'Beta 版',
     theme: '主题',
     themeLight: '浅色',
     themeDark: '深色',
@@ -405,15 +402,12 @@ export const strings = {
     setAiGskTools: 'Genspark 云工具',
     setAiGskToolsDesc:
       '服务商选择 Genspark 时，网页搜索、生图与媒体解析经 Genspark 云端并消耗积分；关闭后搜索改用免费来源，Genspark 生图工具不可用。',
-    setGithub: '开源项目',
-    starOnGitHub: '去 GitHub 点 Star',
     starPromptTitle: '喜欢 GenOffice 吗？',
     starPromptTitleN: '你已经用 GenOffice 打开了 {n} 个文档',
     starPromptBody: 'GenOffice 是免费开源软件。到 GitHub 给我们一个 Star，是对团队最好的支持。',
     starPromptGo: '去点 Star',
     starPromptDone: '已经点过了',
     starPromptLater: '以后再说',
-    onbStarHint: '如果你喜欢 GenOffice，欢迎到 GitHub 给我们一个 Star。',
     setEmail: '邮箱',
     setNotLoggedIn: '未登录',
     setViewUsage: '查看用量',
@@ -428,21 +422,6 @@ export const strings = {
     appMenu: '菜单',
     newTab: '新建标签页',
     // First-run onboarding
-    onbTitle1: '欢迎使用 GenOffice',
-    onbSubtitle1: '第一个开源的 AI 原生 Office 套件',
-    onbBody1: '创建文档、制作表格、生成演示、审阅 PDF。AI 深度融入每个环节。',
-    onbTitle2: '这只是一个开始',
-    onbBody2: 'GenOffice 目前处于 alpha 阶段。欢迎加入 GenTeam 群聊，分享反馈，一起塑造它的未来。',
-    onbCredits: '活跃贡献者可获得 **1,000+ Genspark 积分**',
-    onbJoinGenTeam: '加入 GenTeam',
-    onbSkip: '跳过',
-    onbNext: '下一步',
-    onbStart: '开始使用',
-    onbStepAria: '第 {n} 页，共 {total} 页',
-    onbTitle3: '人人免费',
-    onbBody3: '无授权费用，无广告，无水印。',
-    onbNote3: 'AI 功能可能消耗 Genspark 积分。',
-    onbBack: '上一步',
     intgSkillsDesc:
       'GenOffice 只使用自己技能文件夹里的技能。从文件夹或 zip 导入会把整个技能复制进来；导入不会自动运行任何东西。',
     intgSkillsEmpty: '还没有安装技能。',
@@ -702,9 +681,6 @@ export const strings = {
     setSilentInstall: 'Install updates silently',
     setSilentInstallDesc:
       'When on, a new version found by the background check is downloaded quietly and installed when you quit GenOffice; nothing interrupts you while you work. When off, an update prompt lets you decide when to update.',
-    updateChannel: 'Update Channel',
-    channelStable: 'Stable',
-    channelBeta: 'Beta',
     theme: 'Theme',
     themeLight: 'Light',
     themeDark: 'Dark',
@@ -922,8 +898,6 @@ export const strings = {
     setAiGskTools: 'Genspark cloud tools',
     setAiGskToolsDesc:
       'Web search, image generation and media analysis run through Genspark and use credits while their provider is set to Genspark; when off, search uses free sources and the Genspark image tools are unavailable.',
-    setGithub: 'Open Source',
-    starOnGitHub: 'Star on GitHub',
     starPromptTitle: 'Enjoying GenOffice?',
     starPromptTitleN: "You've opened {n} documents with GenOffice",
     starPromptBody:
@@ -931,7 +905,6 @@ export const strings = {
     starPromptGo: 'Star on GitHub',
     starPromptDone: 'Already starred',
     starPromptLater: 'Maybe later',
-    onbStarHint: 'If you like GenOffice, give us a star on GitHub.',
     setEmail: 'Email',
     setNotLoggedIn: 'Not signed in',
     setViewUsage: 'View usage',
@@ -944,23 +917,6 @@ export const strings = {
     appMenu: 'Menu',
     newTab: 'New tab',
     // First-run onboarding
-    onbTitle1: 'Welcome to GenOffice',
-    onbSubtitle1: 'The first open-source, AI-native office suite',
-    onbBody1:
-      'Create docs, build sheets, make slides, and review PDFs. AI is built into every step.',
-    onbTitle2: 'This is just the beginning',
-    onbBody2:
-      'GenOffice is still in alpha. Join the group chat on GenTeam to share feedback and help shape what comes next.',
-    onbCredits: 'Active contributors get **1,000+ Genspark credits**',
-    onbJoinGenTeam: 'Join GenTeam',
-    onbSkip: 'Skip',
-    onbNext: 'Next',
-    onbStart: 'Get started',
-    onbStepAria: 'Page {n} of {total}',
-    onbTitle3: 'Free for everyone',
-    onbBody3: 'No license fees. No ads. No watermarks.',
-    onbNote3: 'AI features may consume Genspark credits.',
-    onbBack: 'Back',
     intgSkillsDesc:
       'GenOffice only uses skills in its own skills folder. Importing a folder or a zip copies the whole skill in; nothing runs on import.',
     intgSkillsEmpty: 'No skills installed yet.',
@@ -1223,9 +1179,6 @@ export const strings = {
     setSilentInstall: 'Cài đặt cập nhật âm thầm',
     setSilentInstallDesc:
       'Khi bật, phiên bản mới được phát hiện ở chế độ nền sẽ tự tải âm thầm và cài khi bạn thoát GenOffice; không làm gián đoạn khi bạn đang làm việc. Khi tắt, một lời nhắc cập nhật sẽ hiện để bạn tự quyết định.',
-    updateChannel: 'Kênh cập nhật',
-    channelStable: 'Ổn định',
-    channelBeta: 'Beta',
     theme: 'Giao diện',
     themeLight: 'Sáng',
     themeDark: 'Tối',
@@ -1447,8 +1400,6 @@ export const strings = {
     setAiGskTools: 'Công cụ đám mây Genspark',
     setAiGskToolsDesc:
       'Tìm kiếm web, tạo hình ảnh và phân tích phương tiện được xử lý qua Genspark và tiêu tốn credit khi nhà cung cấp được đặt là Genspark; khi tắt, tìm kiếm sẽ dùng các nguồn miễn phí và công cụ hình ảnh Genspark sẽ không khả dụng.',
-    setGithub: 'Mã nguồn mở',
-    starOnGitHub: 'Gắn sao trên GitHub',
     starPromptTitle: 'Bạn thích GenOffice chứ?',
     starPromptTitleN: 'Bạn đã mở {n} tài liệu với GenOffice',
     starPromptBody:
@@ -1456,7 +1407,6 @@ export const strings = {
     starPromptGo: 'Gắn sao trên GitHub',
     starPromptDone: 'Đã gắn sao',
     starPromptLater: 'Để sau',
-    onbStarHint: 'Nếu bạn yêu thích GenOffice, hãy tặng chúng tôi một sao trên GitHub.',
     setEmail: 'Email',
     setNotLoggedIn: 'Chưa đăng nhập',
     setViewUsage: 'Xem mức sử dụng',
@@ -1469,23 +1419,6 @@ export const strings = {
     appMenu: 'Menu',
     newTab: 'Tab mới',
     // First-run onboarding
-    onbTitle1: 'Chào mừng đến với GenOffice',
-    onbSubtitle1: 'Bộ ứng dụng văn phòng AI nguồn mở đầu tiên',
-    onbBody1:
-      'Tạo tài liệu, xây dựng bảng tính, tạo bản trình bày và xem lại PDF. AI được tích hợp trong từng bước.',
-    onbTitle2: 'Đây mới chỉ là khởi đầu',
-    onbBody2:
-      'GenOffice vẫn đang trong giai đoạn alpha. Hãy tham gia nhóm trò chuyện trên GenTeam để chia sẻ phản hồi và định hình những bước phát triển tiếp theo.',
-    onbCredits: 'Thành viên đóng góp tích cực nhận được **1.000+ credit Genspark**',
-    onbJoinGenTeam: 'Tham gia GenTeam',
-    onbSkip: 'Bỏ qua',
-    onbNext: 'Tiếp theo',
-    onbStart: 'Bắt đầu',
-    onbStepAria: 'Trang {n} / {total}',
-    onbTitle3: 'Miễn phí cho mọi người',
-    onbBody3: 'Không phí bản quyền. Không quảng cáo. Không hình mờ.',
-    onbNote3: 'Các tính năng AI có thể tiêu tốn credit Genspark.',
-    onbBack: 'Quay lại',
     intgSkillsDesc:
       'GenOffice chỉ dùng kỹ năng trong thư mục kỹ năng của chính nó. Nhập từ thư mục hoặc zip sẽ sao chép toàn bộ kỹ năng vào; không có gì chạy khi nhập.',
     intgSkillsEmpty: 'Chưa cài kỹ năng nào.',
@@ -1749,9 +1682,6 @@ export const strings = {
     setSilentInstall: 'Güncellemeleri sessizce yükle',
     setSilentInstallDesc:
       'Açıkken arka plan denetiminin bulduğu yeni sürüm sessizce indirilir ve GenOffice’ten çıkarken yüklenir; çalışırken hiçbir şey sizi kesmez. Kapalıyken bir güncelleme bildirimi ne zaman güncelleyeceğinize karar vermenizi sağlar.',
-    updateChannel: 'Güncelleme Kanalı',
-    channelStable: 'Kararlı',
-    channelBeta: 'Beta',
     theme: 'Tema',
     themeLight: 'Açık',
     themeDark: 'Koyu',
@@ -1974,8 +1904,6 @@ export const strings = {
     setAiGskTools: 'Genspark bulut araçları',
     setAiGskToolsDesc:
       'Sağlayıcıları Genspark olarak ayarlıyken web araması, görüntü oluşturma ve medya analizi Genspark üzerinden çalışır ve kredi kullanır; kapalıyken arama ücretsiz kaynakları kullanır ve Genspark görüntü araçları kullanılamaz.',
-    setGithub: 'Açık Kaynak',
-    starOnGitHub: 'GitHub’da yıldızla',
     starPromptTitle: 'GenOffice’i beğeniyor musunuz?',
     starPromptTitleN: 'GenOffice ile {n} belge açtınız',
     starPromptBody:
@@ -1983,7 +1911,6 @@ export const strings = {
     starPromptGo: 'GitHub’da yıldızla',
     starPromptDone: 'Zaten yıldızladım',
     starPromptLater: 'Belki daha sonra',
-    onbStarHint: 'GenOffice’i beğendiyseniz GitHub’da bize bir yıldız verin.',
     setEmail: 'E-posta',
     setNotLoggedIn: 'Giriş yapılmadı',
     setViewUsage: 'Kullanımı görüntüle',
@@ -1996,23 +1923,6 @@ export const strings = {
     appMenu: 'Menü',
     newTab: 'Yeni sekme',
     // First-run onboarding
-    onbTitle1: 'GenOffice’e hoş geldiniz',
-    onbSubtitle1: 'İlk açık kaynaklı, AI yerlisi ofis paketi',
-    onbBody1:
-      'Belgeler oluşturun, tablolar hazırlayın, sunular yapın ve PDF’leri inceleyin. AI her adıma yerleşiktir.',
-    onbTitle2: 'Bu daha başlangıç',
-    onbBody2:
-      'GenOffice hâlâ alfa aşamasında. Geri bildirim paylaşmak ve sıradakileri şekillendirmeye yardım etmek için GenTeam’deki grup sohbetine katılın.',
-    onbCredits: 'Etkin katkıda bulunanlar **1.000+ Genspark kredisi** kazanır',
-    onbJoinGenTeam: 'GenTeam’e katıl',
-    onbSkip: 'Atla',
-    onbNext: 'İleri',
-    onbStart: 'Başlayın',
-    onbStepAria: 'Sayfa {n} / {total}',
-    onbTitle3: 'Herkes için ücretsiz',
-    onbBody3: 'Lisans ücreti yok. Reklam yok. Filigran yok.',
-    onbNote3: 'AI özellikleri Genspark kredisi tüketebilir.',
-    onbBack: 'Geri',
     intgSkillsDesc:
       'GenOffice yalnızca kendi beceri klasöründeki becerileri kullanır. Bir klasör veya zip içe aktarıldığında becerinin tamamı kopyalanır; içe aktarma sırasında hiçbir şey çalıştırılmaz.',
     intgSkillsEmpty: 'Henüz beceri yüklenmedi.',
@@ -2287,9 +2197,6 @@ export const strings = {
     setSilentInstall: 'アップデートをサイレントインストール',
     setSilentInstallDesc:
       'オンにすると、バックグラウンドで見つかった新バージョンをサイレントにダウンロードし、GenOffice の終了時にインストールします。作業中に中断や再起動はありません。オフの場合は更新の案内が表示され、更新のタイミングを自分で決められます。',
-    updateChannel: '更新チャネル',
-    channelStable: '安定版',
-    channelBeta: 'ベータ版',
     theme: 'テーマ',
     themeLight: 'ライト',
     themeDark: 'ダーク',
@@ -2510,8 +2417,6 @@ export const strings = {
     setAiGskTools: 'Genspark クラウドツール',
     setAiGskToolsDesc:
       'プロバイダーが Genspark のとき、Web 検索・画像生成・メディア解析は Genspark 経由でクレジットを消費します。オフにすると検索は無料ソースを使い、Genspark の画像ツールは利用できません。',
-    setGithub: 'オープンソース',
-    starOnGitHub: 'GitHub でスターを付ける',
     starPromptTitle: 'GenOffice はいかがですか？',
     starPromptTitleN: 'GenOffice で {n} 件のドキュメントを開きました',
     starPromptBody:
@@ -2519,7 +2424,6 @@ export const strings = {
     starPromptGo: 'スターを付ける',
     starPromptDone: 'スター済み',
     starPromptLater: 'あとで',
-    onbStarHint: 'GenOffice が気に入ったら、GitHub でスターをお願いします。',
     setEmail: 'メール',
     setNotLoggedIn: '未ログイン',
     setViewUsage: '使用状況を見る',
@@ -2534,23 +2438,6 @@ export const strings = {
     appMenu: 'メニュー',
     newTab: '新しいタブ',
     // First-run onboarding
-    onbTitle1: 'GenOffice へようこそ',
-    onbSubtitle1: '初のオープンソース AI ネイティブ Office スイート',
-    onbBody1:
-      '文書の作成、表計算、プレゼン作成、PDF のレビュー。あらゆるステップに AI が組み込まれています。',
-    onbTitle2: 'これはまだ始まりにすぎません',
-    onbBody2:
-      'GenOffice はまだアルファ版です。GenTeam のグループチャットに参加して、フィードバックを共有し、今後の開発を一緒に形作りましょう。',
-    onbCredits: 'アクティブな貢献者への特典 **1,000+ Genspark クレジット**',
-    onbJoinGenTeam: 'GenTeam に参加',
-    onbSkip: 'スキップ',
-    onbNext: '次へ',
-    onbStart: 'はじめる',
-    onbStepAria: '{total} ページ中 {n} ページ目',
-    onbTitle3: 'すべての人に無料',
-    onbBody3: 'ライセンス料なし、広告なし、透かしなし。',
-    onbNote3: 'AI 機能は Genspark クレジットを消費する場合があります。',
-    onbBack: '戻る',
     intgSkillsDesc:
       'GenOffice は自身のスキルフォルダ内のスキルのみ使用します。フォルダまたは zip からの読み込みはスキル全体をコピーします。読み込み時に何も実行されません。',
     intgSkillsEmpty: 'スキルはまだインストールされていません。',
@@ -2820,9 +2707,6 @@ export const strings = {
     setSilentInstall: '업데이트 자동 설치',
     setSilentInstallDesc:
       '켜면 백그라운드 검사에서 발견된 새 버전을 조용히 다운로드하고 GenOffice를 종료할 때 설치합니다. 작업 중에는 방해하거나 다시 시작하지 않습니다. 끄면 업데이트 알림이 표시되어 직접 시점을 정할 수 있습니다.',
-    updateChannel: '업데이트 채널',
-    channelStable: '안정 버전',
-    channelBeta: '베타 버전',
     theme: '테마',
     themeLight: '라이트',
     themeDark: '다크',
@@ -3037,8 +2921,6 @@ export const strings = {
     setAiGskTools: 'Genspark 클라우드 도구',
     setAiGskToolsDesc:
       '제공자가 Genspark일 때 웹 검색, 이미지 생성, 미디어 분석은 Genspark를 거쳐 크레딧을 사용합니다. 끄면 검색은 무료 소스를 사용하고 Genspark 이미지 도구는 사용할 수 없습니다.',
-    setGithub: '오픈 소스',
-    starOnGitHub: 'GitHub에서 스타 누르기',
     starPromptTitle: 'GenOffice가 마음에 드시나요?',
     starPromptTitleN: 'GenOffice로 문서를 {n}개 열어보셨네요',
     starPromptBody:
@@ -3046,7 +2928,6 @@ export const strings = {
     starPromptGo: '스타 누르기',
     starPromptDone: '이미 눌렀어요',
     starPromptLater: '나중에',
-    onbStarHint: 'GenOffice가 마음에 들면 GitHub에서 스타를 눌러 주세요.',
     setEmail: '이메일',
     setNotLoggedIn: '로그인되지 않음',
     setViewUsage: '사용량 보기',
@@ -3061,23 +2942,6 @@ export const strings = {
     appMenu: '메뉴',
     newTab: '새 탭',
     // First-run onboarding
-    onbTitle1: 'GenOffice에 오신 것을 환영합니다',
-    onbSubtitle1: '최초의 오픈소스 AI 네이티브 오피스 제품군',
-    onbBody1:
-      '문서 작성, 스프레드시트 제작, 프레젠테이션 생성, PDF 검토. 모든 단계에 AI가 녹아 있습니다.',
-    onbTitle2: '이제 시작일 뿐입니다',
-    onbBody2:
-      'GenOffice는 아직 알파 단계입니다. GenTeam 그룹 채팅에 참여해 피드백을 공유하고 앞으로의 방향을 함께 만들어 가세요.',
-    onbCredits: '활발한 기여자를 위한 혜택 **1,000+ Genspark 크레딧**',
-    onbJoinGenTeam: 'GenTeam 참여하기',
-    onbSkip: '건너뛰기',
-    onbNext: '다음',
-    onbStart: '시작하기',
-    onbStepAria: '총 {total}페이지 중 {n}페이지',
-    onbTitle3: '모두에게 무료',
-    onbBody3: '라이선스 비용 없음, 광고 없음, 워터마크 없음.',
-    onbNote3: 'AI 기능은 Genspark 크레딧을 소모할 수 있습니다.',
-    onbBack: '이전',
     intgSkillsDesc:
       'GenOffice는 자체 스킬 폴더의 스킬만 사용합니다. 폴더나 zip에서 가져오면 스킬 전체가 복사되며, 가져오기 시 아무것도 실행되지 않습니다.',
     intgSkillsEmpty: '설치된 스킬이 없습니다.',
@@ -3354,9 +3218,6 @@ export const strings = {
     setSilentInstall: 'Installer les mises à jour silencieusement',
     setSilentInstallDesc:
       'Si activé, une nouvelle version détectée en arrière-plan est téléchargée silencieusement et installée à la fermeture de GenOffice ; rien ne vous interrompt pendant le travail. Sinon, une invite de mise à jour vous laisse choisir le moment.',
-    updateChannel: 'Canal de mise à jour',
-    channelStable: 'Stable',
-    channelBeta: 'Bêta',
     theme: 'Thème',
     themeLight: 'Clair',
     themeDark: 'Sombre',
@@ -3583,8 +3444,6 @@ export const strings = {
     setAiGskTools: 'Outils cloud Genspark',
     setAiGskToolsDesc:
       "Lorsque leur fournisseur est Genspark, la recherche web, la génération d'images et l'analyse de médias passent par Genspark et consomment des crédits ; désactivé, la recherche utilise des sources gratuites et les outils d'image Genspark sont indisponibles.",
-    setGithub: 'Open source',
-    starOnGitHub: 'Mettre une étoile sur GitHub',
     starPromptTitle: 'GenOffice vous plaît ?',
     starPromptTitleN: 'Vous avez ouvert {n} documents avec GenOffice',
     starPromptBody:
@@ -3592,7 +3451,6 @@ export const strings = {
     starPromptGo: 'Mettre une étoile',
     starPromptDone: 'Déjà fait',
     starPromptLater: 'Plus tard',
-    onbStarHint: 'Si GenOffice vous plaît, mettez-nous une étoile sur GitHub.',
     setEmail: 'E-mail',
     setNotLoggedIn: 'Non connecté',
     setViewUsage: "Voir l'utilisation",
@@ -3607,23 +3465,6 @@ export const strings = {
     appMenu: 'Menu',
     newTab: 'Nouvel onglet',
     // First-run onboarding
-    onbTitle1: 'Bienvenue dans GenOffice',
-    onbSubtitle1: 'La première suite bureautique open source et native IA',
-    onbBody1:
-      'Créez des documents, des feuilles de calcul et des présentations, et relisez des PDF. L’IA est intégrée à chaque étape.',
-    onbTitle2: 'Ce n’est qu’un début',
-    onbBody2:
-      'GenOffice est encore en alpha. Rejoignez la discussion de groupe sur GenTeam pour partager vos retours et façonner la suite.',
-    onbCredits: 'Les contributeurs actifs reçoivent **1 000+ crédits Genspark**',
-    onbJoinGenTeam: 'Rejoindre GenTeam',
-    onbSkip: 'Passer',
-    onbNext: 'Suivant',
-    onbStart: 'Commencer',
-    onbStepAria: 'Page {n} sur {total}',
-    onbTitle3: 'Gratuit pour tous',
-    onbBody3: 'Pas de licence. Pas de publicité. Pas de filigrane.',
-    onbNote3: 'Les fonctions IA peuvent consommer des crédits Genspark.',
-    onbBack: 'Retour',
     intgSkillsDesc:
       'GenOffice n’utilise que les compétences de son propre dossier. Importer un dossier ou un zip copie toute la compétence ; rien ne s’exécute à l’import.',
     intgSkillsEmpty: 'Aucune compétence installée.',
@@ -3904,9 +3745,6 @@ export const strings = {
     setSilentInstall: 'Updates still installieren',
     setSilentInstallDesc:
       'Wenn aktiviert, wird eine im Hintergrund gefundene neue Version still heruntergeladen und beim Beenden von GenOffice installiert; nichts unterbricht Sie bei der Arbeit. Sonst lässt Sie eine Update-Meldung den Zeitpunkt selbst wählen.',
-    updateChannel: 'Update-Kanal',
-    channelStable: 'Stabil',
-    channelBeta: 'Beta',
     theme: 'Thema',
     themeLight: 'Hell',
     themeDark: 'Dunkel',
@@ -4129,8 +3967,6 @@ export const strings = {
     setAiGskTools: 'Genspark-Cloud-Tools',
     setAiGskToolsDesc:
       'Steht ihr Anbieter auf Genspark, laufen Websuche, Bildgenerierung und Medienanalyse über Genspark und verbrauchen Credits; ausgeschaltet nutzt die Suche kostenlose Quellen und die Genspark-Bildwerkzeuge sind nicht verfügbar.',
-    setGithub: 'Open Source',
-    starOnGitHub: 'Auf GitHub Stern geben',
     starPromptTitle: 'Gefällt Ihnen GenOffice?',
     starPromptTitleN: 'Sie haben {n} Dokumente mit GenOffice geöffnet',
     starPromptBody:
@@ -4138,7 +3974,6 @@ export const strings = {
     starPromptGo: 'Stern geben',
     starPromptDone: 'Schon erledigt',
     starPromptLater: 'Später',
-    onbStarHint: 'Wenn Ihnen GenOffice gefällt, geben Sie uns einen Stern auf GitHub.',
     setEmail: 'E-Mail',
     setNotLoggedIn: 'Nicht angemeldet',
     setViewUsage: 'Verbrauch anzeigen',
@@ -4153,23 +3988,6 @@ export const strings = {
     appMenu: 'Menü',
     newTab: 'Neuer Tab',
     // First-run onboarding
-    onbTitle1: 'Willkommen bei GenOffice',
-    onbSubtitle1: 'Die erste quelloffene, KI-native Office-Suite',
-    onbBody1:
-      'Dokumente erstellen, Tabellen bauen, Präsentationen gestalten und PDFs prüfen. KI ist in jedem Schritt integriert.',
-    onbTitle2: 'Das ist erst der Anfang',
-    onbBody2:
-      'GenOffice ist noch in der Alpha-Phase. Treten Sie dem Gruppenchat auf GenTeam bei, um Feedback zu teilen und die Zukunft mitzugestalten.',
-    onbCredits: 'Aktive Mitwirkende erhalten **1.000+ Genspark-Guthaben**',
-    onbJoinGenTeam: 'GenTeam beitreten',
-    onbSkip: 'Überspringen',
-    onbNext: 'Weiter',
-    onbStart: 'Loslegen',
-    onbStepAria: 'Seite {n} von {total}',
-    onbTitle3: 'Kostenlos für alle',
-    onbBody3: 'Keine Lizenzgebühren. Keine Werbung. Keine Wasserzeichen.',
-    onbNote3: 'KI-Funktionen können Genspark-Credits verbrauchen.',
-    onbBack: 'Zurück',
     intgSkillsDesc:
       'GenOffice verwendet nur Skills aus seinem eigenen Skills-Ordner. Der Import eines Ordners oder einer ZIP kopiert den ganzen Skill; beim Import wird nichts ausgeführt.',
     intgSkillsEmpty: 'Noch keine Skills installiert.',
@@ -4446,9 +4264,6 @@ export const strings = {
     setSilentInstall: 'Instalar actualizaciones en silencio',
     setSilentInstallDesc:
       'Si está activado, una nueva versión detectada en segundo plano se descarga en silencio y se instala al salir de GenOffice; nada te interrumpe mientras trabajas. Si está desactivado, un aviso de actualización te deja decidir cuándo actualizar.',
-    updateChannel: 'Canal de actualización',
-    channelStable: 'Estable',
-    channelBeta: 'Beta',
     theme: 'Tema',
     themeLight: 'Claro',
     themeDark: 'Oscuro',
@@ -4670,8 +4485,6 @@ export const strings = {
     setAiGskTools: 'Herramientas en la nube de Genspark',
     setAiGskToolsDesc:
       'Cuando su proveedor es Genspark, la búsqueda web, la generación de imágenes y el análisis de medios pasan por Genspark y consumen créditos; desactivado, la búsqueda usa fuentes gratuitas y las herramientas de imagen de Genspark no están disponibles.',
-    setGithub: 'Código abierto',
-    starOnGitHub: 'Dar una estrella en GitHub',
     starPromptTitle: '¿Te gusta GenOffice?',
     starPromptTitleN: 'Has abierto {n} documentos con GenOffice',
     starPromptBody:
@@ -4679,7 +4492,6 @@ export const strings = {
     starPromptGo: 'Dar una estrella',
     starPromptDone: 'Ya la di',
     starPromptLater: 'Más tarde',
-    onbStarHint: 'Si te gusta GenOffice, danos una estrella en GitHub.',
     setEmail: 'Correo electrónico',
     setNotLoggedIn: 'Sesión no iniciada',
     setViewUsage: 'Ver uso',
@@ -4694,23 +4506,6 @@ export const strings = {
     appMenu: 'Menú',
     newTab: 'Nueva pestaña',
     // First-run onboarding
-    onbTitle1: 'Bienvenido a GenOffice',
-    onbSubtitle1: 'La primera suite ofimática de código abierto y nativa de IA',
-    onbBody1:
-      'Crea documentos, hojas de cálculo y presentaciones, y revisa PDF. La IA está integrada en cada paso.',
-    onbTitle2: 'Esto es solo el comienzo',
-    onbBody2:
-      'GenOffice aún está en alfa. Únete al chat grupal en GenTeam para compartir comentarios y ayudar a dar forma a lo que viene.',
-    onbCredits: 'Los colaboradores activos reciben **1.000+ créditos de Genspark**',
-    onbJoinGenTeam: 'Unirse a GenTeam',
-    onbSkip: 'Omitir',
-    onbNext: 'Siguiente',
-    onbStart: 'Empezar',
-    onbStepAria: 'Página {n} de {total}',
-    onbTitle3: 'Gratis para todos',
-    onbBody3: 'Sin licencias. Sin anuncios. Sin marcas de agua.',
-    onbNote3: 'Las funciones de IA pueden consumir créditos de Genspark.',
-    onbBack: 'Atrás',
     intgSkillsDesc:
       'GenOffice solo usa habilidades de su propia carpeta. Importar una carpeta o un zip copia la habilidad completa; nada se ejecuta al importar.',
     intgSkillsEmpty: 'Aún no hay habilidades instaladas.',
@@ -4981,9 +4776,6 @@ export const strings = {
     setSilentInstall: 'ติดตั้งอัปเดตแบบเงียบ',
     setSilentInstallDesc:
       'เมื่อเปิด เวอร์ชันใหม่ที่ตรวจพบเบื้องหลังจะถูกดาวน์โหลดแบบเงียบและติดตั้งเมื่อคุณออกจาก GenOffice โดยไม่รบกวนระหว่างทำงาน เมื่อปิด จะมีข้อความแจ้งอัปเดตให้คุณตัดสินใจเอง',
-    updateChannel: 'ช่องทางอัปเดต',
-    channelStable: 'เสถียร',
-    channelBeta: 'เบต้า',
     theme: 'ธีม',
     themeLight: 'สว่าง',
     themeDark: 'มืด',
@@ -5197,8 +4989,6 @@ export const strings = {
     setAiGskTools: 'เครื่องมือคลาวด์ Genspark',
     setAiGskToolsDesc:
       'เมื่อผู้ให้บริการตั้งเป็น Genspark การค้นหาเว็บ การสร้างภาพ และการวิเคราะห์สื่อจะผ่าน Genspark และใช้เครดิต เมื่อปิด การค้นหาจะใช้แหล่งข้อมูลฟรีและเครื่องมือภาพของ Genspark จะใช้ไม่ได้',
-    setGithub: 'โอเพนซอร์ส',
-    starOnGitHub: 'กดดาวบน GitHub',
     starPromptTitle: 'ชอบ GenOffice ไหม?',
     starPromptTitleN: 'คุณเปิดเอกสารด้วย GenOffice ไปแล้ว {n} ไฟล์',
     starPromptBody:
@@ -5206,7 +4996,6 @@ export const strings = {
     starPromptGo: 'กดดาวเลย',
     starPromptDone: 'กดแล้ว',
     starPromptLater: 'ไว้ทีหลัง',
-    onbStarHint: 'ถ้าชอบ GenOffice ฝากกดดาวให้เราบน GitHub ด้วยนะ',
     setEmail: 'อีเมล',
     setNotLoggedIn: 'ยังไม่ได้เข้าสู่ระบบ',
     setViewUsage: 'ดูการใช้งาน',
@@ -5221,22 +5010,6 @@ export const strings = {
     appMenu: 'เมนู',
     newTab: 'แท็บใหม่',
     // First-run onboarding
-    onbTitle1: 'ยินดีต้อนรับสู่ GenOffice',
-    onbSubtitle1: 'ชุดโปรแกรมออฟฟิศ AI-native โอเพนซอร์สตัวแรก',
-    onbBody1: 'สร้างเอกสาร ทำสเปรดชีต สร้างงานนำเสนอ และตรวจทาน PDF ทุกขั้นตอนมี AI ในตัว',
-    onbTitle2: 'นี่เป็นเพียงจุดเริ่มต้น',
-    onbBody2:
-      'GenOffice ยังอยู่ในช่วงอัลฟ่า เข้าร่วมแชทกลุ่มบน GenTeam เพื่อแบ่งปันความคิดเห็นและร่วมกำหนดทิศทางต่อไป',
-    onbCredits: 'ผู้มีส่วนร่วมอย่างต่อเนื่องจะได้รับ **เครดิต Genspark กว่า 1,000**',
-    onbJoinGenTeam: 'เข้าร่วม GenTeam',
-    onbSkip: 'ข้าม',
-    onbNext: 'ถัดไป',
-    onbStart: 'เริ่มใช้งาน',
-    onbStepAria: 'หน้า {n} จาก {total}',
-    onbTitle3: 'ฟรีสำหรับทุกคน',
-    onbBody3: 'ไม่มีค่าลิขสิทธิ์ ไม่มีโฆษณา ไม่มีลายน้ำ',
-    onbNote3: 'ฟีเจอร์ AI อาจใช้เครดิต Genspark',
-    onbBack: 'ย้อนกลับ',
     intgSkillsDesc:
       'GenOffice ใช้เฉพาะทักษะในโฟลเดอร์ทักษะของตัวเอง การนำเข้าจากโฟลเดอร์หรือ zip จะคัดลอกทักษะทั้งชุด และไม่มีสิ่งใดทำงานเมื่อนำเข้า',
     intgSkillsEmpty: 'ยังไม่ได้ติดตั้งทักษะ',
@@ -5508,9 +5281,6 @@ export const strings = {
     setSilentInstall: 'Pasang pembaruan secara senyap',
     setSilentInstallDesc:
       'Jika aktif, versi baru yang ditemukan di latar belakang diunduh secara senyap dan dipasang saat Anda keluar dari GenOffice; tidak ada yang mengganggu saat bekerja. Jika nonaktif, sebuah pemberitahuan pembaruan membiarkan Anda menentukan waktunya.',
-    updateChannel: 'Saluran Pembaruan',
-    channelStable: 'Stabil',
-    channelBeta: 'Beta',
     theme: 'Tema',
     themeLight: 'Terang',
     themeDark: 'Gelap',
@@ -5729,8 +5499,6 @@ export const strings = {
     setAiGskTools: 'Alat cloud Genspark',
     setAiGskToolsDesc:
       'Saat penyedianya disetel ke Genspark, pencarian web, pembuatan gambar, dan analisis media berjalan lewat Genspark dan memakai kredit; jika dimatikan, pencarian memakai sumber gratis dan alat gambar Genspark tidak tersedia.',
-    setGithub: 'Sumber Terbuka',
-    starOnGitHub: 'Beri Bintang di GitHub',
     starPromptTitle: 'Suka GenOffice?',
     starPromptTitleN: 'Anda telah membuka {n} dokumen dengan GenOffice',
     starPromptBody:
@@ -5738,7 +5506,6 @@ export const strings = {
     starPromptGo: 'Beri Bintang',
     starPromptDone: 'Sudah',
     starPromptLater: 'Nanti saja',
-    onbStarHint: 'Jika Anda menyukai GenOffice, beri kami bintang di GitHub.',
     setEmail: 'Email',
     setNotLoggedIn: 'Belum masuk',
     setViewUsage: 'Lihat penggunaan',
@@ -5753,23 +5520,6 @@ export const strings = {
     appMenu: 'Menu',
     newTab: 'Tab baru',
     // First-run onboarding
-    onbTitle1: 'Selamat datang di GenOffice',
-    onbSubtitle1: 'Suite office open source AI-native pertama',
-    onbBody1:
-      'Buat dokumen, susun spreadsheet, rancang presentasi, dan tinjau PDF. AI hadir di setiap langkah.',
-    onbTitle2: 'Ini baru permulaan',
-    onbBody2:
-      'GenOffice masih dalam tahap alpha. Gabung obrolan grup di GenTeam untuk berbagi masukan dan ikut menentukan arah ke depan.',
-    onbCredits: 'Kontributor aktif mendapat **1.000+ kredit Genspark**',
-    onbJoinGenTeam: 'Gabung GenTeam',
-    onbSkip: 'Lewati',
-    onbNext: 'Berikutnya',
-    onbStart: 'Mulai',
-    onbStepAria: 'Halaman {n} dari {total}',
-    onbTitle3: 'Gratis untuk semua',
-    onbBody3: 'Tanpa biaya lisensi. Tanpa iklan. Tanpa watermark.',
-    onbNote3: 'Fitur AI dapat menggunakan kredit Genspark.',
-    onbBack: 'Kembali',
     intgSkillsDesc:
       'GenOffice hanya memakai keterampilan di folder keterampilannya sendiri. Mengimpor folder atau zip menyalin seluruh keterampilan; tidak ada yang dijalankan saat impor.',
     intgSkillsEmpty: 'Belum ada keterampilan terpasang.',
@@ -6041,9 +5791,6 @@ export const strings = {
     setSilentInstall: 'Устанавливать обновления автоматически',
     setSilentInstallDesc:
       'Если включено, новая версия, найденная фоновой проверкой, скачивается незаметно и устанавливается при выходе из GenOffice; во время работы ничто вас не прерывает. Если выключено, появляется предложение обновиться, и вы решаете сами.',
-    updateChannel: 'Канал обновлений',
-    channelStable: 'Стабильный',
-    channelBeta: 'Бета',
     theme: 'Тема',
     themeLight: 'Светлая',
     themeDark: 'Тёмная',
@@ -6264,8 +6011,6 @@ export const strings = {
     setAiGskTools: 'Облачные инструменты Genspark',
     setAiGskToolsDesc:
       'Когда провайдером выбран Genspark, веб-поиск, генерация изображений и анализ медиа идут через Genspark и расходуют кредиты; при выключении поиск использует бесплатные источники, а инструменты изображений Genspark недоступны.',
-    setGithub: 'Открытый код',
-    starOnGitHub: 'Поставить звезду на GitHub',
     starPromptTitle: 'Нравится GenOffice?',
     starPromptTitleN: 'Вы уже открыли {n} документов в GenOffice',
     starPromptBody:
@@ -6273,7 +6018,6 @@ export const strings = {
     starPromptGo: 'Поставить звезду',
     starPromptDone: 'Уже поставлена',
     starPromptLater: 'Позже',
-    onbStarHint: 'Если вам нравится GenOffice, поставьте нам звезду на GitHub.',
     setEmail: 'Эл. почта',
     setNotLoggedIn: 'Вы не вошли',
     setViewUsage: 'Посмотреть расход',
@@ -6288,23 +6032,6 @@ export const strings = {
     appMenu: 'Меню',
     newTab: 'Новая вкладка',
     // First-run onboarding
-    onbTitle1: 'Добро пожаловать в GenOffice',
-    onbSubtitle1: 'Первый открытый ИИ-нативный офисный пакет',
-    onbBody1:
-      'Создавайте документы, таблицы и презентации, работайте с PDF. ИИ встроен в каждый шаг.',
-    onbTitle2: 'Это только начало',
-    onbBody2:
-      'GenOffice пока в альфа-версии. Присоединяйтесь к групповому чату в GenTeam, чтобы делиться отзывами и влиять на дальнейшее развитие.',
-    onbCredits: 'Активные участники получают **1000+ кредитов Genspark**',
-    onbJoinGenTeam: 'Присоединиться к GenTeam',
-    onbSkip: 'Пропустить',
-    onbNext: 'Далее',
-    onbStart: 'Начать',
-    onbStepAria: 'Страница {n} из {total}',
-    onbTitle3: 'Бесплатно для всех',
-    onbBody3: 'Без лицензий. Без рекламы. Без водяных знаков.',
-    onbNote3: 'Функции ИИ могут расходовать кредиты Genspark.',
-    onbBack: 'Назад',
     intgSkillsDesc:
       'GenOffice использует только навыки из своей папки навыков. Импорт папки или zip копирует навык целиком; при импорте ничего не запускается.',
     intgSkillsEmpty: 'Навыки ещё не установлены.',
@@ -6575,9 +6302,6 @@ export const strings = {
     setSilentInstall: 'تثبيت التحديثات بصمت',
     setSilentInstallDesc:
       'عند التفعيل، يُحمَّل الإصدار الجديد الذي يكتشفه الفحص في الخلفية بصمت ويُثبَّت عند الخروج من GenOffice، دون أي مقاطعة أثناء العمل. عند الإيقاف، يظهر تنبيه تحديث لتقرر أنت موعد التحديث.',
-    updateChannel: 'قناة التحديث',
-    channelStable: 'مستقر',
-    channelBeta: 'تجريبي',
     theme: 'المظهر',
     themeLight: 'فاتح',
     themeDark: 'داكن',
@@ -6792,15 +6516,12 @@ export const strings = {
     setAiGskTools: 'أدوات Genspark السحابية',
     setAiGskToolsDesc:
       'عندما يكون المزوّد Genspark، يمر البحث في الويب وتوليد الصور وتحليل الوسائط عبر Genspark ويستهلك الرصيد؛ عند الإيقاف يستخدم البحث مصادر مجانية وتصبح أدوات صور Genspark غير متاحة.',
-    setGithub: 'مفتوح المصدر',
-    starOnGitHub: 'ضع نجمة على GitHub',
     starPromptTitle: 'هل أعجبك GenOffice؟',
     starPromptTitleN: 'لقد فتحت {n} من المستندات في GenOffice',
     starPromptBody: 'GenOffice مجاني ومفتوح المصدر. نجمة على GitHub هي أفضل دعم للفريق.',
     starPromptGo: 'ضع نجمة',
     starPromptDone: 'وضعتها بالفعل',
     starPromptLater: 'لاحقًا',
-    onbStarHint: 'إذا أعجبك GenOffice، ضع لنا نجمة على GitHub.',
     setEmail: 'البريد الإلكتروني',
     setNotLoggedIn: 'لم يتم تسجيل الدخول',
     setViewUsage: 'عرض الاستخدام',
@@ -6815,23 +6536,6 @@ export const strings = {
     appMenu: 'القائمة',
     newTab: 'علامة تبويب جديدة',
     // First-run onboarding
-    onbTitle1: 'مرحبًا بك في GenOffice',
-    onbSubtitle1: 'أول حزمة مكتبية مفتوحة المصدر وأصيلة في الذكاء الاصطناعي',
-    onbBody1:
-      'أنشئ المستندات وجداول البيانات والعروض التقديمية وراجع ملفات PDF. الذكاء الاصطناعي مدمج في كل خطوة.',
-    onbTitle2: 'هذه مجرد البداية',
-    onbBody2:
-      'لا يزال GenOffice في مرحلة ألفا. انضم إلى الدردشة الجماعية على GenTeam لمشاركة ملاحظاتك والمساهمة في تشكيل المستقبل.',
-    onbCredits: 'يحصل المساهمون النشطون على **+1,000 من أرصدة Genspark**',
-    onbJoinGenTeam: 'الانضمام إلى GenTeam',
-    onbSkip: 'تخطي',
-    onbNext: 'التالي',
-    onbStart: 'ابدأ الآن',
-    onbStepAria: 'الصفحة {n} من {total}',
-    onbTitle3: 'مجاني للجميع',
-    onbBody3: 'بلا رسوم ترخيص، بلا إعلانات، بلا علامات مائية.',
-    onbNote3: 'قد تستهلك ميزات الذكاء الاصطناعي أرصدة Genspark.',
-    onbBack: 'رجوع',
     intgSkillsDesc:
       'يستخدم GenOffice المهارات الموجودة في مجلد مهاراته فقط. استيراد مجلد أو ملف zip ينسخ المهارة كاملة؛ ولا يُشغَّل شيء عند الاستيراد.',
     intgSkillsEmpty: 'لم تُثبَّت أي مهارات بعد.',
@@ -7098,9 +6802,6 @@ export const strings = {
     setSilentInstall: 'Instalar atualizações silenciosamente',
     setSilentInstallDesc:
       'Quando ativado, uma nova versão encontrada em segundo plano é baixada silenciosamente e instalada ao sair do GenOffice; nada interrompe seu trabalho. Quando desativado, um aviso de atualização deixa você decidir quando atualizar.',
-    updateChannel: 'Canal de atualização',
-    channelStable: 'Estável',
-    channelBeta: 'Beta',
     theme: 'Tema',
     themeLight: 'Claro',
     themeDark: 'Escuro',
@@ -7322,8 +7023,6 @@ export const strings = {
     setAiGskTools: 'Ferramentas na nuvem Genspark',
     setAiGskToolsDesc:
       'Quando o provedor é o Genspark, a busca na web, a geração de imagens e a análise de mídia passam pelo Genspark e consomem créditos; desativado, a busca usa fontes gratuitas e as ferramentas de imagem do Genspark ficam indisponíveis.',
-    setGithub: 'Código aberto',
-    starOnGitHub: 'Dar uma estrela no GitHub',
     starPromptTitle: 'Gostando do GenOffice?',
     starPromptTitleN: 'Você já abriu {n} documentos com o GenOffice',
     starPromptBody:
@@ -7331,7 +7030,6 @@ export const strings = {
     starPromptGo: 'Dar uma estrela',
     starPromptDone: 'Já dei',
     starPromptLater: 'Mais tarde',
-    onbStarHint: 'Se você gosta do GenOffice, deixe uma estrela no GitHub.',
     setEmail: 'E-mail',
     setNotLoggedIn: 'Não conectado',
     setViewUsage: 'Ver uso',
@@ -7344,23 +7042,6 @@ export const strings = {
     appMenu: 'Menu',
     newTab: 'Nova guia',
     // First-run onboarding
-    onbTitle1: 'Bem-vindo ao GenOffice',
-    onbSubtitle1: 'A primeira suíte de escritório open source e nativa de IA',
-    onbBody1:
-      'Crie documentos, planilhas e apresentações e revise PDFs. A IA está integrada em cada etapa.',
-    onbTitle2: 'Isto é só o começo',
-    onbBody2:
-      'O GenOffice ainda está em alfa. Entre no chat em grupo no GenTeam para compartilhar feedback e ajudar a moldar o que vem a seguir.',
-    onbCredits: 'Contribuidores ativos recebem **1.000+ créditos Genspark**',
-    onbJoinGenTeam: 'Entrar no GenTeam',
-    onbSkip: 'Pular',
-    onbNext: 'Avançar',
-    onbStart: 'Começar',
-    onbStepAria: 'Página {n} de {total}',
-    onbTitle3: 'Gratuito para todos',
-    onbBody3: "Sem licenças. Sem anúncios. Sem marcas d'água.",
-    onbNote3: 'Os recursos de IA podem consumir créditos Genspark.',
-    onbBack: 'Voltar',
     intgSkillsDesc:
       'O GenOffice só usa habilidades da sua própria pasta. Importar uma pasta ou um zip copia a habilidade inteira; nada é executado na importação.',
     intgSkillsEmpty: 'Nenhuma habilidade instalada.',
@@ -7629,9 +7310,6 @@ export const strings = {
     setSilentInstall: 'Installa gli aggiornamenti in silenzio',
     setSilentInstallDesc:
       'Se attivo, una nuova versione trovata in background viene scaricata in silenzio e installata alla chiusura di GenOffice; nulla ti interrompe mentre lavori. Se disattivato, un avviso di aggiornamento ti lascia decidere quando aggiornare.',
-    updateChannel: 'Canale di aggiornamento',
-    channelStable: 'Stabile',
-    channelBeta: 'Beta',
     theme: 'Tema',
     themeLight: 'Chiaro',
     themeDark: 'Scuro',
@@ -7853,8 +7531,6 @@ export const strings = {
     setAiGskTools: 'Strumenti cloud Genspark',
     setAiGskToolsDesc:
       "Quando il provider è Genspark, la ricerca web, la generazione di immagini e l'analisi dei media passano da Genspark e consumano crediti; se disattivato, la ricerca usa fonti gratuite e gli strumenti immagine di Genspark non sono disponibili.",
-    setGithub: 'Open source',
-    starOnGitHub: 'Metti una stella su GitHub',
     starPromptTitle: 'Ti piace GenOffice?',
     starPromptTitleN: 'Hai aperto {n} documenti con GenOffice',
     starPromptBody:
@@ -7862,7 +7538,6 @@ export const strings = {
     starPromptGo: 'Metti una stella',
     starPromptDone: 'Già fatto',
     starPromptLater: 'Più tardi',
-    onbStarHint: 'Se ti piace GenOffice, lasciaci una stella su GitHub.',
     setEmail: 'Email',
     setNotLoggedIn: 'Non connesso',
     setViewUsage: 'Vedi utilizzo',
@@ -7875,23 +7550,6 @@ export const strings = {
     appMenu: 'Menu',
     newTab: 'Nuova scheda',
     // First-run onboarding
-    onbTitle1: 'Benvenuto in GenOffice',
-    onbSubtitle1: 'La prima suite per ufficio open source e nativa per l’IA',
-    onbBody1:
-      'Crea documenti, fogli di calcolo e presentazioni e rivedi i PDF. L’IA è integrata in ogni passaggio.',
-    onbTitle2: 'Questo è solo l’inizio',
-    onbBody2:
-      'GenOffice è ancora in alpha. Unisciti alla chat di gruppo su GenTeam per condividere feedback e contribuire a plasmare il futuro.',
-    onbCredits: 'I collaboratori attivi ricevono **1.000+ crediti Genspark**',
-    onbJoinGenTeam: 'Unisciti a GenTeam',
-    onbSkip: 'Salta',
-    onbNext: 'Avanti',
-    onbStart: 'Inizia',
-    onbStepAria: 'Pagina {n} di {total}',
-    onbTitle3: 'Gratuito per tutti',
-    onbBody3: 'Nessuna licenza. Nessuna pubblicità. Nessuna filigrana.',
-    onbNote3: 'Le funzioni IA possono consumare crediti Genspark.',
-    onbBack: 'Indietro',
     intgSkillsDesc:
       'GenOffice usa solo le competenze nella propria cartella. Importare una cartella o uno zip copia l’intera competenza; nulla viene eseguito all’importazione.',
     intgSkillsEmpty: 'Nessuna competenza installata.',
@@ -8159,9 +7817,6 @@ export const strings = {
     setSilentInstall: 'Instaluj aktualizacje po cichu',
     setSilentInstallDesc:
       'Gdy włączone, nowa wersja znaleziona w tle jest pobierana po cichu i instalowana przy wyjściu z GenOffice; nic nie przerywa pracy. Gdy wyłączone, monit o aktualizacji pozwala samodzielnie wybrać moment.',
-    updateChannel: 'Kanał aktualizacji',
-    channelStable: 'Stabilny',
-    channelBeta: 'Beta',
     theme: 'Motyw',
     themeLight: 'Jasny',
     themeDark: 'Ciemny',
@@ -8381,8 +8036,6 @@ export const strings = {
     setAiGskTools: 'Narzędzia chmurowe Genspark',
     setAiGskToolsDesc:
       'Gdy dostawcą jest Genspark, wyszukiwanie w sieci, generowanie obrazów i analiza mediów przechodzą przez Genspark i zużywają kredyty; po wyłączeniu wyszukiwanie używa darmowych źródeł, a narzędzia obrazów Genspark są niedostępne.',
-    setGithub: 'Open source',
-    starOnGitHub: 'Gwiazdka na GitHubie',
     starPromptTitle: 'Podoba Ci się GenOffice?',
     starPromptTitleN: 'Otwarto już {n} dokumentów w GenOffice',
     starPromptBody:
@@ -8390,7 +8043,6 @@ export const strings = {
     starPromptGo: 'Daj gwiazdkę',
     starPromptDone: 'Już zrobione',
     starPromptLater: 'Później',
-    onbStarHint: 'Jeśli podoba Ci się GenOffice, zostaw nam gwiazdkę na GitHubie.',
     setEmail: 'E-mail',
     setNotLoggedIn: 'Nie zalogowano',
     setViewUsage: 'Zobacz zużycie',
@@ -8403,23 +8055,6 @@ export const strings = {
     appMenu: 'Menu',
     newTab: 'Nowa karta',
     // First-run onboarding
-    onbTitle1: 'Witamy w GenOffice',
-    onbSubtitle1: 'Pierwszy otwartoźródłowy, natywnie oparty na AI pakiet biurowy',
-    onbBody1:
-      'Twórz dokumenty, arkusze i prezentacje oraz przeglądaj pliki PDF. AI jest wbudowana w każdy etap.',
-    onbTitle2: 'To dopiero początek',
-    onbBody2:
-      'GenOffice jest wciąż w fazie alfa. Dołącz do czatu grupowego na GenTeam, aby dzielić się opiniami i współtworzyć jego przyszłość.',
-    onbCredits: 'Aktywni współtwórcy otrzymują **1000+ kredytów Genspark**',
-    onbJoinGenTeam: 'Dołącz do GenTeam',
-    onbSkip: 'Pomiń',
-    onbNext: 'Dalej',
-    onbStart: 'Rozpocznij',
-    onbStepAria: 'Strona {n} z {total}',
-    onbTitle3: 'Za darmo dla każdego',
-    onbBody3: 'Bez opłat licencyjnych. Bez reklam. Bez znaków wodnych.',
-    onbNote3: 'Funkcje AI mogą zużywać kredyty Genspark.',
-    onbBack: 'Wstecz',
     intgSkillsDesc:
       'GenOffice używa tylko umiejętności z własnego folderu. Import folderu lub pliku zip kopiuje całą umiejętność; podczas importu nic nie jest uruchamiane.',
     intgSkillsEmpty: 'Brak zainstalowanych umiejętności.',
@@ -8685,9 +8320,6 @@ export const strings = {
     setSilentInstall: 'Instalovat aktualizace tiše',
     setSilentInstallDesc:
       'Je-li zapnuto, nová verze nalezená na pozadí se tiše stáhne a nainstaluje při ukončení GenOffice; při práci vás nic nepřeruší. Je-li vypnuto, výzva k aktualizaci vám nechá rozhodnout kdy.',
-    updateChannel: 'Kanál aktualizací',
-    channelStable: 'Stabilní',
-    channelBeta: 'Beta',
     theme: 'Motiv',
     themeLight: 'Světlý',
     themeDark: 'Tmavý',
@@ -8875,8 +8507,6 @@ export const strings = {
     setAiGskTools: 'Cloudové nástroje Genspark',
     setAiGskToolsDesc:
       'Webové vyhledávání, generování obrázků a analýza médií běží přes Genspark a čerpají kredity, pokud je jejich poskytovatel nastaven na Genspark; při vypnutí vyhledávání používá bezplatné zdroje a obrázkové nástroje Genspark nejsou dostupné.',
-    setGithub: 'Open source',
-    starOnGitHub: 'Dát hvězdičku na GitHubu',
     starPromptTitle: 'Líbí se vám GenOffice?',
     starPromptTitleN: 'V GenOffice jste otevřeli už {n} dokumentů',
     starPromptBody:
@@ -8884,7 +8514,6 @@ export const strings = {
     starPromptGo: 'Dát hvězdičku na GitHubu',
     starPromptDone: 'Hvězdička už udělena',
     starPromptLater: 'Možná později',
-    onbStarHint: 'Pokud se vám GenOffice líbí, dejte nám hvězdičku na GitHubu.',
     setEmail: 'E-mail',
     setNotLoggedIn: 'Nepřihlášeno',
     setViewUsage: 'Zobrazit využití',
@@ -8897,23 +8526,6 @@ export const strings = {
     appMenu: 'Nabídka',
     newTab: 'Nová karta',
     // First-run onboarding
-    onbTitle1: 'Vítejte v GenOffice',
-    onbSubtitle1: 'První open-source kancelářský balík s nativní AI',
-    onbBody1:
-      'Vytvářejte dokumenty, tabulky a prezentace a kontrolujte PDF. AI je součástí každého kroku.',
-    onbTitle2: 'Toto je jen začátek',
-    onbBody2:
-      'GenOffice je stále ve fázi alfa. Připojte se ke skupinovému chatu na GenTeam, sdílejte zpětnou vazbu a pomozte utvářet, co přijde dál.',
-    onbCredits: 'Aktivní přispěvatelé získají **1 000+ kreditů Genspark**',
-    onbJoinGenTeam: 'Připojit se ke GenTeam',
-    onbSkip: 'Přeskočit',
-    onbNext: 'Další',
-    onbStart: 'Začít',
-    onbStepAria: 'Stránka {n} z {total}',
-    onbTitle3: 'Zdarma pro všechny',
-    onbBody3: 'Žádné licenční poplatky. Žádné reklamy. Žádné vodoznaky.',
-    onbNote3: 'Funkce AI mohou čerpat kredity Genspark.',
-    onbBack: 'Zpět',
     setRestoreSession: 'Znovu otevřít dokumenty z minula',
     setRestoreSessionDesc:
       'Dokumenty otevřené při zavření GenOffice se při příštím spuštění automaticky znovu otevřou.',
@@ -9209,9 +8821,6 @@ export const strings = {
     setSilentInstall: 'Updates stil installeren',
     setSilentInstallDesc:
       'Indien aan, wordt een nieuwe versie die op de achtergrond is gevonden stil gedownload en geïnstalleerd wanneer u GenOffice afsluit; niets onderbreekt u tijdens het werk. Indien uit, laat een updatemelding u zelf kiezen wanneer.',
-    updateChannel: 'Updatekanaal',
-    channelStable: 'Stabiel',
-    channelBeta: 'Bèta',
     theme: 'Thema',
     themeLight: 'Licht',
     themeDark: 'Donker',
@@ -9431,8 +9040,6 @@ export const strings = {
     setAiGskTools: 'Genspark-cloudtools',
     setAiGskToolsDesc:
       'Staat de provider op Genspark, dan lopen zoeken op het web, afbeeldingen genereren en media-analyse via Genspark en kosten ze credits; uitgeschakeld gebruikt zoeken gratis bronnen en zijn de Genspark-afbeeldingstools niet beschikbaar.',
-    setGithub: 'Open source',
-    starOnGitHub: 'Geef een ster op GitHub',
     starPromptTitle: 'Bevalt GenOffice?',
     starPromptTitleN: 'Je hebt al {n} documenten geopend met GenOffice',
     starPromptBody:
@@ -9440,7 +9047,6 @@ export const strings = {
     starPromptGo: 'Geef een ster',
     starPromptDone: 'Al gedaan',
     starPromptLater: 'Later',
-    onbStarHint: 'Als GenOffice je bevalt, geef ons dan een ster op GitHub.',
     setEmail: 'E-mail',
     setNotLoggedIn: 'Niet ingelogd',
     setViewUsage: 'Verbruik bekijken',
@@ -9453,23 +9059,6 @@ export const strings = {
     appMenu: 'Menu',
     newTab: 'Nieuw tabblad',
     // First-run onboarding
-    onbTitle1: 'Welkom bij GenOffice',
-    onbSubtitle1: 'De eerste open source, AI-native officesuite',
-    onbBody1:
-      'Maak documenten, bouw spreadsheets, maak presentaties en beoordeel PDF-bestanden. AI zit in elke stap ingebouwd.',
-    onbTitle2: 'Dit is nog maar het begin',
-    onbBody2:
-      'GenOffice is nog in alfa. Doe mee aan de groepschat op GenTeam om feedback te delen en mee te bepalen wat er komt.',
-    onbCredits: 'Actieve bijdragers krijgen **1.000+ Genspark-credits**',
-    onbJoinGenTeam: 'Word lid van GenTeam',
-    onbSkip: 'Overslaan',
-    onbNext: 'Volgende',
-    onbStart: 'Aan de slag',
-    onbStepAria: 'Pagina {n} van {total}',
-    onbTitle3: 'Gratis voor iedereen',
-    onbBody3: 'Geen licentiekosten. Geen advertenties. Geen watermerken.',
-    onbNote3: 'AI-functies kunnen Genspark-credits verbruiken.',
-    onbBack: 'Terug',
     intgSkillsDesc:
       'GenOffice gebruikt alleen vaardigheden uit zijn eigen map. Een map of zip importeren kopieert de hele vaardigheid; bij het importeren wordt niets uitgevoerd.',
     intgSkillsEmpty: 'Nog geen vaardigheden geïnstalleerd.',
@@ -9736,9 +9325,6 @@ export const strings = {
     setSilentInstall: 'Pasang kemas kini secara senyap',
     setSilentInstallDesc:
       'Apabila dihidupkan, versi baharu yang ditemui di latar belakang dimuat turun secara senyap dan dipasang apabila anda keluar dari GenOffice; tiada gangguan semasa bekerja. Apabila dimatikan, gesaan kemas kini membiarkan anda memutuskan bila.',
-    updateChannel: 'Saluran Kemas Kini',
-    channelStable: 'Stabil',
-    channelBeta: 'Beta',
     theme: 'Tema',
     themeLight: 'Cerah',
     themeDark: 'Gelap',
@@ -9960,8 +9546,6 @@ export const strings = {
     setAiGskTools: 'Alat awan Genspark',
     setAiGskToolsDesc:
       'Apabila pembekalnya ditetapkan kepada Genspark, carian web, penjanaan imej dan analisis media melalui Genspark dan menggunakan kredit; apabila dimatikan, carian menggunakan sumber percuma dan alat imej Genspark tidak tersedia.',
-    setGithub: 'Sumber Terbuka',
-    starOnGitHub: 'Beri Bintang di GitHub',
     starPromptTitle: 'Suka GenOffice?',
     starPromptTitleN: 'Anda telah membuka {n} dokumen dengan GenOffice',
     starPromptBody:
@@ -9969,7 +9553,6 @@ export const strings = {
     starPromptGo: 'Beri Bintang',
     starPromptDone: 'Sudah',
     starPromptLater: 'Kemudian',
-    onbStarHint: 'Jika anda suka GenOffice, beri kami bintang di GitHub.',
     setEmail: 'E-mel',
     setNotLoggedIn: 'Belum log masuk',
     setViewUsage: 'Lihat penggunaan',
@@ -9982,23 +9565,6 @@ export const strings = {
     appMenu: 'Menu',
     newTab: 'Tab baharu',
     // First-run onboarding
-    onbTitle1: 'Selamat datang ke GenOffice',
-    onbSubtitle1: 'Suite pejabat sumber terbuka natif AI yang pertama',
-    onbBody1:
-      'Cipta dokumen, bina hamparan, hasilkan persembahan dan semak PDF. AI tersedia pada setiap langkah.',
-    onbTitle2: 'Ini baru permulaan',
-    onbBody2:
-      'GenOffice masih dalam peringkat alfa. Sertai sembang kumpulan di GenTeam untuk berkongsi maklum balas dan membentuk masa depannya.',
-    onbCredits: 'Penyumbang aktif menerima **1,000+ kredit Genspark**',
-    onbJoinGenTeam: 'Sertai GenTeam',
-    onbSkip: 'Langkau',
-    onbNext: 'Seterusnya',
-    onbStart: 'Mula',
-    onbStepAria: 'Halaman {n} daripada {total}',
-    onbTitle3: 'Percuma untuk semua',
-    onbBody3: 'Tiada yuran lesen. Tiada iklan. Tiada tera air.',
-    onbNote3: 'Ciri AI mungkin menggunakan kredit Genspark.',
-    onbBack: 'Kembali',
     intgSkillsDesc:
       'GenOffice hanya menggunakan kemahiran dalam folder kemahirannya sendiri. Mengimport folder atau zip menyalin keseluruhan kemahiran; tiada apa yang dijalankan semasa import.',
     intgSkillsEmpty: 'Belum ada kemahiran dipasang.',
@@ -10261,9 +9827,6 @@ export const strings = {
     setSilentInstall: 'התקנת עדכונים בשקט',
     setSilentInstallDesc:
       'כשמופעל, גרסה חדשה שנמצאה ברקע מורדת בשקט ומותקנת ביציאה מ‑GenOffice; שום דבר לא מפריע בזמן העבודה. כשכבוי, הודעת עדכון מאפשרת לכם להחליט מתי לעדכן.',
-    updateChannel: 'ערוץ עדכונים',
-    channelStable: 'יציב',
-    channelBeta: 'בטא',
     theme: 'ערכת נושא',
     themeLight: 'בהיר',
     themeDark: 'כהה',
@@ -10476,15 +10039,12 @@ export const strings = {
     setAiGskTools: 'כלי הענן של Genspark',
     setAiGskToolsDesc:
       'כשהספק מוגדר ל-Genspark, חיפוש באינטרנט, יצירת תמונות וניתוח מדיה עוברים דרך Genspark וצורכים קרדיטים; כשהוא כבוי החיפוש משתמש במקורות חינמיים וכלי התמונות של Genspark אינם זמינים.',
-    setGithub: 'קוד פתוח',
-    starOnGitHub: 'תנו כוכב ב-GitHub',
     starPromptTitle: 'נהנים מ-GenOffice?',
     starPromptTitleN: 'פתחת {n} מסמכים עם GenOffice',
     starPromptBody: 'GenOffice חינמי ובקוד פתוח. כוכב ב-GitHub הוא התמיכה הטובה ביותר בצוות.',
     starPromptGo: 'לתת כוכב',
     starPromptDone: 'כבר נתתי',
     starPromptLater: 'אחר כך',
-    onbStarHint: 'אם GenOffice מוצא חן בעיניכם, תנו לנו כוכב ב-GitHub.',
     setEmail: 'אימייל',
     setNotLoggedIn: 'לא מחובר',
     setViewUsage: 'הצגת שימוש',
@@ -10497,22 +10057,6 @@ export const strings = {
     appMenu: 'תפריט',
     newTab: 'כרטיסייה חדשה',
     // First-run onboarding
-    onbTitle1: 'ברוכים הבאים ל-GenOffice',
-    onbSubtitle1: 'חבילת המשרד הראשונה בקוד פתוח שהיא AI-נייטיב',
-    onbBody1: 'צרו מסמכים, בנו גיליונות, הכינו מצגות ובדקו קובצי PDF. ה-AI מובנה בכל שלב.',
-    onbTitle2: 'זו רק ההתחלה',
-    onbBody2:
-      'GenOffice עדיין בגרסת אלפא. הצטרפו לצ׳אט הקבוצתי ב-GenTeam כדי לשתף משוב ולעזור לעצב את ההמשך.',
-    onbCredits: 'תורמים פעילים מקבלים **1,000+ נקודות Genspark**',
-    onbJoinGenTeam: 'הצטרפו ל-GenTeam',
-    onbSkip: 'דילוג',
-    onbNext: 'הבא',
-    onbStart: 'להתחיל',
-    onbStepAria: 'עמוד {n} מתוך {total}',
-    onbTitle3: 'חינם לכולם',
-    onbBody3: 'ללא דמי רישיון, ללא פרסומות, ללא סימני מים.',
-    onbNote3: 'תכונות AI עשויות לצרוך קרדיטים של Genspark.',
-    onbBack: 'חזרה',
     intgSkillsDesc:
       'GenOffice משתמש רק במיומנויות שבתיקיית המיומנויות שלו. ייבוא תיקייה או zip מעתיק את המיומנות כולה; שום דבר לא מופעל בייבוא.',
     intgSkillsEmpty: 'עדיין לא הותקנו מיומנויות.',
@@ -10777,9 +10321,6 @@ export const strings = {
     setSilentInstall: 'अपडेट चुपचाप इंस्टॉल करें',
     setSilentInstallDesc:
       'चालू होने पर, पृष्ठभूमि जाँच में मिला नया संस्करण चुपचाप डाउनलोड होता है और GenOffice से बाहर निकलते समय इंस्टॉल होता है; काम के दौरान कोई रुकावट नहीं। बंद होने पर, अपडेट सूचना से आप तय करते हैं कि कब अपडेट करना है।',
-    updateChannel: 'अपडेट चैनल',
-    channelStable: 'स्थिर',
-    channelBeta: 'बीटा',
     theme: 'थीम',
     themeLight: 'लाइट',
     themeDark: 'डार्क',
@@ -10997,8 +10538,6 @@ export const strings = {
     setAiGskTools: 'Genspark क्लाउड टूल',
     setAiGskToolsDesc:
       'जब प्रदाता Genspark हो, वेब खोज, इमेज जनरेशन और मीडिया विश्लेषण Genspark से होकर चलते हैं और क्रेडिट खर्च करते हैं; बंद होने पर खोज मुफ़्त स्रोत उपयोग करती है और Genspark इमेज टूल उपलब्ध नहीं रहते।',
-    setGithub: 'ओपन सोर्स',
-    starOnGitHub: 'GitHub पर स्टार दें',
     starPromptTitle: 'GenOffice पसंद आ रहा है?',
     starPromptTitleN: 'आपने GenOffice में {n} दस्तावेज़ खोले हैं',
     starPromptBody:
@@ -11006,7 +10545,6 @@ export const strings = {
     starPromptGo: 'स्टार दें',
     starPromptDone: 'पहले ही दे दिया',
     starPromptLater: 'बाद में',
-    onbStarHint: 'अगर आपको GenOffice पसंद है, तो हमें GitHub पर स्टार दें।',
     setEmail: 'ईमेल',
     setNotLoggedIn: 'साइन इन नहीं किया गया',
     setViewUsage: 'उपयोग देखें',
@@ -11019,23 +10557,6 @@ export const strings = {
     appMenu: 'मेनू',
     newTab: 'नया टैब',
     // First-run onboarding
-    onbTitle1: 'GenOffice में आपका स्वागत है',
-    onbSubtitle1: 'पहला ओपन-सोर्स, AI-नेटिव ऑफ़िस सुइट',
-    onbBody1:
-      'दस्तावेज़ बनाएँ, स्प्रेडशीट तैयार करें, प्रस्तुतियाँ बनाएँ और PDF की समीक्षा करें। AI हर चरण में शामिल है।',
-    onbTitle2: 'यह तो बस शुरुआत है',
-    onbBody2:
-      'GenOffice अभी अल्फ़ा में है। GenTeam पर ग्रुप चैट से जुड़ें, फ़ीडबैक साझा करें और आगे की दिशा तय करने में मदद करें।',
-    onbCredits: 'सक्रिय योगदानकर्ताओं के लिए **1,000+ Genspark क्रेडिट**',
-    onbJoinGenTeam: 'GenTeam से जुड़ें',
-    onbSkip: 'छोड़ें',
-    onbNext: 'आगे',
-    onbStart: 'शुरू करें',
-    onbStepAria: 'कुल {total} में से पृष्ठ {n}',
-    onbTitle3: 'सभी के लिए मुफ़्त',
-    onbBody3: 'कोई लाइसेंस शुल्क नहीं। कोई विज्ञापन नहीं। कोई वॉटरमार्क नहीं।',
-    onbNote3: 'AI सुविधाएँ Genspark क्रेडिट खर्च कर सकती हैं।',
-    onbBack: 'वापस',
     intgSkillsDesc:
       'GenOffice केवल अपने कौशल फ़ोल्डर के कौशल उपयोग करता है। फ़ोल्डर या zip से आयात पूरा कौशल कॉपी करता है; आयात पर कुछ नहीं चलता।',
     intgSkillsEmpty: 'अभी कोई कौशल इंस्टॉल नहीं है।',
@@ -11294,9 +10815,6 @@ export const strings = {
     setSilentInstall: '靜默安裝更新',
     setSilentInstallDesc:
       '開啟後，背景檢查到新版本會靜默下載，並在你結束應用程式時安裝，使用過程中不會打擾或重新啟動。關閉則彈出更新提示，由你決定何時更新。',
-    updateChannel: '更新通道',
-    channelStable: '穩定版',
-    channelBeta: 'Beta 版',
     theme: '主題',
     themeLight: '淺色',
     themeDark: '深色',
@@ -11503,15 +11021,12 @@ export const strings = {
     setAiGskTools: 'Genspark 雲端工具',
     setAiGskToolsDesc:
       '服務商選擇 Genspark 時，網頁搜尋、生圖與媒體解析經 Genspark 雲端並消耗點數；關閉後搜尋改用免費來源，Genspark 生圖工具不可用。',
-    setGithub: '開源專案',
-    starOnGitHub: '到 GitHub 給我們一顆星',
     starPromptTitle: '喜歡 GenOffice 嗎？',
     starPromptTitleN: '你已經用 GenOffice 開啟了 {n} 個文件',
     starPromptBody: 'GenOffice 是免費的開源軟體。到 GitHub 給我們一顆星，是對團隊最好的支持。',
     starPromptGo: '去給星星',
     starPromptDone: '已經給過了',
     starPromptLater: '以後再說',
-    onbStarHint: '如果你喜歡 GenOffice，歡迎到 GitHub 給我們一顆星。',
     setEmail: '電子郵件',
     setNotLoggedIn: '未登入',
     setViewUsage: '查看用量',
@@ -11524,21 +11039,6 @@ export const strings = {
     appMenu: '選單',
     newTab: '新分頁',
     // First-run onboarding
-    onbTitle1: '歡迎使用 GenOffice',
-    onbSubtitle1: '第一個開源的 AI 原生 Office 套件',
-    onbBody1: '建立文件、製作試算表、產生簡報、審閱 PDF。AI 深度融入每個環節。',
-    onbTitle2: '這只是一個開始',
-    onbBody2: 'GenOffice 目前仍在 alpha 階段。歡迎加入 GenTeam 群聊，分享回饋，一起打造它的未來。',
-    onbCredits: '活躍貢獻者可獲得 **1,000+ Genspark 點數**',
-    onbJoinGenTeam: '加入 GenTeam',
-    onbSkip: '略過',
-    onbNext: '下一步',
-    onbStart: '開始使用',
-    onbStepAria: '第 {n} 頁，共 {total} 頁',
-    onbTitle3: '人人免費',
-    onbBody3: '無授權費用，無廣告，無浮水印。',
-    onbNote3: 'AI 功能可能消耗 Genspark 點數。',
-    onbBack: '上一步',
     intgSkillsDesc:
       'GenOffice 只使用自己技能資料夾裡的技能。從資料夾或 zip 匯入會把整個技能複製進來；匯入不會自動執行任何東西。',
     intgSkillsEmpty: '尚未安裝技能。',

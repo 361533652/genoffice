@@ -806,29 +806,6 @@ function recordStarPromptDocOpen(): void {
   }
 }
 
-// Stargazer count for the settings About pane; fetched main-side (the
-// renderer CSP has no api.github.com) and cached per session — the exact
-// number is decoration, staleness is fine.
-let cachedGithubStars: number | null = null
-
-async function fetchGithubStars(): Promise<number | null> {
-  if (cachedGithubStars !== null) return cachedGithubStars
-  try {
-    const response = await fetch('https://api.github.com/repos/genspark-ai/genoffice', {
-      headers: { Accept: 'application/vnd.github+json' },
-      signal: AbortSignal.timeout(5000),
-    })
-    if (!response.ok) return null
-    const body: unknown = await response.json()
-    const count = (body as { stargazers_count?: unknown }).stargazers_count
-    if (typeof count !== 'number' || !Number.isFinite(count)) return null
-    cachedGithubStars = count
-    return count
-  } catch {
-    return null
-  }
-}
-
 const tMain = createI18n({
   zh: {
     menuTabSave: '保存',
@@ -5225,20 +5202,6 @@ function registerHomeIpc(): void {
     cachedSilentInstallUpdate = on
   })
 
-  ipcMain.handle(
-    HOME_CHANNELS.onboardingSeen,
-    (): boolean => readAppSettings(APP_SETTINGS_PATH()).onboardingSeen === true,
-  )
-
-  ipcMain.handle(HOME_CHANNELS.setOnboardingSeen, (): boolean => {
-    try {
-      writeAppSetting(APP_SETTINGS_PATH(), 'onboardingSeen', true)
-      return true
-    } catch {
-      return false
-    }
-  })
-
   ipcMain.handle(HOME_CHANNELS.getTheme, (): UiTheme => currentTheme())
   // editor tabs ask via the app-wide channel (symmetric with app:get-language)
   ipcMain.handle('app:get-theme', (): UiTheme => currentTheme())
@@ -5628,8 +5591,6 @@ function registerHomeIpc(): void {
       // no browser handler available; nothing actionable for the user here
     })
   })
-
-  ipcMain.handle(HOME_CHANNELS.githubStars, () => fetchGithubStars())
 
   // returning true also counts as "shown": the renderer displays it
   // unconditionally, so no separate mark-shown round-trip is needed

@@ -50,7 +50,6 @@ describe('Settings analytics consent', () => {
       setAiPanelPrefs: async (patch) => ({ fontSize: 'default', spellcheck: true, ...patch }),
       getUpdateChannel: async () => 'stable',
       getAppVersion: async () => '1.0.0',
-      githubStars: async () => null,
     } as unknown as HomeApi
 
     await act(async () => {
@@ -107,7 +106,6 @@ describe('Settings AutoSave default', () => {
       setAutoSaveDefault: persist,
       getUpdateChannel: async () => 'stable',
       getAppVersion: async () => '1.0.0',
-      githubStars: async () => null,
     } as unknown as HomeApi
 
     await act(async () => {
