@@ -1,4 +1,4 @@
-﻿/**
+/**
  * electron-builder configuration (moved out of package.json "build" so the
  * auto-update feed URL can be injected at build time instead of living in
  * the repo).
@@ -46,6 +46,8 @@ function normalizeHttpsBaseUrl(name, value) {
 }
 
 const updateUrl = process.env.GENOFFICE_UPDATE_URL
+// owner/name of the GitHub repo whose Releases serve as the update feed
+const updateRepo = (process.env.GENOFFICE_UPDATE_REPO || '').trim()
 const ga4MeasurementId = process.env.GENOFFICE_GA4_MEASUREMENT_ID
 const ga4ApiSecret = process.env.GENOFFICE_GA4_API_SECRET
 const fontCdnUrl = normalizeHttpsBaseUrl(
@@ -1565,6 +1567,14 @@ const config = {
   nsis: {
     oneClick: false,
     allowToChangeInstallationDirectory: true,
+    // Pin the installer's name. electron-builder's default is
+    // "GenOffice Setup <v>.exe" (a space), but the latest.yml it writes next to
+    // it lists the URL-escaped "GenOffice-Setup-<v>.exe" — so the update feed
+    // advertised a file that does not exist and every auto-update download
+    // 404'd. One name for the artifact and for the feed entry fixes that; the
+    // space is dropped entirely rather than half-escaped so GitHub's upload
+    // and electron-updater's URL join agree.
+    artifactName: 'GenOffice-Setup-${version}.${ext}',
   },
   beforePack: async (context) => {
     ensurePlatformHelpers()
@@ -1644,6 +1654,24 @@ if (updateUrl) {
       provider: 'generic',
       url: updateUrl.replace(/\/+$/, ''),
       channel: 'latest',
+    },
+  ]
+}
+
+// GENOFFICE_UPDATE_REPO="owner/name" — auto-update straight from GitHub
+// Releases. This is the fork-friendly counterpart to GENOFFICE_UPDATE_URL:
+// electron-updater's github provider reads latest.yml off the release page, so
+// a release the workflow published IS the update feed, with no CDN to host.
+// The two are mutually exclusive; an explicit URL wins because it is the more
+// specific instruction (a self-hosted mirror of the same artifacts).
+if (!updateUrl && updateRepo) {
+  config.publish = [
+    {
+      provider: 'github',
+      owner: updateRepo.split('/')[0],
+      repo: updateRepo.split('/')[1],
+      // the workflow publishes ordinary (non-draft, non-prerelease) releases
+      releaseType: 'release',
     },
   ]
 }

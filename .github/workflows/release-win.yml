@@ -1,8 +1,10 @@
 name: Release Windows
 
-# Build the NSIS .exe installer on every push to main and attach it to a
-# GitHub Release. Fork-friendly: no signing certs, no update feed, no GA4 —
-# electron-builder.cjs omits all of those when the env vars are unset.
+# Build the NSIS .exe installer on every push to main and publish it as a GitHub
+# Release. The Release is also the auto-update feed: latest.yml + the installer
+# land on the same release page, and the packaged app reads that page to find
+# updates (GENOFFICE_UPDATE_REPO below). Fork-friendly: no signing certs and no
+# CDN — electron-builder.cjs omits those when their env vars are unset.
 
 on:
   push:
@@ -78,13 +80,15 @@ jobs:
       - name: Build xlsx-sidecar
         run: npm run native:build -w @genoffice/sheets
 
-      # Call electron-builder directly: forwarding -c.extraMetadata.version
-      # through "npm run --" makes npm/cmd eat the leading "-c" on Windows
-      # (it arrived as ".extraMetadata.version=..." and was read as a config
-      # FILE path). notices + shell build mirror the dist:win script.
+      # Setting the repo makes electron-builder bake a GitHub publish config into
+      # resources/app-update.yml AND emit latest.yml — the file electron-updater
+      # reads to discover a newer version. --publish never still applies: the
+      # release upload is the next step, not electron-builder's.
       - name: Package NSIS installer
         shell: pwsh
         working-directory: apps/shell
+        env:
+          GENOFFICE_UPDATE_REPO: ${{ github.repository }}
         run: |
           npm run notices
           npx electron-vite build
@@ -95,6 +99,11 @@ jobs:
         run: |
           $exe = Get-ChildItem apps/shell/release -Filter '*.exe' | Select-Object -First 1
           if (-not $exe) { throw 'no installer produced' }
+          # latest.yml is what electron-updater polls; without it in the release
+          # the installed app can never discover this build.
+          if (-not (Test-Path apps/shell/release/latest.yml)) {
+            throw 'latest.yml missing: the GitHub update provider cannot work without it'
+          }
           Get-ChildItem apps/shell/release -File |
             Select-Object Name, @{n='MB';e={[math]::Round($_.Length/1MB,1)}} |
             Format-Table -AutoSize
@@ -106,8 +115,9 @@ jobs:
           name: GenOffice ${{ steps.ver.outputs.version }} (Windows x64)
           generate_release_notes: true
           fail_on_unmatched_files: true
-          # Only the installer: latest.yml / blockmap are produced only when
-          # GENOFFICE_UPDATE_URL injects a publish config, which fork builds
-          # deliberately leave unset.
+          # latest.yml + blockmap are the update feed itself: an installed copy
+          # fetches latest.yml, compares versions, then downloads the exe.
           files: |
             apps/shell/release/*.exe
+            apps/shell/release/*.exe.blockmap
+            apps/shell/release/latest.yml

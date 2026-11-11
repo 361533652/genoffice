@@ -424,11 +424,41 @@ const RECHECK_INTERVAL_MS = 4 * 60 * 60 * 1000
 // code-signing identity (Apple Team ID) change, which Squirrel.Mac rejects
 // on every retry while the error looks like a download failure to the user.
 const MANUAL_FALLBACK_AFTER = 2
-// Last-resort manual link only: the GitHub Latest release tracks one channel
-// and signing track, so a stable/legacy-track user could land on the wrong
-// build. Preferred is the CDN installer derived from the user's own update
-// feed (see manualDownloadUrlFor), which matches channel, track, and arch.
-const DOWNLOAD_PAGE_URL = 'https://github.com/genspark-ai/genoffice/releases/latest'
+/// The baked update feed, read once. A `generic` feed carries `url:`; a
+/// GitHub feed (the fork default, see GENOFFICE_UPDATE_REPO) carries
+/// `owner:`/`repo:` instead. Deriving the manual links from it is what stops a
+/// fork from advertising the upstream project's release page.
+function readUpdateFeed(): { url?: string; owner?: string; repo?: string } | null {
+  try {
+    const yml = readFileSync(path.join(process.resourcesPath, 'app-update.yml'), 'utf8')
+    const field = (name: string) => {
+      const m = new RegExp(`^${name}:\\s*['"]?([^'"\\s]+)`, 'm').exec(yml)
+      return m?.[1]?.trim() || undefined
+    }
+    const feed = { url: field('url'), owner: field('owner'), repo: field('repo') }
+    return feed.url || (feed.owner && feed.repo) ? feed : null
+  } catch {
+    return null
+  }
+}
+
+/// Where "get it manually" sends the user — the fork's own release page when the
+/// feed names a GitHub repo, the upstream page for a generic CDN feed (whose
+/// artifacts have no release page of their own).
+function downloadPageUrl(): string {
+  const feed = readUpdateFeed()
+  if (feed?.owner && feed.repo) {
+    return `https://github.com/${feed.owner}/${feed.repo}/releases/latest`
+  }
+  return 'https://github.com/genspark-ai/genoffice/releases/latest'
+}
+
+/// The workflow tags releases `v<version>`; electron-updater reports a bare
+/// version, so a release-asset URL needs the prefix back.
+function tagForVersion(version: string | null): string | null {
+  const trimmed = (version ?? '').trim()
+  return trimmed ? `v${trimmed}` : null
+}
 
 /// Trusted HTTPS base URL baked into resources/app-update.yml. Manual download
 /// links are always rebuilt from this base rather than trusting URLs supplied
@@ -482,6 +512,15 @@ function manualDownloadUrlFor(info: UpdateInfo): string | null {
     chosen = pick((name) => name.endsWith('.AppImage'))
   }
   if (chosen === null) return null
+  // A GitHub feed's artifacts live on the release page
+  // (<repo>/releases/download/<tag>/<file>); there is no CDN base to join.
+  const feed = readUpdateFeed()
+  if (feed?.owner && feed.repo) {
+    const tag = tagForVersion(info.version)
+    return tag === null
+      ? null
+      : `https://github.com/${feed.owner}/${feed.repo}/releases/download/${tag}/${encodeURIComponent(chosen)}`
+  }
   const base = updateFeedBaseUrl()
   return base === null ? null : new URL(encodeURIComponent(chosen), base).toString()
 }
@@ -581,7 +620,7 @@ export async function checkForUpdatesNow(): Promise<void> {
         defaultId: 0,
         cancelId: 0,
       })
-      if (response === 1) void shell.openExternal(DOWNLOAD_PAGE_URL)
+      if (response === 1) void shell.openExternal(downloadPageUrl())
       return
     }
     dismissedVersion = null
@@ -656,8 +695,9 @@ export function initAutoUpdater(
   autoUpdater.autoDownload = false
   // if the user picked "later" after download, install on normal quit
   autoUpdater.autoInstallOnAppQuit = true
-  // full-package policy: never attempt blockmap differential downloads
-  // (CI does not publish .blockmap files)
+  // Full-package downloads only. The release does publish a .blockmap, but a
+  // differential that fails to assemble leaves the user stuck on an old build,
+  // and the installer is already small enough that the saving is not worth it.
   autoUpdater.disableDifferentialDownload = true
   installResumeDownload(autoUpdater as unknown as Parameters<typeof installResumeDownload>[0])
 
@@ -742,7 +782,7 @@ export function initAutoUpdater(
       closeUpdateWindow()
     },
     onOpenDownload: () => {
-      void shell.openExternal(manualDownloadUrl ?? DOWNLOAD_PAGE_URL)
+      void shell.openExternal(manualDownloadUrl ?? downloadPageUrl())
     },
   }
 
