@@ -121,7 +121,7 @@ setiap klien MCP.
 | ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Tetapan → Integrasi** dalam aplikasi            | Menyenaraikan agen yang ditemui pada komputer ini; satu klik menulis skill ke dalam setiap satu yang anda pilih. Butang **Update** muncul apabila keluaran GenOffice membawa skill yang lebih baharu. |
 | **Muat turun sebagai zip** pada halaman yang sama | Susun atur yang diterima oleh claude.ai, aplikasi desktop Claude dan pembantu lain sebagai skill yang dimuat naik.                                                                                    |
-| `npx skills add 361533652/genoffice`            | Memasang daripada repositori ini ke dalam mana-mana agen yang serasi dengan skill.                                                                                                                    |
+| `npx skills add 361533652/genoffice`              | Memasang daripada repositori ini ke dalam mana-mana agen yang serasi dengan skill.                                                                                                                    |
 
 Kemudian mulakan sembang baharu dan minta sesuatu dokumen. Skill itu mengajar
 agen bila perlu menggunakan `genoffice`, cara membaca fail sebelum
@@ -234,8 +234,8 @@ meninggalkan mesin, kepada pembekal yang dikonfigurasikan dalam GenOffice.
 
 ## Muat Turun
 
-| Platform                             | Keperluan                                             | Muat Turun                                                                                |
-| ------------------------------------ | ----------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Platform                             | Keperluan                                             | Muat Turun                                                                              |
+| ------------------------------------ | ----------------------------------------------------- | --------------------------------------------------------------------------------------- |
 | **macOS** — Apple Silicon (arm64)    | macOS 11+                                             | [`.dmg` terkini (arm64)](https://github.com/361533652/genoffice/releases/latest)        |
 | **macOS** — Intel (x64)              | macOS 11+                                             | [`.dmg` terkini (x64)](https://github.com/361533652/genoffice/releases/latest)          |
 | **Windows** (x64, kebanyakan PC)     | Windows 10+, Intel/AMD                                | [Pemasang `-x64.exe` terkini](https://github.com/361533652/genoffice/releases/latest)   |

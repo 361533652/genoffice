@@ -119,7 +119,7 @@ qualsiasi client MCP.
 | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Impostazioni → Integrazioni** nell'app | Elenca gli agenti trovati su questo computer; un clic scrive lo skill in ognuno di quelli che scegli. Un pulsante **Aggiorna** compare quando una release di GenOffice porta uno skill più recente. |
 | **Scarica come zip** nella stessa pagina | Il formato che claude.ai, le app desktop di Claude e altri assistenti accettano come skill caricato.                                                                                                |
-| `npx skills add 361533652/genoffice`   | Installa da questo repository in qualsiasi agente compatibile con gli skill.                                                                                                                        |
+| `npx skills add 361533652/genoffice`     | Installa da questo repository in qualsiasi agente compatibile con gli skill.                                                                                                                        |
 
 Poi apri una nuova chat e chiedi un documento. Lo skill insegna all'agente
 quando ricorrere a `genoffice`, come leggere un file prima di modificarlo e
@@ -235,8 +235,8 @@ GenOffice.
 
 ## Download
 
-| Piattaforma                                | Requisiti                                             | Download                                                                                   |
-| ------------------------------------------ | ----------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Piattaforma                                | Requisiti                                             | Download                                                                                 |
+| ------------------------------------------ | ----------------------------------------------------- | ---------------------------------------------------------------------------------------- |
 | **macOS** — Apple Silicon (arm64)          | macOS 11+                                             | [Ultima versione `.dmg` (arm64)](https://github.com/361533652/genoffice/releases/latest) |
 | **macOS** — Intel (x64)                    | macOS 11+                                             | [Ultima versione `.dmg` (x64)](https://github.com/361533652/genoffice/releases/latest)   |
 | **Windows** (x64, la maggior parte dei PC) | Windows 10+, Intel/AMD                                | [Ultimo installer `-x64.exe`](https://github.com/361533652/genoffice/releases/latest)    |

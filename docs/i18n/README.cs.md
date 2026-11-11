@@ -111,11 +111,11 @@ MCP klientem.
 
 ### Instalace skillu
 
-| Jak                                    | Co se stane                                                                                                                                                                                |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Nastavení → Integrace** v aplikaci   | Vypíše agenty nalezené na tomto počítači; jedním kliknutím zapíše skill do každého, který vyberete. Když nové vydání GenOffice přinese novější skill, objeví se tlačítko **Aktualizovat**. |
-| **Stáhnout jako zip** na téže stránce  | Rozložení, které claude.ai, desktopové aplikace Claude a další asistenti přijímají jako nahraný skill.                                                                                     |
-| `npx skills add 361533652/genoffice` | Nainstaluje z tohoto repozitáře do jakéhokoli agenta podporujícího skilly.                                                                                                                 |
+| Jak                                   | Co se stane                                                                                                                                                                                |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Nastavení → Integrace** v aplikaci  | Vypíše agenty nalezené na tomto počítači; jedním kliknutím zapíše skill do každého, který vyberete. Když nové vydání GenOffice přinese novější skill, objeví se tlačítko **Aktualizovat**. |
+| **Stáhnout jako zip** na téže stránce | Rozložení, které claude.ai, desktopové aplikace Claude a další asistenti přijímají jako nahraný skill.                                                                                     |
+| `npx skills add 361533652/genoffice`  | Nainstaluje z tohoto repozitáře do jakéhokoli agenta podporujícího skilly.                                                                                                                 |
 
 Pak začněte nový chat a požádejte o dokument. Skill agenta naučí, kdy sáhnout
 po `genoffice`, jak si soubor přečíst před úpravou a jak zkontrolovat vlastní
@@ -226,8 +226,8 @@ poskytovateli nastavenému v GenOffice.
 
 ## Stažení
 
-| Platforma                            | Požadavky                                             | Stažení                                                                                        |
-| ------------------------------------ | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Platforma                            | Požadavky                                             | Stažení                                                                                      |
+| ------------------------------------ | ----------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | **macOS** — Apple Silicon (arm64)    | macOS 11+                                             | [Nejnovější `.dmg` (arm64)](https://github.com/361533652/genoffice/releases/latest)          |
 | **macOS** — Intel (x64)              | macOS 11+                                             | [Nejnovější `.dmg` (x64)](https://github.com/361533652/genoffice/releases/latest)            |
 | **Windows** (x64, většina PC)        | Windows 10+, Intel/AMD                                | [Nejnovější instalátor `-x64.exe`](https://github.com/361533652/genoffice/releases/latest)   |

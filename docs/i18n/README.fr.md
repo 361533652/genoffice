@@ -122,7 +122,7 @@ MCP.
 | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Réglages → Intégrations** dans l'application | Liste les agents trouvés sur cet ordinateur ; un clic écrit le skill dans chacun de ceux que vous choisissez. Un bouton **Mettre à jour** apparaît lorsqu'une version de GenOffice embarque un skill plus récent. |
 | **Télécharger en zip** sur la même page        | Le format que claude.ai, les applications de bureau Claude et d'autres assistants acceptent comme skill téléversé.                                                                                                |
-| `npx skills add 361533652/genoffice`         | Installe depuis ce dépôt dans tout agent compatible avec les skills.                                                                                                                                              |
+| `npx skills add 361533652/genoffice`           | Installe depuis ce dépôt dans tout agent compatible avec les skills.                                                                                                                                              |
 
 Ouvrez ensuite une nouvelle conversation et demandez un document. Le skill
 apprend à l'agent quand recourir à `genoffice`, comment lire un fichier avant
@@ -239,8 +239,8 @@ dans GenOffice.
 
 ## Télécharger
 
-| Plateforme                           | Prérequis                                             | Téléchargement                                                                                |
-| ------------------------------------ | ----------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Plateforme                           | Prérequis                                             | Téléchargement                                                                              |
+| ------------------------------------ | ----------------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | **macOS** — Apple Silicon (arm64)    | macOS 11+                                             | [Dernier `.dmg` (arm64)](https://github.com/361533652/genoffice/releases/latest)            |
 | **macOS** — Intel (x64)              | macOS 11+                                             | [Dernier `.dmg` (x64)](https://github.com/361533652/genoffice/releases/latest)              |
 | **Windows** (x64, la plupart des PC) | Windows 10+, Intel/AMD                                | [Dernier installateur `-x64.exe`](https://github.com/361533652/genoffice/releases/latest)   |

@@ -132,7 +132,7 @@ OpenCode và Windsurf ngay từ đầu, bất kỳ agent nào đọc được sk
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Settings → Integrations** trong ứng dụng | Liệt kê các agent tìm thấy trên máy này; một cú bấm ghi skill vào từng agent bạn chọn. Nút **Update** xuất hiện khi một bản phát hành GenOffice mang skill mới hơn. |
 | **Download as zip** trên cùng trang        | Đúng cấu trúc claude.ai, ứng dụng Claude desktop và các trợ lý khác chấp nhận như skill tải lên.                                                                    |
-| `npx skills add 361533652/genoffice`     | Cài từ kho lưu trữ này vào bất kỳ agent tương thích skills nào.                                                                                                     |
+| `npx skills add 361533652/genoffice`       | Cài từ kho lưu trữ này vào bất kỳ agent tương thích skills nào.                                                                                                     |
 
 Sau đó mở một cuộc trò chuyện mới và yêu cầu một tài liệu. Skill dạy agent
 khi nào nên dùng tới `genoffice`, cách đọc tệp trước khi sửa, và cách tự
@@ -259,8 +259,8 @@ hình trong GenOffice.
 
 ## Tải xuống
 
-| Nền tảng                             | Yêu cầu                                               | Tải xuống                                                                                   |
-| ------------------------------------ | ----------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Nền tảng                             | Yêu cầu                                               | Tải xuống                                                                                 |
+| ------------------------------------ | ----------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | **macOS** — Apple Silicon (arm64)    | macOS 11+                                             | [`.dmg` mới nhất (arm64)](https://github.com/361533652/genoffice/releases/latest)         |
 | **macOS** — Intel (x64)              | macOS 11+                                             | [`.dmg` mới nhất (x64)](https://github.com/361533652/genoffice/releases/latest)           |
 | **Windows** (x64, đa số máy tính)    | Windows 10+, Intel/AMD                                | [Trình cài `-x64.exe` mới nhất](https://github.com/361533652/genoffice/releases/latest)   |

@@ -133,11 +133,11 @@ istemcisi.
 
 ### Skill'i kurun
 
-| Nasıl                                  | Ne olur                                                                                                                                                                       |
-| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Uygulamada **Ayarlar → Integrations**  | Bu bilgisayarda bulunan ajanları listeler; tek tık skill'i seçtiğiniz her birine yazar. Bir GenOffice sürümü daha yeni bir skill getirdiğinde bir **Update** düğmesi belirir. |
-| Aynı sayfadaki **Download as zip**     | claude.ai, Claude masaüstü uygulamaları ve diğer asistanların yüklenen skill olarak kabul ettiği düzen.                                                                       |
-| `npx skills add 361533652/genoffice` | Bu depodan skill uyumlu herhangi bir ajana kurar.                                                                                                                             |
+| Nasıl                                 | Ne olur                                                                                                                                                                       |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Uygulamada **Ayarlar → Integrations** | Bu bilgisayarda bulunan ajanları listeler; tek tık skill'i seçtiğiniz her birine yazar. Bir GenOffice sürümü daha yeni bir skill getirdiğinde bir **Update** düğmesi belirir. |
+| Aynı sayfadaki **Download as zip**    | claude.ai, Claude masaüstü uygulamaları ve diğer asistanların yüklenen skill olarak kabul ettiği düzen.                                                                       |
+| `npx skills add 361533652/genoffice`  | Bu depodan skill uyumlu herhangi bir ajana kurar.                                                                                                                             |
 
 Ardından yeni bir sohbet başlatın ve bir belge isteyin. Skill, ajana ne zaman
 `genoffice`'e başvuracağını, bir dosyayı düzenlemeden önce nasıl okuyacağını
@@ -264,8 +264,8 @@ MCP araç sonuçları olarak yolculuk etti. Makineden yalnızca `search` ve
 
 ## İndir
 
-| Platform                             | Gereksinimler                                         | İndirme                                                                                |
-| ------------------------------------ | ----------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Platform                             | Gereksinimler                                         | İndirme                                                                              |
+| ------------------------------------ | ----------------------------------------------------- | ------------------------------------------------------------------------------------ |
 | **macOS** — Apple Silicon (arm64)    | macOS 11+                                             | [Son `.dmg` (arm64)](https://github.com/361533652/genoffice/releases/latest)         |
 | **macOS** — Intel (x64)              | macOS 11+                                             | [Son `.dmg` (x64)](https://github.com/361533652/genoffice/releases/latest)           |
 | **Windows** (x64, çoğu PC)           | Windows 10+, Intel/AMD                                | [Son `-x64.exe` yükleyici](https://github.com/361533652/genoffice/releases/latest)   |
