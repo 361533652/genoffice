@@ -118,8 +118,33 @@ const theme = EditorView.theme({
   },
   '.cm-content': { caretColor: 'var(--text)' },
   '.cm-cursor, .cm-dropCursor': { borderLeftColor: 'var(--text)' },
-  '&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground, .cm-selectionBackground':
-    { backgroundColor: 'var(--accent-soft)' },
+  // A selection has to read against the line it sits on, not just the page.
+  //
+  // Two rules, both learned from a bug: `--accent-soft` is a near-white tint
+  // that measures 1.14:1 against the page, and `drawSelection()` paints the
+  // selection layer BELOW the line background — so the active line's `--hover`
+  // fill covered it. Dragging within one line (most horizontal drags) showed
+  // nothing, and a vertical drag lost its colour exactly on the active line.
+  //
+  // So: a stronger translucent tint (it multiplies with whatever line fill is
+  // under it instead of fighting it), and z-index on the selection layer to put
+  // it above `.cm-activeLine`. The `!important`s are required — CodeMirror's
+  // own base theme sets `layer` background and `.cm-layer` stacking inline.
+  '.cm-selectionBackground': {
+    backgroundColor: 'var(--md-text-selection) !important',
+  },
+  '&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground': {
+    backgroundColor: 'var(--md-text-selection) !important',
+  },
+  // keep the native (unfocused) selection visible too, in the same tint
+  '.cm-content ::selection': {
+    backgroundColor: 'var(--md-text-selection)',
+  },
+  // `&.cm-focused .cm-selectionLayer` needs !important: the layer's z-index is
+  // written as an inline style by the view (baseTheme `-1 - pos` for a
+  // below-content layer), so a plain CSS rule would lose to it. Raising the
+  // layer above `.cm-activeLine` is what makes a same-line drag visible at all.
+  '&.cm-focused .cm-selectionLayer': { zIndex: '3 !important' },
   '.cm-activeLine': { backgroundColor: 'var(--hover)' },
   '.cm-gutters': {
     backgroundColor: 'var(--surface)',
