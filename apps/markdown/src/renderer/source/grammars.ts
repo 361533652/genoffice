@@ -10,7 +10,7 @@
  *    nobody expects to be authoritative.
  *
  * Grammars are immutable, so each is built once and shared by every editor
- * mount 鈥?a fresh instance per file would only cost memory.
+ * mount —a fresh instance per file would only cost memory.
  */
 import type { Extension } from '@codemirror/state'
 import { StreamLanguage } from '@codemirror/language'
@@ -105,7 +105,7 @@ const cache = new Map<SourceLanguage, Extension>()
 /**
  * `@codemirror/legacy-modes` is typed against `@codemirror/streamparser`, a
  * package that no longer ships with the CM6 line. The runtime objects are the
- * same shape 鈥?StreamLanguage.define is exactly what that package did 鈥?so the
+ * same shape —StreamLanguage.define is exactly what that package did —so the
  * cast is over a version skew in the .d.ts files, not a behavioural lie.
  */
 function streamMode(mode: unknown): Extension {

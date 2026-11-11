@@ -3,23 +3,23 @@
  * auto-update feed URL can be injected at build time instead of living in
  * the repo).
  *
- * GENOFFICE_UPDATE_URL 鈥?public base URL of the update channel (the generic
+ * GENOFFICE_UPDATE_URL —public base URL of the update channel (the generic
  * provider prefix that serves latest.yml / latest-mac.yml). Required for
  * release builds; CI provides it as a repository secret. For local release
- * builds put it in apps/shell/electron-builder.env (gitignored) 鈥?the
+ * builds put it in apps/shell/electron-builder.env (gitignored) —the
  * electron-builder CLI loads that file automatically.
  *
  * When the variable is unset (forks, PR smoke builds, plain local packaging)
  * the publish config is omitted: electron-builder then bakes no
  * app-update.yml into the app and in-app auto-update stays disabled.
  *
- * GENOFFICE_GA4_MEASUREMENT_ID / GENOFFICE_GA4_API_SECRET 鈥?GA4 Measurement
+ * GENOFFICE_GA4_MEASUREMENT_ID / GENOFFICE_GA4_API_SECRET —GA4 Measurement
  * Protocol credentials for anonymous usage analytics, injected the same way
  * (CI secrets, or apps/shell/electron-builder.env locally). They are written
  * into the packaged app's package.json via extraMetadata and read back by
- * src/main/analytics.ts. When either is unset 鈥?every source/fork build 鈥? * nothing is injected and the app runs with analytics fully disabled.
+ * src/main/analytics.ts. When either is unset —every source/fork build — * nothing is injected and the app runs with analytics fully disabled.
  *
- * GENOFFICE_FONT_CDN_URL 鈥?base URL for the curated downloadable-font catalog.
+ * GENOFFICE_FONT_CDN_URL —base URL for the curated downloadable-font catalog.
  * Official release jobs inject it through extraMetadata so the endpoint stays
  * out of source. Without it, font download prompts/catalog entries are hidden;
  * users can still install local font files.
@@ -55,7 +55,7 @@ const fontCdnUrl = normalizeHttpsBaseUrl(
   process.env.GENOFFICE_FONT_CDN_URL,
 )
 
-// GENOFFICE_MAC_X64=1 鈥?opt into packaging the Intel (x64) dmg/zip alongside
+// GENOFFICE_MAC_X64=1 —opt into packaging the Intel (x64) dmg/zip alongside
 // arm64. Off by default: Intel packages must only ever ship signed with the
 // company certificate (planned dual-track pipeline), so the current release
 // pipeline stays arm64-only and never produces a personally-signed Intel
@@ -64,7 +64,7 @@ const fontCdnUrl = normalizeHttpsBaseUrl(
 // switch.
 const includeMacX64 = process.env.GENOFFICE_MAC_X64 === '1'
 
-// GENOFFICE_WIN_ARM64=1 鈥?package the Windows ARM64 installer instead of x64.
+// GENOFFICE_WIN_ARM64=1 —package the Windows ARM64 installer instead of x64.
 // CI runs it as a second electron-builder pass (own BUILD_DIR) after the
 // unchanged x64 pass, so the two never share an output dir or a sidecar path:
 // the sidecar comes from the matching cargo target dir and is checked to
@@ -83,7 +83,7 @@ const winSidecarTarget = winArm64 ? 'aarch64-pc-windows-msvc' : 'x86_64-pc-windo
 // triple (CI builds it that way). A Windows contributor's plain
 // `npm run build:all` instead leaves it in cargo's host-native target/release
 // (MSVC, statically linked per native/xlsx-engine/.cargo/config.toml), so that
-// output is accepted too 鈥?but only when the host arch really matches the
+// output is accepted too —but only when the host arch really matches the
 // packaged one: an x64 host build must never be shipped inside an arm64
 // installer, which has to come from a cross build.
 const winSidecarCandidates = [
@@ -95,11 +95,11 @@ const winSidecarCandidates = [
 const WIN_SIDECAR =
   winSidecarCandidates.find((rel) => existsSync(join(__dirname, rel))) ?? winSidecarCandidates[0]
 
-// GENOFFICE_LINUX_ARM64=1 鈥?package the arm64 Linux artifacts instead of x64.
+// GENOFFICE_LINUX_ARM64=1 —package the arm64 Linux artifacts instead of x64.
 // Config support only: no CI job runs a second Linux pass yet, and whether
 // Linux arm64 joins the release matrix is decided on the maintainers' side.
 // With the flag set the AppImage/deb/rpm targets switch to arm64, and the
-// sidecar has to be an aarch64 build 鈥?cargo's host-native target/release when
+// sidecar has to be an aarch64 build —cargo's host-native target/release when
 // the build host is arm64 Linux itself (a native ubuntu-arm64 runner needs no
 // cross toolchain), or an explicit cross-compilation triple otherwise.
 // beforePack checks the ELF machine type either way, because
@@ -108,7 +108,7 @@ const WIN_SIDECAR =
 const linuxArm64 = process.env.GENOFFICE_LINUX_ARM64 === '1'
 const linuxSidecarTarget = linuxArm64 ? 'aarch64-unknown-linux-gnu' : 'x86_64-unknown-linux-gnu'
 // Mirrors the Windows candidate list above: the explicit triple first, then
-// cargo's plain host-native output 鈥?but only when the host really is the
+// cargo's plain host-native output —but only when the host really is the
 // packaged architecture, so an arm64 host can never hand its native sidecar
 // to an x64 package (and the other way round). The x64 pass therefore keeps
 // the historical host-native source on an x64 Linux host.
@@ -158,7 +158,7 @@ function assertLinuxSidecarArch(sidecarPath, wantArm64) {
     const want = wantArm64 ? 'aarch64' : 'x86_64'
     if (got !== want) {
       throw new Error(
-        `linux sidecar is ${got} but this package ships ${want}: ${sidecarPath} 鈥?` +
+        `linux sidecar is ${got} but this package ships ${want}: ${sidecarPath} —` +
           (wantArm64
             ? 'cross-build it (cargo zigbuild --target aarch64-unknown-linux-gnu) or build natively on an arm64 host'
             : 'rebuild it for x64'),
@@ -170,7 +170,7 @@ function assertLinuxSidecarArch(sidecarPath, wantArm64) {
 }
 
 // macOS local-OCR helper (scanned-page text recovery): a swiftc output, not
-// an npm artifact 鈥?compiled here on demand so CI runners and fresh checkouts
+// an npm artifact —compiled here on demand so CI runners and fresh checkouts
 // need no manual step. Universal (arm64 + x86_64) when both targets compile,
 // host-arch otherwise; mac installers must not silently ship without it.
 const VISION_OCR_HELPER = '../../packages/pdf2docx/ocr-helper/vision-ocr'
@@ -193,7 +193,7 @@ function compileVisionOcr({ universalOnly } = { universalOnly: false }) {
       for (const slice of slices) rmSync(slice, { force: true })
     } catch (err) {
       if (universalOnly) throw err
-      // cross-target SDK unavailable 鈥?a host-arch helper still serves this build
+      // cross-target SDK unavailable —a host-arch helper still serves this build
       execFileSync('swiftc', ['-O', src, '-o', out], { stdio: 'inherit' })
     }
   } catch (err) {
@@ -222,7 +222,7 @@ function ensurePlatformHelpers() {
 
 // Dual-arch packs share one extraResources path, so the shipped helper must be
 // a lipo fat binary. A stale host-arch build (dev path above) is rebuilt in
-// place; if a universal build cannot be produced, packaging aborts 鈥?otherwise
+// place; if a universal build cannot be produced, packaging aborts —otherwise
 // the other arch's OCR silently fails and every scanned page ships as bitmap.
 function assertUniversalVisionOcr() {
   const helper = join(__dirname, VISION_OCR_HELPER)
@@ -249,14 +249,14 @@ function assertUniversalVisionOcr() {
 // one means that module's build did not run or failed. electron-builder only
 // logs "file source doesn't exist" for an absent extraResources source and
 // still exits 0, so without this the installer launches normally and is simply
-// missing that editor 鈥?it surfaces only when a user opens the tab.
+// missing that editor —it surfaces only when a user opens the tab.
 //
 // Runs from the beforePack hook, not at module load: gen-third-party-notices
 // requires this config to read extraResources, and the dist:* scripts run
 // notices before build:all, when the out dirs legitimately don't exist yet.
 // When the mac build packages BOTH arches (GENOFFICE_MAC_X64=1) its
 // extraResources entry is a single path shared by the two packs, so the
-// sidecar there must be a lipo fat binary 鈥?a host-arch-only build (the plain
+// sidecar there must be a lipo fat binary —a host-arch-only build (the plain
 // `native:build` dev path) would silently ship an arm64 sidecar inside the
 // Intel dmg, where every workbook open fails. Runs from beforePack, dual-arch
 // mac packs only.
@@ -271,7 +271,7 @@ function assertUniversalSidecar() {
   for (const want of ['x86_64', 'arm64']) {
     if (!archs.includes(want)) {
       throw new Error(
-        `xlsx-sidecar is [${archs.join(', ')}] but both mac arch packages ship it 鈥?` +
+        `xlsx-sidecar is [${archs.join(', ')}] but both mac arch packages ship it —` +
           'run "npm run native:build:universal -w @genoffice/sheets" before packaging mac',
       )
     }
@@ -1380,8 +1380,8 @@ const config = {
       from: '../../packages/cli/bin/genoffice.cmd',
       to: 'cli/genoffice.cmd',
     },
-    // the CLI's version (Settings 鈫?Integrations shows it) and the agent skill
-    // the same pane installs into Claude Code / Codex / 鈥? bytes identical to the repo file
+    // the CLI's version (Settings →Integrations shows it) and the agent skill
+    // the same pane installs into Claude Code / Codex / — bytes identical to the repo file
     {
       from: '../../packages/cli/package.json',
       to: 'cli/package.json',
@@ -1474,10 +1474,10 @@ const config = {
     ],
   },
   // Unlike win (which cross-compiles the sidecar to an explicit target
-  // triple), linux takes it from cargo's host-native target/release/ 鈥?the
+  // triple), linux takes it from cargo's host-native target/release/ —the
   // same source mac uses. So no `arch` is pinned here beyond the flag below:
   // electron-builder defaults to the build host's architecture, which is the
-  // only one the sidecar was actually built for 鈥?and GENOFFICE_LINUX_ARM64=1
+  // only one the sidecar was actually built for —and GENOFFICE_LINUX_ARM64=1
   // switches every target to arm64, where the sidecar must come from a native
   // arm64 host or an explicit cross build (see linuxSidecarCandidates and the
   // ELF check). That flag is config support only: no second Linux pass runs
@@ -1485,7 +1485,7 @@ const config = {
   linux: {
     // AppImage (self-contained, any distro) + deb (apt install, pulls in the
     // GTK/NSS runtime deps) + rpm (dnf/zypper install on Fedora / RHEL /
-    // openSUSE). Default artifact names are kept on purpose 鈥?    // GenOffice-<v>.AppImage / genoffice_<v>_amd64.deb 鈥?because the public
+    // openSUSE). Default artifact names are kept on purpose —    // GenOffice-<v>.AppImage / genoffice_<v>_amd64.deb —because the public
     // README download links and the already-published linux-v0.5.149 release
     // use them. The arm64 targets reuse the ${arch}-templated deb/rpm names
     // (genoffice_<v>_arm64.deb).
@@ -1503,7 +1503,7 @@ const config = {
     category: 'Office',
     // Icon SET directory, not the single 1024px png: electron-builder does
     // not resize a lone png, so deb/rpm would install only
-    // hicolor/1024x1024/apps/genoffice.png 鈥?a size absent from the hicolor
+    // hicolor/1024x1024/apps/genoffice.png —a size absent from the hicolor
     // theme index, leaving GNOME/KDE launchers on the generic fallback icon
     // (genspark-ai/genoffice#90). The set ships every standard raster size.
     icon: 'build/icons',
@@ -1518,7 +1518,7 @@ const config = {
     // (genoffice.desktop); syncDesktopName makes electron-builder name the
     // .desktop file and its StartupWMClass from the same value. Without it
     // StartupWMClass falls back to productName ("GenOffice"), which does not
-    // match the "genoffice" WM_CLASS the window actually reports 鈥?and X11
+    // match the "genoffice" WM_CLASS the window actually reports —and X11
     // compares case-sensitively, so the taskbar shows an unlinked window.
     syncDesktopName: true,
     extraResources: [
@@ -1543,7 +1543,7 @@ const config = {
   // fpm treat "@genoffice" as a directory. Spell the published name out
   // (genoffice_<version>_amd64.deb, matching the linux-v0.5.149 release).
   // packageName pins the control Package field to the same value the 0.5.149
-  // deb shipped with 鈥?apt treats a different Package name as an unrelated
+  // deb shipped with —apt treats a different Package name as an unrelated
   // install, breaking upgrades. Without it, fpm receives productName
   // "GenOffice" and only happens to downcase it to the right value.
   deb: {
@@ -1556,7 +1556,7 @@ const config = {
   // Same "@genoffice/shell" naming problem as deb: spell the artifact name
   // out (${arch} expands to the rpm arch string, x86_64) and pin the rpm
   // Package name so dnf/zypper treat successive releases as upgrades of the
-  // same package. Like deb, rpm installs run no in-app updater 鈥?users
+  // same package. Like deb, rpm installs run no in-app updater —users
   // upgrade with `dnf install ./<new>.rpm`. Packaging needs rpmbuild on the
   // build host (the `rpm` apt package on Ubuntu; CI installs it).
   //
@@ -1631,10 +1631,10 @@ const config = {
 
 // Windows in-package code signing. Security features that judge every PE
 // individually (Smart App Control, WDAC/AppLocker, AV heuristics) block
-// unsigned child processes 鈥?the unsigned xlsx-sidecar.exe died with
+// unsigned child processes —the unsigned xlsx-sidecar.exe died with
 // "spawn UNKNOWN" on such machines even though the installer itself was
 // signed. When CI exports GENOFFICE_WIN_SIGN_MODE ("test" = alpha
-// self-signed PFX, "production" = DigiCert KeyLocker 鈥?the two modes of
+// self-signed PFX, "production" = DigiCert KeyLocker —the two modes of
 // scripts/win-sign.cjs, whose env-var contract applies here too), every
 // binary electron-builder signs for win (GenOffice.exe, the NSIS
 // uninstaller, and the installer) goes through that script. The static
