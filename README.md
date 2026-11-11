@@ -9,8 +9,8 @@
 
 <h1 align="center">GenOffice</h1>
 
-<p align="center"><b>The world's first full-featured open-source AI Office suite.</b><br>
-Word, Excel, PowerPoint and PDF files, edited by you and your AI, saved back in the real formats.</p>
+<p align="center"><b>A full-featured open-source Office suite.</b><br>
+Word, Excel, PowerPoint and PDF files, saved back in the real formats.</p>
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/github/license/361533652/genoffice" alt="License: Apache-2.0"></a>
@@ -34,9 +34,8 @@ Word, Excel, PowerPoint and PDF files, edited by you and your AI, saved back in 
 
 GenOffice is a free, open-source alternative to Microsoft Office for macOS,
 Windows and Linux. It opens and saves native `.docx`, `.xlsx` and `.pptx`
-files, edits PDF, Markdown and HTML, and puts an AI agent next to every
-document — not a chat box bolted on the side, but an editor that reads the
-file, makes the change, and shows you exactly what it touched. ODF files
+files, edits PDF, Markdown and HTML, and opens source code with syntax
+highlighting and formatting. ODF files
 (`.odt`, `.ods`, `.odp` and the `.ott`/`.ots`/`.otp` templates) open as
 editable OOXML copies, and so do legacy Word `.doc`/`.dot` files and Hancom
 documents (`.hwp`, `.hwpx`); the imports are open-only — saving writes OOXML,
@@ -73,178 +72,6 @@ never the source format.
 [Windows](https://github.com/361533652/genoffice/releases/latest) (x64 and Arm) ·
 [Linux](https://github.com/361533652/genoffice/releases/latest) (deb, rpm, AppImage) —
 details and requirements in [Download](#download).
-
-## Demo
-
-Six apps, one file format each, and a command line for your coding agent.
-Every screenshot is the real app on macOS.
-
-### 1 · Docs — open and edit `.docx` with an AI you can review
-
-<table>
-<tr>
-<td width="50%"><img src="docs/assets/readme/docs-report.webp" alt="GenOffice Docs rendering a two-column annual-report page with a full-width cover image, shaded KPI table, header and footer, at 80% zoom"></td>
-<td width="50%"><img src="docs/assets/readme/docs-ai.webp" alt="GenOffice Docs: a company overview with a banner image; the AI tightened the Overview and inserted a new bulleted section, and the panel offers a one-click roll back"></td>
-</tr>
-<tr>
-<td><b>Opens the file as Word lays it out</b> — two-column sections, full-bleed images, shaded tables, headers and footers, pagination on Word's line metrics. Styles, comments, tracked changes, equations, ink and content controls round-trip untouched. A <b>Mailings</b> tab turns the document into a merge template: pick a <code>.xlsx</code> or <code>.csv</code> recipient list, insert real <code>MERGEFIELD</code>s, preview record by record, and merge to one document or one <code>.docx</code> per record.</td>
-<td><b>Ask for the edit</b> — the AI reads the blocks it needs, rewrites the Overview and inserts a new bulleted section. Every AI turn is a snapshot you can roll back; with <b>Track changes</b> on, edits arrive as Word-style revisions. Ask for a mind map instead and the answer is an interactive diagram of the whole document: collapsible branches, zoom and pan, a node click asks a follow-up, and citations jump back to the block they came from.</td>
-</tr>
-</table>
-
-### 2 · Sheets — `.xlsx` with live formulas and charts, not pasted numbers
-
-<table>
-<tr>
-<td width="50%"><img src="docs/assets/readme/sheets-ai.webp" alt="GenOffice Sheets: the AI added a Summary sheet with revenue by region and category using SUMIF formulas, plus a column chart, and reports 43 applied changes with an Undo button"></td>
-<td width="50%"><img src="docs/assets/readme/sheets-qa.webp" alt="GenOffice Sheets: asked which region led Q2 revenue, the AI answers Europe with the category breakdown and cites the cells it used as links, next to the Orders sheet"></td>
-</tr>
-<tr>
-<td><b>Build it</b> — from one sentence the agent adds a Summary sheet with real <code>SUMIF</code>s by region and category, inserts a column chart, and applies the 43 changes as a single undoable batch.</td>
-<td><b>Ask it</b> — questions about the workbook come back with the reasoning and the exact cells used as clickable citations. Under the hood: an in-house Rust <code>.xlsx</code> engine, pivot tables, slicers, conditional formatting, formula tracing, and pictures embedded in cells as Excel's native rich values — Excel reopens them still in the cell. Cell notes can carry a picture, shown under the note's popup.</td>
-</tr>
-</table>
-
-### 3 · Slides — from a prompt to a `.pptx` deck
-
-<img src="docs/assets/readme/slides-generate.webp" alt="Time-lapse of GenOffice Slides generating the Aurora Home investor deck: the AI plans the storyline in the panel, slides appear on the canvas one after another, and the finished deck ends on the closing ask" width="100%">
-
-<table>
-<tr>
-<td width="50%"><img src="docs/assets/readme/slides-cover.webp" alt="GenOffice Slides: the cover slide of an AI-generated Aurora Home investor deck on the canvas, with the original one-line prompt and the AI's summary of what it built in the panel"></td>
-<td width="50%"><img src="docs/assets/readme/slides-ai.webp" alt="GenOffice Slides: the designed closing slide of the same 11-slide deck, with the thumbnail strip on the left"></td>
-</tr>
-<tr>
-<td><b>One line in</b> — "Create a 10-slide investor pitch deck for Aurora Home…". GenOffice plans the storyline, researches the numbers, and drafts every slide onto the canvas as a real <code>.pptx</code>.</td>
-<td><b>A finished deck out</b> — eleven designed slides with consistent typography, imagery and a closing call to action; keep editing with masters, layouts, smart guides and non-destructive cropping, or ask the panel to restyle, rewrite and reorder. Insert a <code>.glb</code> and it is a real 3D model: turn it by dragging in the editor, stored the way PowerPoint stores 3D, still 3D in PowerPoint.</td>
-</tr>
-</table>
-
-**Slide Show → Record** narrates the deck slide by slide, with pause and
-resume. The narration and the auto-advance timings it measures are saved into
-the `.pptx`, and PowerPoint plays them back the same way.
-
-### 4 · PDF — edit PDF text in place, convert PDF to Word on-device
-
-<table>
-<tr>
-<td width="50%"><img src="docs/assets/readme/pdf-edit.webp" alt="GenOffice PDF: Edit text mode outlines every text block on the page for in-place editing"></td>
-<td width="50%"><img src="docs/assets/readme/pdf-convert.webp" alt="GenOffice Docs showing a Word document converted locally from the Helios quarterly review PDF, opened in a second tab beside the original PDF"></td>
-</tr>
-<tr>
-<td><b>Edit inside the page</b> — Edit text mode outlines every text block for in-place retyping; the content stream is rewritten through PDFium with the original fonts, not a cover-up annotation. Ask the AI about a long report and get answers with page citations.</td>
-<td><b>Convert on-device</b> — <b>PDF Converter → PDF to Word</b> produces an editable <code>.docx</code> that opens in Docs next to the source, headings, stat rows and paragraphs intact. Excel and PowerPoint targets work the same way; scanned pages go through the system OCR.</td>
-</tr>
-</table>
-
-### 5 · HTML — an AI page and UI builder, design brief first
-
-Say what the page is for and who it is for. The AI proposes a **design brief**
-first — hook, palette, typography and style directions — then builds a single
-self-contained `.html` file against those tokens.
-
-<img src="docs/assets/readme/html-restyle-motion.webp" alt="Time-lapse of GenOffice HTML restyling the Lumen landing page: one Restyle request in the panel turns the dark Midnight Studio page into the warm Solar Daybreak version while every section and all copy stay in place" width="100%">
-
-<table>
-<tr>
-<td width="50%"><img src="docs/assets/readme/html-ai.webp" alt="GenOffice HTML: a generated landing page for a solar desk lamp in the dark Midnight Studio direction, shown in the live preview"></td>
-<td width="50%"><img src="docs/assets/readme/html-restyle.webp" alt="The same Lumen landing page restyled by the AI into the warm Solar Daybreak direction: paper background, serif headlines and an orange accent, with every section and all copy kept"></td>
-</tr>
-<tr>
-<td><b>Generated from one prompt</b> — a bold hero, feature cards, pricing and a waitlist form for Lumen, built in the Midnight Studio direction. Click any element to restyle it, double-click to edit text, or switch to the CodeMirror source view.</td>
-<td><b>Same design, new direction</b> — one <b>Restyle</b> request swaps the brief's tokens and the page follows: warm paper, editorial serif, sun-orange accent, nothing rewritten. Present fullscreen, or export as PDF or a native editable Word document.</td>
-</tr>
-</table>
-<table>
-<tr>
-<td width="50%"><img src="docs/assets/readme/html-dashboard.webp" alt="GenOffice HTML: a generated personal dashboard UI for a freelance designer in a warm linen style, with a left rail, serif greeting and four metric cards"></td>
-<td width="50%"><img src="docs/assets/readme/html-report.webp" alt="GenOffice HTML: a generated EV-market data report in a broadsheet style, with a serif masthead, a 17.3 million headline figure and a stat row"></td>
-</tr>
-<tr>
-<td><b>UI mockups</b> — the "personal dashboard" starter turns a persona into a working layout: left rail, greeting, billable-hours sparkline, invoice and utilization cards, all real HTML you can hand to a developer.</td>
-<td><b>Data stories</b> — the "data report" starter builds an editorial broadsheet: serif masthead, one headline number, a rule-separated stat row, inline SVG charts and a methodology note.</td>
-</tr>
-</table>
-
-### 6 · Markdown — a block editor over plain `.md`
-
-<table>
-<tr>
-<td width="50%"><img src="docs/assets/readme/markdown-render.webp" alt="GenOffice Markdown rendering a launch-notes document with a table, a Mermaid flowchart and a task list"></td>
-<td><b>Rendered, saved as plain Markdown</b> — headings, lists, tables, images, code blocks and Mermaid diagrams in a Tiptap block editor, written back as plain <code>.md</code>, with a fully local <b>Markdown → Word</b> export.</td>
-</tr>
-</table>
-
-**Linked notes, the way Obsidian does it.** `[[wiki links]]` click through to
-the note they name, typing `[[` offers note-name completion, and `![[…]]`
-embeds a note or a picture inline. A **Backlinks** panel lists every note that
-points at the open one, and the **Graph** view maps the links of the whole
-vault.
-
-### 7 · Search — find the file that answers the question, with TypeSafe Jev
-
-Every file in your work folder is indexed on-device: names, folders and the
-extracted text of Word, Excel, PowerPoint, PDF, Markdown and HTML files, in a
-SQLite full-text index with CJK-aware tokenizing. Switch on **Jev search
-reranking** and the top 20 local hits are judged by
-[TypeSafe Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev),
-the System One model that returns one calibrated relevance score per document
-in a single call instead of generating text. The list is reordered by
-that score; if the call fails or times out, the local order stays.
-
-<img src="docs/assets/readme/search-jev-motion.webp" alt="Screen recording of the GenOffice home screen: typing laptop refresh policy lists a browser-cache policy, a brand-refresh plan and a dashboard-refresh schedule first while the equipment standards document is last; the Settings page shows Jev search reranking switched on under AI Media & Search with the TypeSafe endpoint; the same search then shows the equipment standards document first with a Jev badge next to the result count" width="100%">
-
-<table>
-<tr>
-<td width="50%"><img src="docs/assets/readme/search-jev-before-after.webp" alt="Two result lists for the query laptop refresh policy side by side: without Jev the dashboard refresh schedule, brand refresh plan and browser cache refresh policy lead and the company equipment standards document is fifth; with Jev the equipment standards document, which states the three-year laptop replacement cycle, is first"></td>
-<td width="50%"><img src="docs/assets/readme/search-jev-settings.webp" alt="GenOffice Settings, AI Media & Search page: the Local file search block with the Jev search reranking switch, the endpoint choice between OpenRouter and TypeSafe, and the API key field"></td>
-</tr>
-<tr>
-<td><b>Same words, different answers</b> — "laptop refresh policy" matches a browser-cache refresh policy, a brand-refresh plan and a dashboard-refresh schedule word for word, so full-text ranking puts them first. Jev reads the excerpts and moves the equipment standards document, the one that states the three-year replacement cycle, to the top. The <b>Jev</b> badge next to the result count shows when the order came from the model.</td>
-<td><b>Off by default, one switch to turn on</b> — Settings → AI Media & Search → Local file search. Pick OpenRouter or TypeSafe direct, paste a key, hit Test connection. Only when the switch is on do excerpts of the top hits leave the device; the index itself never does.</td>
-</tr>
-</table>
-
-### 8 · CLI — your coding agent drives GenOffice, on your machine
-
-GenOffice ships a `genoffice` command line and an agent skill. Install the
-skill and Claude Code, Codex, Cursor, Gemini CLI, GitHub Copilot, OpenCode or
-Windsurf can create, convert, read and edit real Office files through the
-same engines as the apps, without opening a window.
-
-<img src="docs/assets/readme/cli-deck-in-app.webp" alt="GenOffice Slides showing an eight-slide Solar System deck that a coding agent built through the genoffice command line: the cover slide on the canvas and eight thumbnails on the left" width="100%">
-
-<table>
-<tr>
-<td width="50%"><img src="docs/assets/readme/cli-slides-grid.webp" alt="The eight rendered slides of the Solar System deck side by side: cover, exploration timeline, four key numbers, planet-diameter bar chart, rocky worlds versus giants, the Sun's 99.8% hero number, the four giants grid and takeaways"></td>
-<td width="50%"><img src="docs/assets/readme/cli-integrations.webp" alt="GenOffice Settings, Integrations page: the genoffice skill installed into Claude Code, with Install buttons next to Codex and Cursor"></td>
-</tr>
-<tr>
-<td><b>One prompt to your agent</b> — "Build an eight-slide deck about the Solar System." The agent reads the skill, writes a style sheet, an outline and one page spec per slide, generates the two photos with <code>genoffice image</code>, and lets <code>genoffice slides check</code> reject anything that overflows or overlaps before <code>genoffice create</code> assembles the <code>.pptx</code> and <code>slides render</code> hands back a PNG per slide to look at.</td>
-<td><b>Install once, from Settings → Integrations</b> — GenOffice lists the coding agents it finds on this computer and writes the skill into each one you pick. Or download the skill as a zip, or run <code>npx skills add 361533652/genoffice</code>. Commands and the full workflow are in <a href="#command-line-and-agent-skill">Command line and agent skill</a>.</td>
-</tr>
-</table>
-
-### 9 · MCP — the same tools over the Model Context Protocol
-
-Every `genoffice` command is also an MCP tool. Claude Code, Claude Desktop,
-Cursor and any other MCP client can start `genoffice mcp` themselves, with no
-skill to install and no window open, and get 29 tools plus the op references
-as resources. A second, HTTP server inside the app lets an agent build a Word
-document in a visible editor tab while you watch.
-
-<img src="docs/assets/readme/mcp-deck-motion.webp" alt="Time-lapse of Claude Code building an eight-slide renewable-energy investor briefing through the genoffice MCP server: it searches for figures and photos, checks each candidate picture with media, deck_start writes the style sheet and outline, deck_page adds one checked page at a time, deck_build assembles the .pptx and slides_render returns a picture of every slide; the finished deck then opens in GenOffice Slides" width="100%">
-
-<table>
-<tr>
-<td width="50%"><img src="docs/assets/readme/mcp-deck-in-app.webp" alt="GenOffice Slides showing the eight-slide Renewable Energy 2026 deck that Claude Code built through the genoffice MCP server: the cover slide with a wind-farm photograph on the canvas and eight thumbnails on the left"></td>
-<td width="50%"><img src="docs/assets/readme/mcp-integrations.webp" alt="GenOffice Settings, Integrations page, MCP part: the one-line claude mcp add command for Claude Code, the JSON block for Cursor, Claude Desktop and other MCP clients, and the local HTTP server option below"></td>
-</tr>
-<tr>
-<td><b>One prompt, 38 tool calls, no shell</b> — "Build an eight-slide investor briefing about renewable energy in 2026, with a real photo on the cover and wherever a photo helps." The agent pulls the figures and the photos with <code>search</code>, asks <code>media</code> whether each candidate picture is a real photograph, calls <code>deck_start</code> with a style sheet and an outline, then <code>deck_page</code> once per slide; every page is checked against the outline and the palette before it is kept, <code>deck_build</code> assembles the <code>.pptx</code>, <code>slides_audit</code> looks for overflow, <code>slides_render</code> hands back a PNG per slide as image content the model can look at, and <code>deck_replace</code> fixes the three pages it did not like.</td>
-<td><b>Connect once, from Settings → Integrations</b> — copy the <code>claude mcp add</code> line for Claude Code, or the JSON block into Cursor, Claude Desktop or any other MCP client. Option B switches on the local HTTP server for the visible Word editor. Both are described in <a href="#mcp-server">MCP server</a>.</td>
-</tr>
-</table>
 
 ## Why GenOffice
 
