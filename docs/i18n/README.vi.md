@@ -13,10 +13,10 @@
 Tệp Word, Excel, PowerPoint và PDF do bạn và AI của bạn cùng chỉnh sửa, được lưu lại đúng định dạng gốc.</p>
 
 <p align="center">
-  <a href="../../LICENSE"><img src="https://img.shields.io/github/license/genspark-ai/genoffice" alt="License: Apache-2.0"></a>
-  <a href="https://github.com/genspark-ai/genoffice/releases/latest"><img src="https://img.shields.io/github/v/release/genspark-ai/genoffice" alt="Latest release"></a>
-  <a href="https://github.com/genspark-ai/genoffice/releases"><img src="https://img.shields.io/github/downloads/genspark-ai/genoffice/total" alt="Downloads"></a>
-  <a href="https://github.com/genspark-ai/genoffice/stargazers"><img src="https://img.shields.io/github/stars/genspark-ai/genoffice?style=flat" alt="GitHub stars"></a>
+  <a href="../../LICENSE"><img src="https://img.shields.io/github/license/361533652/genoffice" alt="License: Apache-2.0"></a>
+  <a href="https://github.com/361533652/genoffice/releases/latest"><img src="https://img.shields.io/github/v/release/361533652/genoffice" alt="Latest release"></a>
+  <a href="https://github.com/361533652/genoffice/releases"><img src="https://img.shields.io/github/downloads/361533652/genoffice/total" alt="Downloads"></a>
+  <a href="https://github.com/361533652/genoffice/stargazers"><img src="https://img.shields.io/github/stars/361533652/genoffice?style=flat" alt="GitHub stars"></a>
   <a href="https://x.com/merrickbuilds"><img src="https://img.shields.io/badge/follow-%40merrickbuilds-000000?logo=x&logoColor=white" alt="Follow @merrickbuilds on X"></a>
 </p>
 
@@ -77,9 +77,9 @@ nhập chỉ theo chiều mở — lưu thì ghi OOXML, không bao giờ ghi ODF
   chuyển đổi, đọc và chỉnh sửa tệp Office thật ngay trên máy của bạn mà
   không cần mở cửa sổ nào.
 
-**Tải ngay:** [macOS](https://github.com/genspark-ai/genoffice/releases/latest) (Apple Silicon và Intel) ·
-[Windows](https://github.com/genspark-ai/genoffice/releases/latest) (x64 và Arm) ·
-[Linux](https://github.com/genspark-ai/genoffice/releases/latest) (deb, rpm, AppImage) —
+**Tải ngay:** [macOS](https://github.com/361533652/genoffice/releases/latest) (Apple Silicon và Intel) ·
+[Windows](https://github.com/361533652/genoffice/releases/latest) (x64 và Arm) ·
+[Linux](https://github.com/361533652/genoffice/releases/latest) (deb, rpm, AppImage) —
 chi tiết và yêu cầu hệ thống xem mục [Tải xuống](#download).
 
 ## Demo
@@ -278,27 +278,7 @@ hàng đầu mới rời khỏi máy; bản thân chỉ mục thì không bao gi
 </tr>
 </table>
 
-### 8 · Ask AI — các tệp bạn gắn sao, được trả lời kèm nguồn
-
-Gắn sao những tệp bạn đang làm việc và **Ask AI** trên màn hình chính coi
-chúng là một cơ sở tri thức. Đặt câu hỏi bằng ngôn ngữ thường ngày; agent
-tìm trong các tệp đã gắn sao, đọc những tệp nó cần và trả lời với một trích
-dẫn sau mỗi thông điệp. Bấm vào trích dẫn và tệp mở trong đúng ứng dụng.
-Đính kèm tệp vào câu hỏi bằng cách kéo thả, dán hoặc từ menu **+** — ảnh
-được đưa cho mô hình dưới dạng đầu vào thị giác — và mỗi câu hỏi được giữ
-như một cuộc trò chuyện riêng: chuyển giữa chúng, tạo cuộc mới, xóa bớt,
-danh sách vẫn còn sau khi khởi động lại.
-
-<img src="../assets/readme/home-ask-ai-motion.webp" alt="Bản ghi màn hình Ask AI của GenOffice: câu hỏi tóm tắt nhanh, điều gì thúc đẩy tăng trưởng quý 3 của chúng ta và khu vực châu Á – Thái Bình Dương thể hiện ra sao, được gõ trên màn hình chính; agent đọc hai tệp đã gắn sao và trả lời với việc ra mắt Aurora X1 và mở rộng châu Á – Thái Bình Dương, mỗi thông điệp theo sau là một chip trích dẫn nêu tên báo cáo quý hoặc sổ doanh số theo vùng; bấm vào chip sổ tính mở nó trong Sheets với hàng châu Á – Thái Bình Dương được tô sáng" width="100%">
-
-Ask AI tìm kiếm trên cùng chỉ mục toàn văn trên máy với
-[Search](#7--search--find-the-file-that-answers-the-question-with-typesafe-jev)
-và đọc tệp theo từng trang, nên mô hình chỉ thấy các kết quả trùng và đúng
-đoạn nó cần, qua nhà cung cấp bạn đã chọn. Nó cũng có thể gọi CLI
-`genoffice` tích hợp sẵn để tạo thẳng các tệp; mỗi tệp hiện ra dưới dạng
-một thẻ artifact dưới câu trả lời, bấm vào là mở.
-
-### 9 · CLI — agent lập trình của bạn điều khiển GenOffice, ngay trên máy của bạn
+### 8 · CLI — agent lập trình của bạn điều khiển GenOffice, ngay trên máy của bạn
 
 GenOffice đi kèm dòng lệnh `genoffice` và một agent skill. Cài skill và
 Claude Code, Codex, Cursor, Gemini CLI, GitHub Copilot, OpenCode hay
@@ -322,12 +302,12 @@ khi <code>genoffice create</code> lắp <code>.pptx</code> và
 <td><b>Cài một lần, từ Settings → Integrations</b> — GenOffice liệt kê các
 agent lập trình tìm thấy trên máy này và ghi skill vào mỗi agent bạn chọn.
 Hoặc tải skill dưới dạng zip, hoặc chạy <code>npx skills add
-genspark-ai/genoffice</code>. Các lệnh và toàn bộ quy trình nằm ở
+361533652/genoffice</code>. Các lệnh và toàn bộ quy trình nằm ở
 <a href="#command-line-and-agent-skill">Dòng lệnh và agent skill</a>.</td>
 </tr>
 </table>
 
-### 10 · MCP — cùng bộ công cụ qua Model Context Protocol
+### 9 · MCP — cùng bộ công cụ qua Model Context Protocol
 
 Mỗi lệnh `genoffice` cũng là một công cụ MCP. Claude Code, Claude Desktop,
 Cursor và bất kỳ MCP client nào khác có thể tự chạy `genoffice mcp`, không
@@ -392,54 +372,6 @@ trình soạn thảo Word hiện rõ. Cả hai được mô tả ở
   và các agent khác — vẫn ngay trên máy.
 - **Miễn phí**, cho cả cá nhân lẫn nhóm.
 
-## Các backend AI
-
-**Đăng nhập Genspark** và không có gì phải cấu hình: các lời gọi mô hình đi
-qua proxy Genspark (họ Claude, GPT và Gemini) và các agent có tìm kiếm web
-và ảnh, tạo ảnh, cùng phân tích ảnh/âm thanh/video.
-
-**Hoặc mang khoá riêng của bạn.** Settings → AI liệt kê Claude, OpenAI,
-Gemini, DeepSeek, Kimi, GLM, Qwen, Doubao, MiniMax, Grok, Mistral,
-OpenRouter, Requesty, Opper, Cheaper Inference, Atlas Cloud, SiliconFlow,
-PPIO, Command Code và OpenCode Zen/Go, cùng một ô tuỳ biến cho bất kỳ điểm cuối tương thích OpenAI nào
-(base URL + khoá), kể cả máy chủ mô hình cục bộ. Search và media có nhà
-cung cấp riêng theo từng khả năng dưới **AI Media & Search**: Serper,
-Serply, SearchApi, Tavily, Parallel, Keenable, Exa hoặc Firecrawl cho tìm kiếm web;
-OpenAI, Gemini, Doubao/Seedream, GLM, Grok, Qwen, MiniMax, Stability, FLUX
-hoặc bất kỳ điểm
-cuối ảnh tương thích OpenAI nào cho tạo ảnh và phân tích ảnh/video, cùng
-DeepSeek V4.1 Flash cho phân tích ảnh.
-
-**TypeSafe Jev** xếp lại thứ hạng tìm kiếm tệp trên màn hình chính. Dưới
-**AI Media & Search → Local file search**, bật Jev search reranking và chọn
-điểm cuối: [OpenRouter](https://openrouter.ai/typesafe) (mô hình
-`typesafe/jev-1.13`) hoặc API của chính TypeSafe. Khoá chỉ được lưu trên
-chính thiết bị này. Mặc định tính năng tắt; khi bật, đoạn trích của 20 kết
-quả cục bộ hàng đầu được gửi đi để phán đoán và không gì khác rời khỏi máy.
-
-**Parallel** hoạt động không cần tài khoản: Search MCP miễn phí của nó
-(giới hạn tần suất) là tìm kiếm web mặc định khi chưa có đăng nhập
-Genspark hay khoá tìm kiếm, và chạy trước bước scrape DuckDuckGo. Chọn
-Parallel dưới Web search và nhập khoá
-[Parallel](https://platform.parallel.ai/) để dùng Search API thay thế.
-Keenable cũng không cần khoá; khoá chỉ giúp nâng giới hạn tần suất.
-
-Toàn bộ bộ ứng dụng có giao diện sáng, tối và theo hệ thống. Giao diện chỉ
-thay đổi những gì trên màn hình: xuất, in và tệp đã lưu luôn giữ màu riêng
-của tài liệu.
-
-<a id="skills"></a>
-
-## Skill
-
-Skill là một tệp `SKILL.md` chỉ cho AI cách làm tốt một việc: báo cáo tuần, NDA, giáo án.
-GenOffice đi kèm một bộ skill và nhận cả skill của bạn, cùng định dạng mà các agent lập trình dùng.
-
-- **Cài đặt → Skill.** **Cài** một skill được đề xuất, hoặc **Nhập** một thư mục, một tệp zip hay một `SKILL.md` đơn lẻ. Không có gì chạy khi nhập. Tab **Tất cả** liệt kê toàn bộ danh mục được đề xuất ở một nơi, với mô tả theo ngôn ngữ của ứng dụng.
-- **Trong trò chuyện.** Mở menu **+** cạnh ô nhập của bất kỳ bảng AI nào, chọn **Skill**, tích một cái rồi gửi. Skill chỉ đi kèm đúng tin nhắn đó.
-
----
-
 ## Dòng lệnh và agent skill
 
 Mọi thứ các ứng dụng làm được với một tệp, dòng lệnh `genoffice` làm được
@@ -460,7 +392,7 @@ OpenCode và Windsurf ngay từ đầu, bất kỳ agent nào đọc được sk
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Settings → Integrations** trong ứng dụng | Liệt kê các agent tìm thấy trên máy này; một cú bấm ghi skill vào từng agent bạn chọn. Nút **Update** xuất hiện khi một bản phát hành GenOffice mang skill mới hơn. |
 | **Download as zip** trên cùng trang        | Đúng cấu trúc claude.ai, ứng dụng Claude desktop và các trợ lý khác chấp nhận như skill tải lên.                                                                    |
-| `npx skills add genspark-ai/genoffice`     | Cài từ kho lưu trữ này vào bất kỳ agent tương thích skills nào.                                                                                                     |
+| `npx skills add 361533652/genoffice`     | Cài từ kho lưu trữ này vào bất kỳ agent tương thích skills nào.                                                                                                     |
 
 Sau đó mở một cuộc trò chuyện mới và yêu cầu một tài liệu. Skill dạy agent
 khi nào nên dùng tới `genoffice`, cách đọc tệp trước khi sửa, và cách tự
@@ -589,17 +521,17 @@ hình trong GenOffice.
 
 | Nền tảng                             | Yêu cầu                                               | Tải xuống                                                                                   |
 | ------------------------------------ | ----------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| **macOS** — Apple Silicon (arm64)    | macOS 11+                                             | [`.dmg` mới nhất (arm64)](https://github.com/genspark-ai/genoffice/releases/latest)         |
-| **macOS** — Intel (x64)              | macOS 11+                                             | [`.dmg` mới nhất (x64)](https://github.com/genspark-ai/genoffice/releases/latest)           |
-| **Windows** (x64, đa số máy tính)    | Windows 10+, Intel/AMD                                | [Trình cài `-x64.exe` mới nhất](https://github.com/genspark-ai/genoffice/releases/latest)   |
-| **Windows** on Arm (ARM64)           | Windows 11 on Arm (Snapdragon X và tương tự)          | [Trình cài `-arm64.exe` mới nhất](https://github.com/genspark-ai/genoffice/releases/latest) |
-| **Linux** — Debian / Ubuntu          | x86_64, glibc 2.34+ (Ubuntu 22.04 trở lên)            | [`.deb` mới nhất](https://github.com/genspark-ai/genoffice/releases/latest)                 |
-| **Linux** — Fedora / RHEL / openSUSE | x86_64, glibc 2.34+ (Fedora 35+, RHEL 9+, Leap 15.6+) | [`.rpm` mới nhất](https://github.com/genspark-ai/genoffice/releases/latest)                 |
-| **Linux** — các bản phân phối khác   | x86_64, glibc 2.34+, FUSE 2                           | [`.AppImage` mới nhất](https://github.com/genspark-ai/genoffice/releases/latest)            |
+| **macOS** — Apple Silicon (arm64)    | macOS 11+                                             | [`.dmg` mới nhất (arm64)](https://github.com/361533652/genoffice/releases/latest)         |
+| **macOS** — Intel (x64)              | macOS 11+                                             | [`.dmg` mới nhất (x64)](https://github.com/361533652/genoffice/releases/latest)           |
+| **Windows** (x64, đa số máy tính)    | Windows 10+, Intel/AMD                                | [Trình cài `-x64.exe` mới nhất](https://github.com/361533652/genoffice/releases/latest)   |
+| **Windows** on Arm (ARM64)           | Windows 11 on Arm (Snapdragon X và tương tự)          | [Trình cài `-arm64.exe` mới nhất](https://github.com/361533652/genoffice/releases/latest) |
+| **Linux** — Debian / Ubuntu          | x86_64, glibc 2.34+ (Ubuntu 22.04 trở lên)            | [`.deb` mới nhất](https://github.com/361533652/genoffice/releases/latest)                 |
+| **Linux** — Fedora / RHEL / openSUSE | x86_64, glibc 2.34+ (Fedora 35+, RHEL 9+, Leap 15.6+) | [`.rpm` mới nhất](https://github.com/361533652/genoffice/releases/latest)                 |
+| **Linux** — các bản phân phối khác   | x86_64, glibc 2.34+, FUSE 2                           | [`.AppImage` mới nhất](https://github.com/361533652/genoffice/releases/latest)            |
 
 Mọi bản dựng đều đến từ `main`; trình cài macOS và Windows có ký số. Các
 phiên bản cũ nằm trên trang
-[Releases](https://github.com/genspark-ai/genoffice/releases).
+[Releases](https://github.com/361533652/genoffice/releases).
 
 <details>
 <summary><b>Cài trên Linux</b></summary>
@@ -676,7 +608,7 @@ Xem [CONTRIBUTING.md](../../CONTRIBUTING.md) để biết các kiểm tra mọi 
 GenOffice đang được phát triển liên tục và phản hồi của bạn định hình nó.
 
 - **Báo lỗi hoặc đề xuất tính năng** trong
-  [GitHub Issues](https://github.com/genspark-ai/genoffice/issues).
+  [GitHub Issues](https://github.com/361533652/genoffice/issues).
 - **Tham gia trò chuyện nhóm GenOffice** trên
   [GenTeam](https://genoffice.ai/join) để nói chuyện với đội ngũ và những
   người dùng khác.

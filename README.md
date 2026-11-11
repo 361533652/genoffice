@@ -2,7 +2,7 @@
   <a href="https://genoffice.ai/">
     <picture>
       <source srcset="docs/assets/readme/hero-dark.webp" media="(prefers-color-scheme: dark)">
-      <img src="docs/assets/readme/hero.webp" alt="GenOffice — the open-source AI Office suite: Docs, Sheets, Slides, PDF, Markdown and HTML with a built-in AI panel" width="100%">
+      <img src="docs/assets/readme/hero.webp" alt="GenOffice — the open-source Office suite: Docs, Sheets, Slides, PDF, Markdown and HTML" width="100%">
     </picture>
   </a>
 </p>
@@ -13,10 +13,10 @@
 Word, Excel, PowerPoint and PDF files, edited by you and your AI, saved back in the real formats.</p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/genspark-ai/genoffice" alt="License: Apache-2.0"></a>
-  <a href="https://github.com/genspark-ai/genoffice/releases/latest"><img src="https://img.shields.io/github/v/release/genspark-ai/genoffice" alt="Latest release"></a>
-  <a href="https://github.com/genspark-ai/genoffice/releases"><img src="https://img.shields.io/github/downloads/genspark-ai/genoffice/total" alt="Downloads"></a>
-  <a href="https://github.com/genspark-ai/genoffice/stargazers"><img src="https://img.shields.io/github/stars/genspark-ai/genoffice?style=flat" alt="GitHub stars"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/361533652/genoffice" alt="License: Apache-2.0"></a>
+  <a href="https://github.com/361533652/genoffice/releases/latest"><img src="https://img.shields.io/github/v/release/361533652/genoffice" alt="Latest release"></a>
+  <a href="https://github.com/361533652/genoffice/releases"><img src="https://img.shields.io/github/downloads/361533652/genoffice/total" alt="Downloads"></a>
+  <a href="https://github.com/361533652/genoffice/stargazers"><img src="https://img.shields.io/github/stars/361533652/genoffice?style=flat" alt="GitHub stars"></a>
   <a href="https://x.com/merrickbuilds"><img src="https://img.shields.io/badge/follow-%40merrickbuilds-000000?logo=x&logoColor=white" alt="Follow @merrickbuilds on X"></a>
 </p>
 
@@ -24,7 +24,6 @@ Word, Excel, PowerPoint and PDF files, edited by you and your AI, saved back in 
 
 <p align="center">
   <a href="#download"><b>Download</b></a> ·
-  <a href="#skills"><b>Skills</b></a> ·
   <a href="#command-line-and-agent-skill"><b>CLI</b></a> ·
   <a href="#mcp-server"><b>MCP</b></a> ·
   <a href="https://genoffice.ai/"><b>Website</b></a> ·
@@ -61,9 +60,6 @@ never the source format.
   HTML files from a local SQLite index, CJK included. Optionally, the top hits
   are reranked by **[TypeSafe Jev](https://typesafe.ai/)**, the System One
   judgment model, so the file that answers your question comes first.
-- **Ask your files, with sources.** Star a set of documents and **Ask AI** on
-  the home screen answers questions across them, citing the file behind every
-  claim so you can open it and check.
 - **Your keys or none.** Sign in with Genspark and skip keys, or bring your own
   key for Claude, OpenAI, Gemini, DeepSeek, Kimi, GLM, Qwen, Doubao, MiniMax,
   Grok, Mistral, OpenRouter, Requesty, Opper, Cheaper Inference, Atlas Cloud, or any OpenAI-compatible endpoint, local
@@ -73,24 +69,21 @@ never the source format.
   and Windsurf, so a coding agent can create, convert, read and edit real
   Office files on your machine without opening a window.
 
-**Get it:** [macOS](https://github.com/genspark-ai/genoffice/releases/latest) (Apple Silicon and Intel) ·
-[Windows](https://github.com/genspark-ai/genoffice/releases/latest) (x64 and Arm) ·
-[Linux](https://github.com/genspark-ai/genoffice/releases/latest) (deb, rpm, AppImage) —
+**Get it:** [macOS](https://github.com/361533652/genoffice/releases/latest) (Apple Silicon and Intel) ·
+[Windows](https://github.com/361533652/genoffice/releases/latest) (x64 and Arm) ·
+[Linux](https://github.com/361533652/genoffice/releases/latest) (deb, rpm, AppImage) —
 details and requirements in [Download](#download).
 
 ## Demo
 
-Six apps, one AI panel, a file search reranked by TypeSafe Jev, an Ask AI
-that answers from your starred files with sources, and a command line for
-your coding agent. Every
-screenshot is the real app on macOS, with the AI driven from the prompt you
-can read in the panel.
+Six apps, one file format each, and a command line for your coding agent.
+Every screenshot is the real app on macOS.
 
 ### 1 · Docs — open and edit `.docx` with an AI you can review
 
 <table>
 <tr>
-<td width="50%"><img src="docs/assets/readme/docs-report.webp" alt="GenOffice Docs rendering a two-column annual-report page with a full-width cover image, shaded KPI table, header and footer, at 80% zoom with the AI panel collapsed"></td>
+<td width="50%"><img src="docs/assets/readme/docs-report.webp" alt="GenOffice Docs rendering a two-column annual-report page with a full-width cover image, shaded KPI table, header and footer, at 80% zoom"></td>
 <td width="50%"><img src="docs/assets/readme/docs-ai.webp" alt="GenOffice Docs: a company overview with a banner image; the AI tightened the Overview and inserted a new bulleted section, and the panel offers a one-click roll back"></td>
 </tr>
 <tr>
@@ -119,7 +112,7 @@ can read in the panel.
 <table>
 <tr>
 <td width="50%"><img src="docs/assets/readme/slides-cover.webp" alt="GenOffice Slides: the cover slide of an AI-generated Aurora Home investor deck on the canvas, with the original one-line prompt and the AI's summary of what it built in the panel"></td>
-<td width="50%"><img src="docs/assets/readme/slides-ai.webp" alt="GenOffice Slides: the designed closing slide of the same 11-slide deck, with the thumbnail strip on the left and the AI panel summarizing the storyline"></td>
+<td width="50%"><img src="docs/assets/readme/slides-ai.webp" alt="GenOffice Slides: the designed closing slide of the same 11-slide deck, with the thumbnail strip on the left"></td>
 </tr>
 <tr>
 <td><b>One line in</b> — "Create a 10-slide investor pitch deck for Aurora Home…". GenOffice plans the storyline, researches the numbers, and drafts every slide onto the canvas as a real <code>.pptx</code>.</td>
@@ -135,7 +128,7 @@ the `.pptx`, and PowerPoint plays them back the same way.
 
 <table>
 <tr>
-<td width="50%"><img src="docs/assets/readme/pdf-edit.webp" alt="GenOffice PDF: Edit text mode outlines every text block on the page for in-place editing while the AI panel answers a question about the report with page citations"></td>
+<td width="50%"><img src="docs/assets/readme/pdf-edit.webp" alt="GenOffice PDF: Edit text mode outlines every text block on the page for in-place editing"></td>
 <td width="50%"><img src="docs/assets/readme/pdf-convert.webp" alt="GenOffice Docs showing a Word document converted locally from the Helios quarterly review PDF, opened in a second tab beside the original PDF"></td>
 </tr>
 <tr>
@@ -154,7 +147,7 @@ self-contained `.html` file against those tokens.
 
 <table>
 <tr>
-<td width="50%"><img src="docs/assets/readme/html-ai.webp" alt="GenOffice HTML: a generated landing page for a solar desk lamp in the dark Midnight Studio direction, shown in the live preview with the AI panel summarizing the page it just built"></td>
+<td width="50%"><img src="docs/assets/readme/html-ai.webp" alt="GenOffice HTML: a generated landing page for a solar desk lamp in the dark Midnight Studio direction, shown in the live preview"></td>
 <td width="50%"><img src="docs/assets/readme/html-restyle.webp" alt="The same Lumen landing page restyled by the AI into the warm Solar Daybreak direction: paper background, serif headlines and an orange accent, with every section and all copy kept"></td>
 </tr>
 <tr>
@@ -173,15 +166,11 @@ self-contained `.html` file against those tokens.
 </tr>
 </table>
 
-### 6 · Markdown — a block editor over plain `.md`, with Ask AI
+### 6 · Markdown — a block editor over plain `.md`
 
 <table>
 <tr>
-<td width="50%"><img src="docs/assets/readme/markdown-ai.webp" alt="GenOffice Markdown: a selected paragraph shows an Ask AI popover with a typed instruction and suggestion chips such as Polish, Make more concise, Expand and Fix grammar, plus Send now and Add to queue buttons"></td>
-<td width="50%"><img src="docs/assets/readme/markdown-render.webp" alt="GenOffice Markdown rendering a launch-notes document with a table, a Mermaid flowchart and a task list, with the AI panel's starter prompts on the left"></td>
-</tr>
-<tr>
-<td><b>Ask AI about a selection</b> — select any passage and an <b>Ask AI</b> chip appears: type an instruction or pick a suggestion, send it now, or queue several anchored edits and run them in one pass. The same entry exists in every app.</td>
+<td width="50%"><img src="docs/assets/readme/markdown-render.webp" alt="GenOffice Markdown rendering a launch-notes document with a table, a Mermaid flowchart and a task list"></td>
 <td><b>Rendered, saved as plain Markdown</b> — headings, lists, tables, images, code blocks and Mermaid diagrams in a Tiptap block editor, written back as plain <code>.md</code>, with a fully local <b>Markdown → Word</b> export.</td>
 </tr>
 </table>
@@ -216,34 +205,14 @@ that score; if the call fails or times out, the local order stays.
 </tr>
 </table>
 
-### 8 · Ask AI — your starred files, answered with sources
-
-Star the files you work with and the home screen's **Ask AI** treats them as
-a knowledge base. Ask a question in plain language; the agent searches the
-starred files, reads the ones it needs and answers with a citation after
-every claim. Click a citation and the file opens in the right app. Attach
-files to the question by dragging, pasting or from the **+** menu — images go
-to the model as visual input — and every question is kept as its own
-conversation: switch between them, start a new one, delete one, the list
-survives a restart.
-
-<img src="docs/assets/readme/home-ask-ai-motion.webp" alt="Screen recording of GenOffice Ask AI: the question quick summary, what drove our Q3 growth and how did Asia-Pacific perform, is typed on the home screen; the agent reads two starred files and answers with the Aurora X1 launch and the Asia-Pacific expansion, each claim followed by a citation chip naming the quarterly report or the regional sales workbook; a click on the workbook chip opens it in Sheets with the Asia-Pacific row highlighted" width="100%">
-
-Ask AI searches the same on-device full-text index as
-[Search](#7--search--find-the-file-that-answers-the-question-with-typesafe-jev)
-and reads files in pages, so the model only sees the hits and the passages it
-asked for, through the provider you chose. It can also call the built-in
-`genoffice` CLI to build files outright; each one appears as an artifact card
-under the answer, and a click opens it.
-
-### 9 · CLI — your coding agent drives GenOffice, on your machine
+### 8 · CLI — your coding agent drives GenOffice, on your machine
 
 GenOffice ships a `genoffice` command line and an agent skill. Install the
 skill and Claude Code, Codex, Cursor, Gemini CLI, GitHub Copilot, OpenCode or
 Windsurf can create, convert, read and edit real Office files through the
 same engines as the apps, without opening a window.
 
-<img src="docs/assets/readme/cli-deck-in-app.webp" alt="GenOffice Slides showing an eight-slide Solar System deck that a coding agent built through the genoffice command line: the cover slide on the canvas, eight thumbnails on the left and the AI panel open" width="100%">
+<img src="docs/assets/readme/cli-deck-in-app.webp" alt="GenOffice Slides showing an eight-slide Solar System deck that a coding agent built through the genoffice command line: the cover slide on the canvas and eight thumbnails on the left" width="100%">
 
 <table>
 <tr>
@@ -252,11 +221,11 @@ same engines as the apps, without opening a window.
 </tr>
 <tr>
 <td><b>One prompt to your agent</b> — "Build an eight-slide deck about the Solar System." The agent reads the skill, writes a style sheet, an outline and one page spec per slide, generates the two photos with <code>genoffice image</code>, and lets <code>genoffice slides check</code> reject anything that overflows or overlaps before <code>genoffice create</code> assembles the <code>.pptx</code> and <code>slides render</code> hands back a PNG per slide to look at.</td>
-<td><b>Install once, from Settings → Integrations</b> — GenOffice lists the coding agents it finds on this computer and writes the skill into each one you pick. Or download the skill as a zip, or run <code>npx skills add genspark-ai/genoffice</code>. Commands and the full workflow are in <a href="#command-line-and-agent-skill">Command line and agent skill</a>.</td>
+<td><b>Install once, from Settings → Integrations</b> — GenOffice lists the coding agents it finds on this computer and writes the skill into each one you pick. Or download the skill as a zip, or run <code>npx skills add 361533652/genoffice</code>. Commands and the full workflow are in <a href="#command-line-and-agent-skill">Command line and agent skill</a>.</td>
 </tr>
 </table>
 
-### 10 · MCP — the same tools over the Model Context Protocol
+### 9 · MCP — the same tools over the Model Context Protocol
 
 Every `genoffice` command is also an MCP tool. Claude Code, Claude Desktop,
 Cursor and any other MCP client can start `genoffice mcp` themselves, with no
@@ -292,65 +261,14 @@ document in a visible editor tab while you watch.
   endpoint included.
 - **PDF done properly.** Edit text inside the page, and convert PDF to Word,
   Excel or PowerPoint on-device, with system OCR for scans.
-- **Markdown and HTML too**, with the same AI panel and local export to Word.
+- **Markdown and HTML too**, with local export to Word.
 - **Search that finds the answer, not the keyword.** Full-text search over
   every document in your folders, indexed on-device, with optional reranking
   by TypeSafe Jev, the System One judgment model.
-- **Ask AI across your files.** Star the files that matter and ask questions
-  in plain language; every answer cites the file it came from, one click away.
-- **Skills.** Ready-made skills, or your own `SKILL.md`, attached from
-  the **+** menu of any AI panel.
 - **Scriptable.** A `genoffice` command line, an agent skill and an MCP server
   put every engine at the service of Claude Code, Claude Desktop, Codex, Cursor
   and other agents, still on-device.
 - **Free**, for individuals and teams alike.
-
-## AI backends
-
-**Sign in with Genspark** and there is nothing to configure: model calls route
-through the Genspark proxy (Claude, GPT and Gemini families) and the agents get
-web and image search, image generation, and image/audio/video analysis.
-
-**Or bring your own key.** Settings → AI lists Claude, OpenAI, Gemini,
-DeepSeek, Kimi, GLM, Qwen, Doubao, MiniMax, Grok, Mistral, OpenRouter, Requesty, Opper,
-Cheaper Inference, Atlas Cloud, SiliconFlow, PPIO, Command Code and OpenCode Zen/Go, plus a
-custom slot for any OpenAI-compatible endpoint (base URL + key), including local model servers. Search and media have their own
-per-capability providers under **AI Media & Search**: Serper, Serply, SearchApi, Tavily, Parallel,
-Keenable, Exa or Firecrawl for web search, and OpenAI, Gemini, Doubao/Seedream, GLM, Grok,
-Qwen, MiniMax, Stability, FLUX or any OpenAI-compatible images endpoint for image
-generation and image/video analysis, plus DeepSeek V4.1 Flash for image analysis.
-
-**TypeSafe Jev** reranks the home screen's file search. Under **AI Media & Search →
-Local file search**, switch on Jev search reranking and pick an endpoint:
-[OpenRouter](https://openrouter.ai/typesafe) (model `typesafe/jev-1.13`) or
-TypeSafe's own API. The key is stored only on this device. It is off by
-default; when on, the excerpts of the top 20 local hits are sent for judgment
-and nothing else leaves the machine.
-
-**Parallel** works without an account: its free Search MCP (rate-limited) is the
-default web search whenever no Genspark login or search key is configured, and
-it runs ahead of the DuckDuckGo scrape. Select Parallel under Web search and
-enter a [Parallel](https://platform.parallel.ai/) key to use the Search API
-instead. Keenable is keyless too; a key only raises the rate limits.
-
-The whole suite ships light, dark and system themes. Themes only change what
-is on screen: exports, prints and saved files always keep the document's own
-colors.
-
-## Skills
-
-A skill is a `SKILL.md` that tells the AI how to do one job well: a weekly
-report, an NDA, a lesson plan. GenOffice ships a set of them and takes your own,
-in the same format coding agents use.
-
-- **Settings → Skills.** **Install** a recommended skill, or **Import** a
-  folder, a zip or a single `SKILL.md`. Nothing runs on import. The **All** tab
-  lists the whole recommended catalog in one place, with descriptions that
-  follow the app language.
-- **In a chat.** Open the **+** menu next to the composer of any AI panel,
-  pick **Skills**, tick one, send. The skill goes along with that message only.
-
----
 
 ## Command line and agent skill
 
@@ -372,7 +290,7 @@ through the [MCP server](#mcp-server), Claude Desktop and every MCP client.
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Settings → Integrations** in the app | Lists the agents found on this computer; one click writes the skill into each one you choose. An **Update** button appears when a GenOffice release ships a newer skill. |
 | **Download as zip** on the same page   | The layout claude.ai, the Claude desktop apps and other assistants accept as an uploaded skill.                                                                          |
-| `npx skills add genspark-ai/genoffice` | Installs from this repository into any skills-compatible agent.                                                                                                          |
+| `npx skills add 361533652/genoffice` | Installs from this repository into any skills-compatible agent.                                                                                                          |
 
 Then start a new chat and ask for a document. The skill teaches the agent when
 to reach for `genoffice`, how to read a file before editing it, and how to
@@ -499,16 +417,16 @@ the provider configured in GenOffice.
 
 | Platform                             | Requirements                                          | Download                                                                                  |
 | ------------------------------------ | ----------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| **macOS** — Apple Silicon (arm64)    | macOS 11+                                             | [Latest `.dmg` (arm64)](https://github.com/genspark-ai/genoffice/releases/latest)         |
-| **macOS** — Intel (x64)              | macOS 11+                                             | [Latest `.dmg` (x64)](https://github.com/genspark-ai/genoffice/releases/latest)           |
-| **Windows** (x64, most PCs)          | Windows 10+, Intel/AMD                                | [Latest `-x64.exe` installer](https://github.com/genspark-ai/genoffice/releases/latest)   |
-| **Windows** on Arm (ARM64)           | Windows 11 on Arm (Snapdragon X and similar)          | [Latest `-arm64.exe` installer](https://github.com/genspark-ai/genoffice/releases/latest) |
-| **Linux** — Debian / Ubuntu          | x86_64, glibc 2.34+ (Ubuntu 22.04 or newer)           | [Latest `.deb`](https://github.com/genspark-ai/genoffice/releases/latest)                 |
-| **Linux** — Fedora / RHEL / openSUSE | x86_64, glibc 2.34+ (Fedora 35+, RHEL 9+, Leap 15.6+) | [Latest `.rpm`](https://github.com/genspark-ai/genoffice/releases/latest)                 |
-| **Linux** — other distributions      | x86_64, glibc 2.34+, FUSE 2                           | [Latest `.AppImage`](https://github.com/genspark-ai/genoffice/releases/latest)            |
+| **macOS** — Apple Silicon (arm64)    | macOS 11+                                             | [Latest `.dmg` (arm64)](https://github.com/361533652/genoffice/releases/latest)         |
+| **macOS** — Intel (x64)              | macOS 11+                                             | [Latest `.dmg` (x64)](https://github.com/361533652/genoffice/releases/latest)           |
+| **Windows** (x64, most PCs)          | Windows 10+, Intel/AMD                                | [Latest `-x64.exe` installer](https://github.com/361533652/genoffice/releases/latest)   |
+| **Windows** on Arm (ARM64)           | Windows 11 on Arm (Snapdragon X and similar)          | [Latest `-arm64.exe` installer](https://github.com/361533652/genoffice/releases/latest) |
+| **Linux** — Debian / Ubuntu          | x86_64, glibc 2.34+ (Ubuntu 22.04 or newer)           | [Latest `.deb`](https://github.com/361533652/genoffice/releases/latest)                 |
+| **Linux** — Fedora / RHEL / openSUSE | x86_64, glibc 2.34+ (Fedora 35+, RHEL 9+, Leap 15.6+) | [Latest `.rpm`](https://github.com/361533652/genoffice/releases/latest)                 |
+| **Linux** — other distributions      | x86_64, glibc 2.34+, FUSE 2                           | [Latest `.AppImage`](https://github.com/361533652/genoffice/releases/latest)            |
 
 All builds come from `main`; the macOS and Windows installers are signed.
-Older versions are on the [Releases](https://github.com/genspark-ai/genoffice/releases) page.
+Older versions are on the [Releases](https://github.com/361533652/genoffice/releases) page.
 
 <details>
 <summary><b>Installing on Linux</b></summary>
@@ -612,13 +530,11 @@ change must pass and how pull requests land.
 GenOffice is in active development and your feedback shapes it.
 
 - **Report a bug or request a feature** in
-  [GitHub Issues](https://github.com/genspark-ai/genoffice/issues).
+  [GitHub Issues](https://github.com/361533652/genoffice/issues).
 - **Join the GenOffice group chat** on
   [GenTeam](https://genoffice.ai/join) to talk to the team and other users.
 - **Follow [@merrickbuilds](https://x.com/merrickbuilds) on X** for release
   notes, demos and what is being built next.
-- **Star the repo** if GenOffice is useful to you — it is the best way to
-  support the project.
 
 ## FAQ
 
@@ -678,16 +594,6 @@ key for Claude, OpenAI, Gemini, DeepSeek, Kimi, GLM, Qwen, Doubao, MiniMax,
 Grok, Mistral, OpenRouter, Requesty, Opper, Cheaper Inference, Atlas Cloud and OpenCode Zen/Go, plus any OpenAI-compatible
 endpoint — including local model servers. Search, image generation and
 image/video analysis take their own keys under Settings → AI Media & Search.
-
-</details>
-
-<details>
-<summary><b>Can I turn the AI panel off?</b></summary>
-
-Yes. Settings → AI carries a **Show the AI sidebar** switch. Off, and every
-editor hides the sidebar; new documents stop opening it on their own. An
-explicit AI action — a ribbon button, a menu item — still opens the panel for
-that document, and closing it returns to hidden.
 
 </details>
 

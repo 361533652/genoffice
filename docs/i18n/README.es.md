@@ -13,10 +13,10 @@
 Archivos Word, Excel, PowerPoint y PDF, editados por ti y tu IA, guardados de nuevo en los formatos reales.</p>
 
 <p align="center">
-  <a href="../../LICENSE"><img src="https://img.shields.io/github/license/genspark-ai/genoffice" alt="Licencia: Apache-2.0"></a>
-  <a href="https://github.com/genspark-ai/genoffice/releases/latest"><img src="https://img.shields.io/github/v/release/genspark-ai/genoffice" alt="Última versión"></a>
-  <a href="https://github.com/genspark-ai/genoffice/releases"><img src="https://img.shields.io/github/downloads/genspark-ai/genoffice/total" alt="Descargas"></a>
-  <a href="https://github.com/genspark-ai/genoffice/stargazers"><img src="https://img.shields.io/github/stars/genspark-ai/genoffice?style=flat" alt="Estrellas de GitHub"></a>
+  <a href="../../LICENSE"><img src="https://img.shields.io/github/license/361533652/genoffice" alt="Licencia: Apache-2.0"></a>
+  <a href="https://github.com/361533652/genoffice/releases/latest"><img src="https://img.shields.io/github/v/release/361533652/genoffice" alt="Última versión"></a>
+  <a href="https://github.com/361533652/genoffice/releases"><img src="https://img.shields.io/github/downloads/361533652/genoffice/total" alt="Descargas"></a>
+  <a href="https://github.com/361533652/genoffice/stargazers"><img src="https://img.shields.io/github/stars/361533652/genoffice?style=flat" alt="Estrellas de GitHub"></a>
 </p>
 
 <p align="center"><a href="../../README.md">English</a> · <b>Español</b> · <a href="README.pt-BR.md">Português</a> · <a href="README.de.md">Deutsch</a> · <a href="README.fr.md">Français</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.zh-TW.md">繁體中文</a> · <a href="README.ko.md">한국어</a> · <a href="README.ja.md">日本語</a> · <a href="README.ar.md">العربية</a> · <a href="README.ru.md">Русский</a> · <a href="README.it.md">Italiano</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.pl.md">Polski</a> · <a href="README.cs.md">Čeština</a> · <a href="README.id.md">Bahasa Indonesia</a> · <a href="README.ms.md">Bahasa Melayu</a> · <a href="README.th.md">ไทย</a> · <a href="README.hi.md">हिन्दी</a> · <a href="README.he.md">עברית</a> · <a href="README.vi.md">Tiếng Việt</a> · <a href="README.tr.md">Türkçe</a></p>
@@ -66,9 +66,9 @@ escribe OOXML, nunca ODF.
   crear, convertir, leer y editar archivos Office reales en tu equipo sin
   abrir una ventana.
 
-**Consíguelo:** [macOS](https://github.com/genspark-ai/genoffice/releases/latest) (Apple Silicon e Intel) ·
-[Windows](https://github.com/genspark-ai/genoffice/releases/latest) (x64 y Arm) ·
-[Linux](https://github.com/genspark-ai/genoffice/releases/latest) (deb, rpm, AppImage) —
+**Consíguelo:** [macOS](https://github.com/361533652/genoffice/releases/latest) (Apple Silicon e Intel) ·
+[Windows](https://github.com/361533652/genoffice/releases/latest) (x64 y Arm) ·
+[Linux](https://github.com/361533652/genoffice/releases/latest) (deb, rpm, AppImage) —
 detalles y requisitos en [Download](#download).
 
 ## Demo
@@ -200,7 +200,7 @@ reales con los mismos motores que las apps, sin abrir una ventana.
 </tr>
 <tr>
 <td><b>Un solo prompt a tu agente</b> — «Crea una presentación de ocho diapositivas sobre el Sistema Solar». El agente lee el skill, escribe una hoja de estilos, un esquema y una especificación de página por diapositiva, genera las dos fotos con <code>genoffice image</code> y deja que <code>genoffice slides check</code> rechace todo lo que desborde o se superponga antes de que <code>genoffice create</code> ensamble el <code>.pptx</code> y <code>slides render</code> devuelva un PNG por diapositiva para revisarlo.</td>
-<td><b>Instálalo una vez, desde Ajustes → Integraciones</b> — GenOffice muestra los agentes de programación que encuentra en este equipo y escribe el skill en cada uno de los que elijas. O descarga el skill como zip, o ejecuta <code>npx skills add genspark-ai/genoffice</code>. Los comandos y el flujo de trabajo completo están en <a href="#command-line-and-agent-skill">Línea de comandos y skill de agente</a>.</td>
+<td><b>Instálalo una vez, desde Ajustes → Integraciones</b> — GenOffice muestra los agentes de programación que encuentra en este equipo y escribe el skill en cada uno de los que elijas. O descarga el skill como zip, o ejecuta <code>npx skills add 361533652/genoffice</code>. Los comandos y el flujo de trabajo completo están en <a href="#command-line-and-agent-skill">Línea de comandos y skill de agente</a>.</td>
 </tr>
 </table>
 
@@ -254,42 +254,6 @@ mientras lo observas.
   Desktop, Codex, Cursor y otros agentes, siempre en el dispositivo.
 - **Gratis**, tanto para personas individuales como para equipos.
 
-## Backends de IA
-
-**Inicia sesión con Genspark** y no hay nada que configurar: las llamadas al
-modelo se enrutan a través del proxy de Genspark (familias Claude, GPT y
-Gemini) y los agentes obtienen búsqueda web y de imágenes, generación de
-imágenes, y análisis de imagen/audio/video.
-
-**O usa tu propia clave.** Settings → AI incluye Claude, OpenAI, Gemini,
-DeepSeek, Kimi, GLM, Qwen, Doubao, MiniMax, Grok, Mistral, OpenRouter, Requesty, Opper, Cheaper Inference, Atlas Cloud, SiliconFlow, PPIO, Command Code y
-OpenCode Zen/Go, además de una ranura personalizada para cualquier endpoint
-compatible con OpenAI (URL base + clave), incluidos servidores de modelos
-locales. La búsqueda y los medios tienen sus propios proveedores por
-capacidad en **AI Media & Search**: Serper, Serply, SearchApi, Tavily, Parallel,
-Keenable, Exa o Firecrawl para búsqueda web, y
-OpenAI, Gemini, Doubao/Seedream, GLM, Grok, Qwen, MiniMax, Stability, FLUX o cualquier
-endpoint de imágenes compatible con OpenAI para generación de imágenes y
-análisis de imagen/video.
-
-Toda la suite incluye temas claro, oscuro y del sistema. Los temas solo
-cambian lo que se ve en pantalla: las exportaciones, las impresiones y los
-archivos guardados siempre conservan los colores propios del documento.
-
-<a id="skills"></a>
-
-## Skills
-
-Un skill es un `SKILL.md` que le dice a la IA cómo hacer bien una tarea: un informe semanal, un NDA, un plan de clase.
-GenOffice incluye un conjunto y acepta los tuyos, en el mismo formato que usan los agentes de código.
-
-- **Ajustes → Skills.** **Instala** un skill recomendado o **Importa** una carpeta, un zip o un único `SKILL.md`. Al importar no se ejecuta nada. La pestaña **Todas** muestra todo el catálogo recomendado en un solo lugar, con descripciones en el idioma de la aplicación.
-- **En un chat.** Abre el menú **+** junto al cuadro de texto de cualquier panel de IA, elige **Skills**, marca uno y envía. El skill solo acompaña a ese mensaje.
-
----
-
-<a id="command-line-and-agent-skill"></a>
-
 ## Línea de comandos y skill de agente
 
 Todo lo que las apps pueden hacer con un archivo, la línea de comandos
@@ -312,7 +276,7 @@ cualquier cliente MCP.
 | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Ajustes → Integraciones** en la app     | Muestra los agentes encontrados en este equipo; con un clic escribe el skill en cada uno de los que elijas. Aparece un botón **Actualizar** cuando una versión de GenOffice trae un skill más reciente. |
 | **Descargar como zip** en la misma página | El formato que claude.ai, las apps de escritorio de Claude y otros asistentes aceptan como skill subido.                                                                                                |
-| `npx skills add genspark-ai/genoffice`    | Lo instala desde este repositorio en cualquier agente compatible con skills.                                                                                                                            |
+| `npx skills add 361533652/genoffice`    | Lo instala desde este repositorio en cualquier agente compatible con skills.                                                                                                                            |
 
 Después abre un chat nuevo y pide un documento. El skill enseña al agente
 cuándo recurrir a `genoffice`, cómo leer un archivo antes de editarlo y cómo
@@ -429,17 +393,17 @@ en GenOffice.
 
 | Plataforma                              | Requisitos                                            | Descarga                                                                                         |
 | --------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| **macOS** — Apple Silicon (arm64)       | macOS 11+                                             | [Última versión `.dmg` (arm64)](https://github.com/genspark-ai/genoffice/releases/latest)        |
-| **macOS** — Intel (x64)                 | macOS 11+                                             | [Última versión `.dmg` (x64)](https://github.com/genspark-ai/genoffice/releases/latest)          |
-| **Windows** (x64, la mayoría de los PC) | Windows 10+, Intel/AMD                                | [Instalador `-x64.exe` más reciente](https://github.com/genspark-ai/genoffice/releases/latest)   |
-| **Windows** en Arm (ARM64)              | Windows 11 en Arm (Snapdragon X y similares)          | [Instalador `-arm64.exe` más reciente](https://github.com/genspark-ai/genoffice/releases/latest) |
-| **Linux** — Debian / Ubuntu             | x86_64, glibc 2.34+ (Ubuntu 22.04 o posterior)        | [Última versión `.deb`](https://github.com/genspark-ai/genoffice/releases/latest)                |
-| **Linux** — Fedora / RHEL / openSUSE    | x86_64, glibc 2.34+ (Fedora 35+, RHEL 9+, Leap 15.6+) | [Última versión `.rpm`](https://github.com/genspark-ai/genoffice/releases/latest)                |
-| **Linux** — otras distribuciones        | x86_64, glibc 2.34+, FUSE 2                           | [Última versión `.AppImage`](https://github.com/genspark-ai/genoffice/releases/latest)           |
+| **macOS** — Apple Silicon (arm64)       | macOS 11+                                             | [Última versión `.dmg` (arm64)](https://github.com/361533652/genoffice/releases/latest)        |
+| **macOS** — Intel (x64)                 | macOS 11+                                             | [Última versión `.dmg` (x64)](https://github.com/361533652/genoffice/releases/latest)          |
+| **Windows** (x64, la mayoría de los PC) | Windows 10+, Intel/AMD                                | [Instalador `-x64.exe` más reciente](https://github.com/361533652/genoffice/releases/latest)   |
+| **Windows** en Arm (ARM64)              | Windows 11 en Arm (Snapdragon X y similares)          | [Instalador `-arm64.exe` más reciente](https://github.com/361533652/genoffice/releases/latest) |
+| **Linux** — Debian / Ubuntu             | x86_64, glibc 2.34+ (Ubuntu 22.04 o posterior)        | [Última versión `.deb`](https://github.com/361533652/genoffice/releases/latest)                |
+| **Linux** — Fedora / RHEL / openSUSE    | x86_64, glibc 2.34+ (Fedora 35+, RHEL 9+, Leap 15.6+) | [Última versión `.rpm`](https://github.com/361533652/genoffice/releases/latest)                |
+| **Linux** — otras distribuciones        | x86_64, glibc 2.34+, FUSE 2                           | [Última versión `.AppImage`](https://github.com/361533652/genoffice/releases/latest)           |
 
 Todas las compilaciones provienen de `main`; los instaladores de macOS y
 Windows están firmados. Las versiones anteriores están en la página de
-[Releases](https://github.com/genspark-ai/genoffice/releases).
+[Releases](https://github.com/361533652/genoffice/releases).
 
 <details>
 <summary><b>Instalación en Linux</b></summary>
@@ -517,7 +481,7 @@ requests.
 GenOffice está en desarrollo activo y tu opinión ayuda a darle forma.
 
 - **Reporta un error o solicita una función** en
-  [GitHub Issues](https://github.com/genspark-ai/genoffice/issues).
+  [GitHub Issues](https://github.com/361533652/genoffice/issues).
 - **Únete al chat de grupo de GenOffice** en
   [GenTeam](https://genoffice.ai/join) para hablar con el equipo y otros
   usuarios.

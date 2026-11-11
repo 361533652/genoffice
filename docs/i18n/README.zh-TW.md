@@ -13,10 +13,10 @@
 Word、Excel、PowerPoint 與 PDF 檔案，由你與你的 AI 共同編輯，並以原生格式存回。</p>
 
 <p align="center">
-  <a href="../../LICENSE"><img src="https://img.shields.io/github/license/genspark-ai/genoffice" alt="License: Apache-2.0"></a>
-  <a href="https://github.com/genspark-ai/genoffice/releases/latest"><img src="https://img.shields.io/github/v/release/genspark-ai/genoffice" alt="Latest release"></a>
-  <a href="https://github.com/genspark-ai/genoffice/releases"><img src="https://img.shields.io/github/downloads/genspark-ai/genoffice/total" alt="Downloads"></a>
-  <a href="https://github.com/genspark-ai/genoffice/stargazers"><img src="https://img.shields.io/github/stars/genspark-ai/genoffice?style=flat" alt="GitHub stars"></a>
+  <a href="../../LICENSE"><img src="https://img.shields.io/github/license/361533652/genoffice" alt="License: Apache-2.0"></a>
+  <a href="https://github.com/361533652/genoffice/releases/latest"><img src="https://img.shields.io/github/v/release/361533652/genoffice" alt="Latest release"></a>
+  <a href="https://github.com/361533652/genoffice/releases"><img src="https://img.shields.io/github/downloads/361533652/genoffice/total" alt="Downloads"></a>
+  <a href="https://github.com/361533652/genoffice/stargazers"><img src="https://img.shields.io/github/stars/361533652/genoffice?style=flat" alt="GitHub stars"></a>
 </p>
 
 <p align="center"><a href="../../README.md">English</a> · <a href="README.es.md">Español</a> · <a href="README.pt-BR.md">Português</a> · <a href="README.de.md">Deutsch</a> · <a href="README.fr.md">Français</a> · <a href="README.zh-CN.md">简体中文</a> · <b>繁體中文</b> · <a href="README.ko.md">한국어</a> · <a href="README.ja.md">日本語</a> · <a href="README.ar.md">العربية</a> · <a href="README.ru.md">Русский</a> · <a href="README.it.md">Italiano</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.pl.md">Polski</a> · <a href="README.cs.md">Čeština</a> · <a href="README.id.md">Bahasa Indonesia</a> · <a href="README.ms.md">Bahasa Melayu</a> · <a href="README.th.md">ไทย</a> · <a href="README.hi.md">हिन्दी</a> · <a href="README.he.md">עברית</a> · <a href="README.vi.md">Tiếng Việt</a> · <a href="README.tr.md">Türkçe</a></p>
@@ -59,9 +59,9 @@ Windows 與 Linux。它能開啟並儲存原生的 `.docx`、`.xlsx` 與 `.pptx`
   OpenCode 與 Windsurf 使用的 agent skill，讓程式開發代理不必開啟任何
   視窗，就能在你的裝置上建立、轉換、讀取與編輯真正的 Office 檔案。
 
-**立即取得：** [macOS](https://github.com/genspark-ai/genoffice/releases/latest)（Apple Silicon 與 Intel）·
-[Windows](https://github.com/genspark-ai/genoffice/releases/latest)（x64 與 Arm）·
-[Linux](https://github.com/genspark-ai/genoffice/releases/latest)（deb、rpm、AppImage）——
+**立即取得：** [macOS](https://github.com/361533652/genoffice/releases/latest)（Apple Silicon 與 Intel）·
+[Windows](https://github.com/361533652/genoffice/releases/latest)（x64 與 Arm）·
+[Linux](https://github.com/361533652/genoffice/releases/latest)（deb、rpm、AppImage）——
 詳細內容與系統需求請見[下載](#download)。
 
 ## Demo
@@ -235,7 +235,7 @@ Claude Code、Codex、Cursor、Gemini CLI、GitHub Copilot、OpenCode 或 Windsu
 供你檢視。</td>
 <td><b>在設定 → 整合中一次安裝</b>——GenOffice 會列出在這台電腦上找到的
 程式開發代理，並把 skill 寫入你勾選的每一個。也可以把 skill 下載成 zip
-壓縮檔，或執行 <code>npx skills add genspark-ai/genoffice</code>。命令與完整
+壓縮檔，或執行 <code>npx skills add 361533652/genoffice</code>。命令與完整
 工作流程請見<a href="#command-line-and-agent-skill">命令列與 agent skill</a>。</td>
 </tr>
 </table>
@@ -281,40 +281,6 @@ Cursor 及任何其他 MCP 用戶端都能自行啟動 `genoffice mcp`，不必�
   在本機執行。
 - **免費**，個人與團隊皆可使用。
 
-## AI 後端
-
-**用 Genspark 登入**就完全不用設定：模型呼叫會透過 Genspark 代理路由
-（涵蓋 Claude、GPT 與 Gemini 家族），代理也能使用網頁與圖片搜尋、
-圖片生成，以及圖片／音訊／影片分析。
-
-**或自帶金鑰。**「設定 → AI」列出了 Claude、OpenAI、Gemini、DeepSeek、
-Kimi、GLM、Qwen、Doubao、MiniMax、Grok、Mistral、OpenRouter、Requesty、Opper、Cheaper Inference、Atlas Cloud、SiliconFlow、PPIO、Command Code 與
-OpenCode Zen/Go，另外還有一個自訂欄位可填入任何相容 OpenAI 的服務端點
-（base URL + 金鑰），也包括本機模型伺服器。搜尋與媒體功能則各自在
-**AI 媒體與搜尋**下設定獨立的服務商：網頁搜尋可選 Serper、Serply、
-SearchApi、
-Tavily、Parallel、Keenable、Exa 或 Firecrawl——其中 Keenable 同樣免金鑰，
-設定金鑰只會提高速率限制；圖片生成與圖片／影片分析可選 OpenAI、Gemini、
-Doubao/Seedream、GLM、Grok、Qwen、MiniMax、Stability、FLUX，或任何相容 OpenAI 的圖片
-服務端點。
-
-整套軟體支援亮色、深色與跟隨系統三種主題。主題只會改變畫面顯示：
-匯出、列印與儲存的檔案永遠保留文件本身的原始色彩。
-
-<a id="skills"></a>
-
-## Skills
-
-Skill 是一份 `SKILL.md`，告訴 AI 怎樣把一件事做好：週報、保密協議、教案。
-GenOffice 內建了一批，也接受你自己的，格式與程式開發代理所用的相同。
-
-- **設定 → Skills。** **安裝**推薦的 skill，或**匯入**資料夾、zip 或單一 `SKILL.md`。匯入不會執行任何東西。 **全部**標籤頁把整個推薦目錄列在一處，說明隨應用程式語言顯示。
-- **在聊天中。** 開啟任一 AI 面板輸入框旁的 **+** 選單，選 **Skills**，勾選一個，送出。Skill 只隨這一則訊息送出。
-
----
-
-<a id="command-line-and-agent-skill"></a>
-
 ## 命令列與 agent skill
 
 應用程式能對檔案做的每一件事，`genoffice` 命令列都能在終端機裡完成：
@@ -334,7 +300,7 @@ HTML，用的是同一套引擎，且無需介面。它隨 GenOffice 一起安�
 | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | 應用程式內的 **設定 → 整合**           | 列出在這台電腦上找到的代理；按一下就把 skill 寫入你選擇的每一個。當 GenOffice 新版本附帶更新的 skill 時，會出現**更新**按鈕。 |
 | 同一頁面上的 **下載為 zip**            | claude.ai、Claude 桌面版應用程式與其他助理可作為上傳 skill 接受的目錄結構。                                                   |
-| `npx skills add genspark-ai/genoffice` | 從本儲存庫安裝到任何相容 skills 的代理。                                                                                      |
+| `npx skills add 361533652/genoffice` | 從本儲存庫安裝到任何相容 skills 的代理。                                                                                      |
 
 接著開一個新的對話，請它幫你做一份文件。這份 skill 會教代理何時該使用
 `genoffice`、編輯前如何先讀取檔案，以及如何檢查自己的成果。
@@ -439,16 +405,16 @@ deck_replace(dir, n, page) ×3 · slides_render(file, out)
 
 | 平台                                 | 系統需求                                               | 下載                                                                                     |
 | ------------------------------------ | ------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
-| **macOS** — Apple Silicon（arm64）   | macOS 11 以上                                          | [最新版 `.dmg`（arm64）](https://github.com/genspark-ai/genoffice/releases/latest)       |
-| **macOS** — Intel（x64）             | macOS 11 以上                                          | [最新版 `.dmg`（x64）](https://github.com/genspark-ai/genoffice/releases/latest)         |
-| **Windows**（x64，一般 PC）          | Windows 10 以上，Intel/AMD                             | [最新版 `-x64.exe` 安裝程式](https://github.com/genspark-ai/genoffice/releases/latest)   |
-| **Windows** on Arm（ARM64）          | Windows 11 on Arm（Snapdragon X 及同類機型）           | [最新版 `-arm64.exe` 安裝程式](https://github.com/genspark-ai/genoffice/releases/latest) |
-| **Linux** — Debian / Ubuntu          | x86_64，glibc 2.34+（Ubuntu 22.04 或以上）             | [最新版 `.deb`](https://github.com/genspark-ai/genoffice/releases/latest)                |
-| **Linux** — Fedora / RHEL / openSUSE | x86_64，glibc 2.34+（Fedora 35+、RHEL 9+、Leap 15.6+） | [最新版 `.rpm`](https://github.com/genspark-ai/genoffice/releases/latest)                |
-| **Linux** — 其他發行版               | x86_64，glibc 2.34+，FUSE 2                            | [最新版 `.AppImage`](https://github.com/genspark-ai/genoffice/releases/latest)           |
+| **macOS** — Apple Silicon（arm64）   | macOS 11 以上                                          | [最新版 `.dmg`（arm64）](https://github.com/361533652/genoffice/releases/latest)       |
+| **macOS** — Intel（x64）             | macOS 11 以上                                          | [最新版 `.dmg`（x64）](https://github.com/361533652/genoffice/releases/latest)         |
+| **Windows**（x64，一般 PC）          | Windows 10 以上，Intel/AMD                             | [最新版 `-x64.exe` 安裝程式](https://github.com/361533652/genoffice/releases/latest)   |
+| **Windows** on Arm（ARM64）          | Windows 11 on Arm（Snapdragon X 及同類機型）           | [最新版 `-arm64.exe` 安裝程式](https://github.com/361533652/genoffice/releases/latest) |
+| **Linux** — Debian / Ubuntu          | x86_64，glibc 2.34+（Ubuntu 22.04 或以上）             | [最新版 `.deb`](https://github.com/361533652/genoffice/releases/latest)                |
+| **Linux** — Fedora / RHEL / openSUSE | x86_64，glibc 2.34+（Fedora 35+、RHEL 9+、Leap 15.6+） | [最新版 `.rpm`](https://github.com/361533652/genoffice/releases/latest)                |
+| **Linux** — 其他發行版               | x86_64，glibc 2.34+，FUSE 2                            | [最新版 `.AppImage`](https://github.com/361533652/genoffice/releases/latest)           |
 
 所有版本皆由 `main` 分支建置，macOS 與 Windows 安裝程式皆有簽署。
-較舊版本可在[發行頁面](https://github.com/genspark-ai/genoffice/releases)找到。
+較舊版本可在[發行頁面](https://github.com/361533652/genoffice/releases)找到。
 
 <details>
 <summary><b>在 Linux 上安裝</b></summary>
@@ -522,7 +488,7 @@ sheets 應用程式還需要 Rust 工具鏈來編譯其 xlsx sidecar
 
 GenOffice 正在積極開發中，你的意見回饋會影響它的方向。
 
-- 在 [GitHub Issues](https://github.com/genspark-ai/genoffice/issues)
+- 在 [GitHub Issues](https://github.com/361533652/genoffice/issues)
   **回報問題或提出功能需求**。
 - 到 [GenTeam](https://genoffice.ai/join) **加入 GenOffice 群組聊天**，
   和團隊及其他使用者交流。

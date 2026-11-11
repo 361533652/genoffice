@@ -13,10 +13,10 @@
 Файлы Word, Excel, PowerPoint и PDF, редактируемые вами и вашим ИИ, сохраняются обратно в реальных форматах.</p>
 
 <p align="center">
-  <a href="../../LICENSE"><img src="https://img.shields.io/github/license/genspark-ai/genoffice" alt="Лицензия: Apache-2.0"></a>
-  <a href="https://github.com/genspark-ai/genoffice/releases/latest"><img src="https://img.shields.io/github/v/release/genspark-ai/genoffice" alt="Последний релиз"></a>
-  <a href="https://github.com/genspark-ai/genoffice/releases"><img src="https://img.shields.io/github/downloads/genspark-ai/genoffice/total" alt="Загрузки"></a>
-  <a href="https://github.com/genspark-ai/genoffice/stargazers"><img src="https://img.shields.io/github/stars/genspark-ai/genoffice?style=flat" alt="Звёзды на GitHub"></a>
+  <a href="../../LICENSE"><img src="https://img.shields.io/github/license/361533652/genoffice" alt="Лицензия: Apache-2.0"></a>
+  <a href="https://github.com/361533652/genoffice/releases/latest"><img src="https://img.shields.io/github/v/release/361533652/genoffice" alt="Последний релиз"></a>
+  <a href="https://github.com/361533652/genoffice/releases"><img src="https://img.shields.io/github/downloads/361533652/genoffice/total" alt="Загрузки"></a>
+  <a href="https://github.com/361533652/genoffice/stargazers"><img src="https://img.shields.io/github/stars/361533652/genoffice?style=flat" alt="Звёзды на GitHub"></a>
 </p>
 
 <p align="center"><a href="../../README.md">English</a> · <a href="README.es.md">Español</a> · <a href="README.pt-BR.md">Português</a> · <a href="README.de.md">Deutsch</a> · <a href="README.fr.md">Français</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.zh-TW.md">繁體中文</a> · <a href="README.ko.md">한국어</a> · <a href="README.ja.md">日本語</a> · <a href="README.ar.md">العربية</a> · <b>Русский</b> · <a href="README.it.md">Italiano</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.pl.md">Polski</a> · <a href="README.cs.md">Čeština</a> · <a href="README.id.md">Bahasa Indonesia</a> · <a href="README.ms.md">Bahasa Melayu</a> · <a href="README.th.md">ไทย</a> · <a href="README.hi.md">हिन्दी</a> · <a href="README.he.md">עברית</a> · <a href="README.vi.md">Tiếng Việt</a> · <a href="README.tr.md">Türkçe</a></p>
@@ -67,9 +67,9 @@ GenOffice — бесплатная альтернатива Microsoft Office с 
   создавать, конвертировать, читать и редактировать настоящие файлы Office на
   вашем компьютере, не открывая ни одного окна.
 
-**Скачать:** [macOS](https://github.com/genspark-ai/genoffice/releases/latest) (Apple Silicon и Intel) ·
-[Windows](https://github.com/genspark-ai/genoffice/releases/latest) (x64 и Arm) ·
-[Linux](https://github.com/genspark-ai/genoffice/releases/latest) (deb, rpm, AppImage) —
+**Скачать:** [macOS](https://github.com/361533652/genoffice/releases/latest) (Apple Silicon и Intel) ·
+[Windows](https://github.com/361533652/genoffice/releases/latest) (x64 и Arm) ·
+[Linux](https://github.com/361533652/genoffice/releases/latest) (deb, rpm, AppImage) —
 подробности и системные требования в разделе [Скачать](#download).
 
 ## Демонстрация
@@ -200,7 +200,7 @@ Windsurf смогут создавать, конвертировать, чита
 </tr>
 <tr>
 <td><b>Один промпт вашему агенту</b> — «Сделай презентацию о Солнечной системе из восьми слайдов». Агент читает скилл, пишет таблицу стилей, план и по одной спецификации страницы на слайд, генерирует две фотографии через <code>genoffice image</code> и даёт <code>genoffice slides check</code> отклонить всё, что выходит за границы или перекрывается, прежде чем <code>genoffice create</code> соберёт <code>.pptx</code>, а <code>slides render</code> вернёт по одному PNG на слайд для просмотра.</td>
-<td><b>Установите один раз в разделе «Настройки → Интеграции»</b> — GenOffice перечисляет кодинг-агентов, найденных на этом компьютере, и записывает скилл в каждый выбранный вами. Либо скачайте скилл в виде zip или выполните <code>npx skills add genspark-ai/genoffice</code>. Команды и полный рабочий процесс — в разделе <a href="#command-line-and-agent-skill">Командная строка и агентный скилл</a>.</td>
+<td><b>Установите один раз в разделе «Настройки → Интеграции»</b> — GenOffice перечисляет кодинг-агентов, найденных на этом компьютере, и записывает скилл в каждый выбранный вами. Либо скачайте скилл в виде zip или выполните <code>npx skills add 361533652/genoffice</code>. Команды и полный рабочий процесс — в разделе <a href="#command-line-and-agent-skill">Командная строка и агентный скилл</a>.</td>
 </tr>
 </table>
 
@@ -251,43 +251,6 @@ HTTP-сервер внутри приложения позволяет аген�
   Desktop, Codex, Cursor и других агентов — по-прежнему на устройстве.
 - **Бесплатно**, как для отдельных пользователей, так и для команд.
 
-## ИИ-провайдеры
-
-**Войдите через Genspark** — и настраивать ничего не нужно: вызовы моделей
-идут через проксирующий сервис Genspark (семейства Claude, GPT и Gemini), а
-агенты получают веб- и графический поиск, генерацию изображений и анализ
-изображений, аудио и видео.
-
-**Либо используйте собственный ключ.** В разделе «Настройки → Модель ИИ» перечислены
-Claude, OpenAI, Gemini, DeepSeek, Kimi, GLM, Qwen, Doubao, MiniMax, Grok,
-Mistral, OpenRouter, Requesty, Opper, Cheaper Inference, Atlas Cloud, SiliconFlow, PPIO, Command Code и OpenCode Zen/Go, а также отдельный слот для любого
-совместимого с OpenAI эндпоинта (базовый URL + ключ), включая локальные
-серверы моделей. Поиск и работа с медиа настраиваются через отдельных
-провайдеров по каждой возможности в разделе **Медиа и поиск ИИ**: Serper,
-Serply, SearchApi, Tavily, Parallel, Keenable, Exa или Firecrawl для веб-поиска
-(Keenable тоже работает без ключа — ключ лишь поднимает лимиты запросов) и
-OpenAI, Gemini, Doubao/Seedream, GLM, Grok, Qwen, MiniMax, Stability, FLUX или любой
-совместимый с OpenAI эндпоинт для генерации изображений и анализа
-изображений/видео.
-
-Весь пакет поддерживает светлую, тёмную и системную темы. Темы меняют только
-то, что видно на экране: экспорт, печать и сохранённые файлы всегда сохраняют
-собственные цвета документа.
-
-<a id="skills"></a>
-
-## Скиллы
-
-Скилл — это файл `SKILL.md`, который объясняет ИИ, как хорошо выполнить одну задачу: еженедельный отчёт, NDA, план урока.
-GenOffice поставляется с набором скиллов и принимает ваши, в том же формате, что используют агенты для программирования.
-
-- **Настройки → Скиллы.** **Установите** рекомендованный скилл или **Импортируйте** папку, zip либо один `SKILL.md`. При импорте ничего не запускается. Вкладка **Все** показывает весь рекомендуемый каталог в одном месте, с описаниями на языке приложения.
-- **В чате.** Откройте меню **+** рядом с полем ввода любой панели ИИ, выберите **Скиллы**, отметьте один и отправьте. Скилл уходит только с этим сообщением.
-
----
-
-<a id="command-line-and-agent-skill"></a>
-
 ## Командная строка и агентный скилл
 
 Всё, что приложения умеют делать с файлом, командная строка `genoffice` умеет
@@ -310,7 +273,7 @@ MCP-клиентом.
 | --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Настройки → Интеграции** в приложении | Показывает агентов, найденных на этом компьютере; один клик записывает скилл в каждый выбранный. Когда релиз GenOffice приносит более новый скилл, появляется кнопка **Update**. |
 | **Скачать как zip** на той же странице  | Формат, который claude.ai, десктопные приложения Claude и другие ассистенты принимают как загружаемый скилл.                                                                     |
-| `npx skills add genspark-ai/genoffice`  | Устанавливает скилл из этого репозитория в любой агент, поддерживающий скиллы.                                                                                                   |
+| `npx skills add 361533652/genoffice`  | Устанавливает скилл из этого репозитория в любой агент, поддерживающий скиллы.                                                                                                   |
 
 Затем начните новый чат и попросите документ. Скилл учит агента, когда
 обращаться к `genoffice`, как прочитать файл перед редактированием и как
@@ -424,17 +387,17 @@ deck_replace(dir, n, page) ×3 · slides_render(file, out)
 
 | Платформа                            | Требования                                            | Скачать                                                                                       |
 | ------------------------------------ | ----------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| **macOS** — Apple Silicon (arm64)    | macOS 11+                                             | [Последний `.dmg` (arm64)](https://github.com/genspark-ai/genoffice/releases/latest)          |
-| **macOS** — Intel (x64)              | macOS 11+                                             | [Последний `.dmg` (x64)](https://github.com/genspark-ai/genoffice/releases/latest)            |
-| **Windows** (x64, большинство ПК)    | Windows 10+, Intel/AMD                                | [Последний установщик `-x64.exe`](https://github.com/genspark-ai/genoffice/releases/latest)   |
-| **Windows** на Arm (ARM64)           | Windows 11 на Arm (Snapdragon X и аналогичные)        | [Последний установщик `-arm64.exe`](https://github.com/genspark-ai/genoffice/releases/latest) |
-| **Linux** — Debian / Ubuntu          | x86_64, glibc 2.34+ (Ubuntu 22.04 или новее)          | [Последний `.deb`](https://github.com/genspark-ai/genoffice/releases/latest)                  |
-| **Linux** — Fedora / RHEL / openSUSE | x86_64, glibc 2.34+ (Fedora 35+, RHEL 9+, Leap 15.6+) | [Последний `.rpm`](https://github.com/genspark-ai/genoffice/releases/latest)                  |
-| **Linux** — другие дистрибутивы      | x86_64, glibc 2.34+, FUSE 2                           | [Последний `.AppImage`](https://github.com/genspark-ai/genoffice/releases/latest)             |
+| **macOS** — Apple Silicon (arm64)    | macOS 11+                                             | [Последний `.dmg` (arm64)](https://github.com/361533652/genoffice/releases/latest)          |
+| **macOS** — Intel (x64)              | macOS 11+                                             | [Последний `.dmg` (x64)](https://github.com/361533652/genoffice/releases/latest)            |
+| **Windows** (x64, большинство ПК)    | Windows 10+, Intel/AMD                                | [Последний установщик `-x64.exe`](https://github.com/361533652/genoffice/releases/latest)   |
+| **Windows** на Arm (ARM64)           | Windows 11 на Arm (Snapdragon X и аналогичные)        | [Последний установщик `-arm64.exe`](https://github.com/361533652/genoffice/releases/latest) |
+| **Linux** — Debian / Ubuntu          | x86_64, glibc 2.34+ (Ubuntu 22.04 или новее)          | [Последний `.deb`](https://github.com/361533652/genoffice/releases/latest)                  |
+| **Linux** — Fedora / RHEL / openSUSE | x86_64, glibc 2.34+ (Fedora 35+, RHEL 9+, Leap 15.6+) | [Последний `.rpm`](https://github.com/361533652/genoffice/releases/latest)                  |
+| **Linux** — другие дистрибутивы      | x86_64, glibc 2.34+, FUSE 2                           | [Последний `.AppImage`](https://github.com/361533652/genoffice/releases/latest)             |
 
 Все сборки собираются из ветки `main`; установщики для macOS и Windows
 подписаны. Более старые версии доступны на странице
-[Releases](https://github.com/genspark-ai/genoffice/releases).
+[Releases](https://github.com/361533652/genoffice/releases).
 
 <details>
 <summary><b>Установка на Linux</b></summary>
@@ -511,7 +474,7 @@ npm run dist:linux   # package Linux AppImage + deb + rpm
 GenOffice активно развивается, и ваши отзывы влияют на его развитие.
 
 - **Сообщите об ошибке или предложите функцию** в
-  [GitHub Issues](https://github.com/genspark-ai/genoffice/issues).
+  [GitHub Issues](https://github.com/361533652/genoffice/issues).
 - **Присоединяйтесь к групповому чату GenOffice** в
   [GenTeam](https://genoffice.ai/join), чтобы общаться с командой и другими
   пользователями.

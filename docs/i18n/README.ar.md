@@ -13,10 +13,10 @@
 ملفات Word و Excel و PowerPoint و PDF، يحرّرها أنت والذكاء الاصطناعي الخاص بك، وتُحفظ بالصيغ الأصلية نفسها.</p>
 
 <p align="center">
-  <a href="../../LICENSE"><img src="https://img.shields.io/github/license/genspark-ai/genoffice" alt="الترخيص: Apache-2.0"></a>
-  <a href="https://github.com/genspark-ai/genoffice/releases/latest"><img src="https://img.shields.io/github/v/release/genspark-ai/genoffice" alt="أحدث إصدار"></a>
-  <a href="https://github.com/genspark-ai/genoffice/releases"><img src="https://img.shields.io/github/downloads/genspark-ai/genoffice/total" alt="عدد التنزيلات"></a>
-  <a href="https://github.com/genspark-ai/genoffice/stargazers"><img src="https://img.shields.io/github/stars/genspark-ai/genoffice?style=flat" alt="نجوم GitHub"></a>
+  <a href="../../LICENSE"><img src="https://img.shields.io/github/license/361533652/genoffice" alt="الترخيص: Apache-2.0"></a>
+  <a href="https://github.com/361533652/genoffice/releases/latest"><img src="https://img.shields.io/github/v/release/361533652/genoffice" alt="أحدث إصدار"></a>
+  <a href="https://github.com/361533652/genoffice/releases"><img src="https://img.shields.io/github/downloads/361533652/genoffice/total" alt="عدد التنزيلات"></a>
+  <a href="https://github.com/361533652/genoffice/stargazers"><img src="https://img.shields.io/github/stars/361533652/genoffice?style=flat" alt="نجوم GitHub"></a>
 </p>
 
 <p align="center"><a href="../../README.md">English</a> · <a href="README.es.md">Español</a> · <a href="README.pt-BR.md">Português</a> · <a href="README.de.md">Deutsch</a> · <a href="README.fr.md">Français</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.zh-TW.md">繁體中文</a> · <a href="README.ko.md">한국어</a> · <a href="README.ja.md">日本語</a> · <b>العربية</b> · <a href="README.ru.md">Русский</a> · <a href="README.it.md">Italiano</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.pl.md">Polski</a> · <a href="README.cs.md">Čeština</a> · <a href="README.id.md">Bahasa Indonesia</a> · <a href="README.ms.md">Bahasa Melayu</a> · <a href="README.th.md">ไทย</a> · <a href="README.hi.md">हिन्दी</a> · <a href="README.he.md">עברית</a> · <a href="README.vi.md">Tiếng Việt</a> · <a href="README.tr.md">Türkçe</a></p>
@@ -63,9 +63,9 @@ GenOffice بديل مجاني ومفتوح المصدر لـ Microsoft Office ع
   وWindsurf، ليتمكّن وكيل البرمجة من إنشاء ملفات Office حقيقية وتحويلها
   وقراءتها وتحريرها على جهازك دون فتح أي نافذة.
 
-**الحصول عليه:** [macOS](https://github.com/genspark-ai/genoffice/releases/latest) (Apple Silicon و Intel) ·
-[Windows](https://github.com/genspark-ai/genoffice/releases/latest) (x64 و Arm) ·
-[Linux](https://github.com/genspark-ai/genoffice/releases/latest) (deb، rpm، AppImage) —
+**الحصول عليه:** [macOS](https://github.com/361533652/genoffice/releases/latest) (Apple Silicon و Intel) ·
+[Windows](https://github.com/361533652/genoffice/releases/latest) (x64 و Arm) ·
+[Linux](https://github.com/361533652/genoffice/releases/latest) (deb، rpm، AppImage) —
 التفاصيل والمتطلبات في [التنزيل](#download).
 
 ## العرض التوضيحي
@@ -196,7 +196,7 @@ Windsurf من إنشاء ملفات Office حقيقية وتحويلها وقر�
 </tr>
 <tr>
 <td dir="rtl"><b>توجيه واحد إلى وكيلك</b> — "أنشئ عرضًا تقديميًا من ثماني شرائح عن المجموعة الشمسية." يقرأ الوكيل المهارة، ويكتب ورقة أنماط ومخططًا ومواصفة صفحة واحدة لكل شريحة، ويولّد الصورتين بواسطة <code>genoffice image</code>، ويترك <code>genoffice slides check</code> يرفض أي عنصر يتجاوز الحدود أو يتداخل قبل أن يجمّع <code>genoffice create</code> ملف <code>.pptx</code> ويُعيد <code>slides render</code> صورة PNG لكل شريحة لمعاينتها.</td>
-<td dir="rtl"><b>ثبّت مرة واحدة، من الإعدادات → التكاملات</b> — يسرد GenOffice وكلاء البرمجة الذين يجدهم على هذا الجهاز ويكتب المهارة في كل وكيل تختاره. أو نزّل المهارة كملف zip، أو شغّل <code>npx skills add genspark-ai/genoffice</code>. الأوامر وسير العمل الكامل في <a href="#command-line-and-agent-skill">سطر الأوامر ومهارة الوكيل</a>.</td>
+<td dir="rtl"><b>ثبّت مرة واحدة، من الإعدادات → التكاملات</b> — يسرد GenOffice وكلاء البرمجة الذين يجدهم على هذا الجهاز ويكتب المهارة في كل وكيل تختاره. أو نزّل المهارة كملف zip، أو شغّل <code>npx skills add 361533652/genoffice</code>. الأوامر وسير العمل الكامل في <a href="#command-line-and-agent-skill">سطر الأوامر ومهارة الوكيل</a>.</td>
 </tr>
 </table>
 
@@ -243,46 +243,6 @@ Desktop وCursor وأي عميل MCP آخر تشغيل `genoffice mcp` بأنف�
   مع بقاء كل شيء على الجهاز.
 - **مجاني**، للأفراد والفرق على حد سواء.
 
-## خلفيات الذكاء الاصطناعي
-
-**سجّل الدخول بواسطة Genspark** فلا تحتاج إلى أي إعداد: تُوجَّه طلبات النماذج
-عبر بروكسي Genspark (عائلات Claude و GPT و Gemini)، ويحصل الوكلاء على البحث
-عبر الويب والصور، وتوليد الصور، وتحليل الصور والصوت والفيديو.
-
-**أو استخدم مفتاحك الخاص.** تسرد صفحة Settings → AI مزوِّدين مثل Claude
-وOpenAI وGemini وDeepSeek وKimi وGLM وQwen وDoubao وMiniMax وGrok وMistral
-وOpenRouter وRequesty
-وOpper
-وCheaper Inference
-وAtlas Cloud
-وSiliconFlow
-وPPIO
-وCommand Code وOpenCode Zen/Go، إضافة إلى خانة مخصَّصة لأي نقطة نهاية متوافقة مع
-OpenAI (عنوان أساسي + مفتاح)، بما في ذلك خوادم النماذج المحلية. ولكل من
-البحث والوسائط مزوِّدوه الخاصون بحسب القدرة تحت **AI Media & Search**: Serper
-أو Serply أو SearchApi أو Tavily أو Parallel أو Keenable أو Exa أو Firecrawl للبحث عبر
-الويب — وKeenable كذلك لا يحتاج إلى مفتاح، فالمفتاح يرفع حدود الاستخدام فقط؛
-وOpenAI أو Gemini أو Doubao/Seedream أو GLM أو Grok أو Qwen أو MiniMax أو Stability أو FLUX أو أي
-نقطة نهاية للصور متوافقة مع OpenAI لتوليد الصور وتحليل الصور والفيديو.
-
-تأتي الحزمة كاملةً بثلاثة مظاهر: فاتح وداكن ومظهر النظام. تغيّر المظاهر فقط ما
-يظهر على الشاشة: تحتفظ ملفات التصدير والطباعة والحفظ دائمًا بألوان المستند
-نفسه.
-
-<a id="skills"></a>
-
-## المهارات
-
-المهارة ملف `SKILL.md` يخبر الذكاء الاصطناعي كيف يُنجز مهمة واحدة بإتقان: تقرير أسبوعي، اتفاقية عدم إفصاح، خطة درس.
-يأتي GenOffice بمجموعة منها ويقبل مهاراتك الخاصة بالتنسيق نفسه الذي تستخدمه وكلاء البرمجة.
-
-- **الإعدادات ← المهارات.** **ثبّت** مهارة موصى بها، أو **استورد** مجلدًا أو ملف zip أو ملف `SKILL.md` واحدًا. لا يُشغَّل شيء عند الاستيراد. ويوضح تبويب **الكل** الدليل الموصى به كاملاً في مكان واحد، مع أوصاف تتبع لغة التطبيق.
-- **في المحادثة.** افتح قائمة **+** بجوار مربع الكتابة في أي لوحة ذكاء اصطناعي، اختر **المهارات**، حدد واحدة وأرسل. تُرفق المهارة بتلك الرسالة فقط.
-
----
-
-<a id="command-line-and-agent-skill"></a>
-
 ## سطر الأوامر ومهارة الوكيل
 
 كل ما تستطيع التطبيقات فعله بملف، يستطيع سطر أوامر `genoffice` فعله من
@@ -302,7 +262,7 @@ GenOffice، ولا يحتاج إلى بيئة تشغيل خاصة به، ولا 
 | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **الإعدادات → التكاملات** في التطبيق   | يسرد الوكلاء الموجودين على هذا الجهاز؛ وبنقرة واحدة يكتب المهارة في كل وكيل تختاره. ويظهر زر **Update** عندما يصدر إصدار من GenOffice بمهارة أحدث. |
 | **التنزيل كملف zip** من الصفحة نفسها   | التنسيق الذي يقبله claude.ai وتطبيقات Claude لسطح المكتب والمساعدون الآخرون كمهارة مرفوعة.                                                         |
-| `npx skills add genspark-ai/genoffice` | يثبّت من هذا المستودع في أي وكيل متوافق مع المهارات.                                                                                               |
+| `npx skills add 361533652/genoffice` | يثبّت من هذا المستودع في أي وكيل متوافق مع المهارات.                                                                                               |
 
 ثم ابدأ محادثة جديدة واطلب مستندًا. تعلّم المهارة الوكيل متى يلجأ إلى
 `genoffice`، وكيف يقرأ الملف قبل تحريره، وكيف يتحقّق من عمله بنفسه.
@@ -411,16 +371,16 @@ deck_replace(dir, n, page) ×3 · slides_render(file, out)
 
 | المنصة                               | المتطلبات                                             | التنزيل                                                                              |
 | ------------------------------------ | ----------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| **macOS** — شريحة Apple (arm64)      | macOS 11+                                             | [أحدث نسخة `.dmg` (arm64)](https://github.com/genspark-ai/genoffice/releases/latest) |
-| **macOS** — Intel (x64)              | macOS 11+                                             | [أحدث نسخة `.dmg` (x64)](https://github.com/genspark-ai/genoffice/releases/latest)   |
-| **Windows** (x64، لمعظم الأجهزة)     | Windows 10+، معالجات Intel/AMD                        | [أحدث مثبِّت `-x64.exe`](https://github.com/genspark-ai/genoffice/releases/latest)   |
-| **Windows** على Arm (ARM64)          | Windows 11 على Arm (معالج Snapdragon X وما شابهه)     | [أحدث مثبِّت `-arm64.exe`](https://github.com/genspark-ai/genoffice/releases/latest) |
-| **Linux** — Debian / Ubuntu          | x86_64، glibc 2.34+ (Ubuntu 22.04 أو أحدث)            | [أحدث نسخة `.deb`](https://github.com/genspark-ai/genoffice/releases/latest)         |
-| **Linux** — Fedora / RHEL / openSUSE | x86_64، glibc 2.34+ (Fedora 35+، RHEL 9+، Leap 15.6+) | [أحدث نسخة `.rpm`](https://github.com/genspark-ai/genoffice/releases/latest)         |
-| **Linux** — توزيعات أخرى             | x86_64، glibc 2.34+، وFUSE 2                          | [أحدث نسخة `.AppImage`](https://github.com/genspark-ai/genoffice/releases/latest)    |
+| **macOS** — شريحة Apple (arm64)      | macOS 11+                                             | [أحدث نسخة `.dmg` (arm64)](https://github.com/361533652/genoffice/releases/latest) |
+| **macOS** — Intel (x64)              | macOS 11+                                             | [أحدث نسخة `.dmg` (x64)](https://github.com/361533652/genoffice/releases/latest)   |
+| **Windows** (x64، لمعظم الأجهزة)     | Windows 10+، معالجات Intel/AMD                        | [أحدث مثبِّت `-x64.exe`](https://github.com/361533652/genoffice/releases/latest)   |
+| **Windows** على Arm (ARM64)          | Windows 11 على Arm (معالج Snapdragon X وما شابهه)     | [أحدث مثبِّت `-arm64.exe`](https://github.com/361533652/genoffice/releases/latest) |
+| **Linux** — Debian / Ubuntu          | x86_64، glibc 2.34+ (Ubuntu 22.04 أو أحدث)            | [أحدث نسخة `.deb`](https://github.com/361533652/genoffice/releases/latest)         |
+| **Linux** — Fedora / RHEL / openSUSE | x86_64، glibc 2.34+ (Fedora 35+، RHEL 9+، Leap 15.6+) | [أحدث نسخة `.rpm`](https://github.com/361533652/genoffice/releases/latest)         |
+| **Linux** — توزيعات أخرى             | x86_64، glibc 2.34+، وFUSE 2                          | [أحدث نسخة `.AppImage`](https://github.com/361533652/genoffice/releases/latest)    |
 
 جميع الإصدارات مبنية من الفرع `main`؛ ومثبِّتات macOS و Windows موقَّعة رقميًا.
-الإصدارات الأقدم متوفرة في صفحة [Releases](https://github.com/genspark-ai/genoffice/releases).
+الإصدارات الأقدم متوفرة في صفحة [Releases](https://github.com/361533652/genoffice/releases).
 
 <details>
 <summary><b>التثبيت على Linux</b></summary>
@@ -497,7 +457,7 @@ npm run dist:linux   # package Linux AppImage + deb + rpm
 GenOffice قيد تطوير نشط، وملاحظاتك هي ما يشكِّل مستقبله.
 
 - **أبلغ عن خطأ أو اطلب ميزة جديدة** عبر
-  [GitHub Issues](https://github.com/genspark-ai/genoffice/issues).
+  [GitHub Issues](https://github.com/361533652/genoffice/issues).
 - **انضم إلى محادثة مجموعة GenOffice** على
   [GenTeam](https://genoffice.ai/join) للتواصل مع الفريق والمستخدمين الآخرين.
 - **أضِف نجمة (Star) للمستودع** إذا كان GenOffice مفيدًا لك — فهذه أفضل طريقة

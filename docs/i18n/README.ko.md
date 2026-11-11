@@ -13,10 +13,10 @@
 Word, Excel, PowerPoint, PDF 파일을 당신과 당신의 AI가 함께 편집하고, 실제 포맷 그대로 저장합니다.</p>
 
 <p align="center">
-  <a href="../../LICENSE"><img src="https://img.shields.io/github/license/genspark-ai/genoffice" alt="라이선스: Apache-2.0"></a>
-  <a href="https://github.com/genspark-ai/genoffice/releases/latest"><img src="https://img.shields.io/github/v/release/genspark-ai/genoffice" alt="최신 릴리스"></a>
-  <a href="https://github.com/genspark-ai/genoffice/releases"><img src="https://img.shields.io/github/downloads/genspark-ai/genoffice/total" alt="다운로드 수"></a>
-  <a href="https://github.com/genspark-ai/genoffice/stargazers"><img src="https://img.shields.io/github/stars/genspark-ai/genoffice?style=flat" alt="GitHub 스타 수"></a>
+  <a href="../../LICENSE"><img src="https://img.shields.io/github/license/361533652/genoffice" alt="라이선스: Apache-2.0"></a>
+  <a href="https://github.com/361533652/genoffice/releases/latest"><img src="https://img.shields.io/github/v/release/361533652/genoffice" alt="최신 릴리스"></a>
+  <a href="https://github.com/361533652/genoffice/releases"><img src="https://img.shields.io/github/downloads/361533652/genoffice/total" alt="다운로드 수"></a>
+  <a href="https://github.com/361533652/genoffice/stargazers"><img src="https://img.shields.io/github/stars/361533652/genoffice?style=flat" alt="GitHub 스타 수"></a>
 </p>
 
 <p align="center"><a href="../../README.md">English</a> · <a href="README.es.md">Español</a> · <a href="README.pt-BR.md">Português</a> · <a href="README.de.md">Deutsch</a> · <a href="README.fr.md">Français</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.zh-TW.md">繁體中文</a> · <b>한국어</b> · <a href="README.ja.md">日本語</a> · <a href="README.ar.md">العربية</a> · <a href="README.ru.md">Русский</a> · <a href="README.it.md">Italiano</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.pl.md">Polski</a> · <a href="README.cs.md">Čeština</a> · <a href="README.id.md">Bahasa Indonesia</a> · <a href="README.ms.md">Bahasa Melayu</a> · <a href="README.th.md">ไทย</a> · <a href="README.hi.md">हिन्दी</a> · <a href="README.he.md">עברית</a> · <a href="README.vi.md">Tiếng Việt</a> · <a href="README.tr.md">Türkçe</a></p>
@@ -66,9 +66,9 @@ OOXML 사본으로 열립니다. 가져오기는 열기 전용이며 — 저장�
   않고도 내 컴퓨터에서 실제 Office 파일을 만들고, 변환하고, 읽고, 편집할 수
   있습니다.
 
-**다운로드:** [macOS](https://github.com/genspark-ai/genoffice/releases/latest) (Apple Silicon 및 Intel) ·
-[Windows](https://github.com/genspark-ai/genoffice/releases/latest) (x64 및 Arm) ·
-[Linux](https://github.com/genspark-ai/genoffice/releases/latest) (deb, rpm, AppImage) —
+**다운로드:** [macOS](https://github.com/361533652/genoffice/releases/latest) (Apple Silicon 및 Intel) ·
+[Windows](https://github.com/361533652/genoffice/releases/latest) (x64 및 Arm) ·
+[Linux](https://github.com/361533652/genoffice/releases/latest) (deb, rpm, AppImage) —
 자세한 내용과 요구 사항은 [다운로드](#download) 섹션을 참고하세요.
 
 ## 데모
@@ -198,7 +198,7 @@ Windsurf가 앱과 동일한 엔진을 통해 창을 열지 않고도 실제 Off
 </tr>
 <tr>
 <td><b>에이전트에게 프롬프트 하나</b> — "태양계에 관한 8장짜리 덱을 만들어줘." 에이전트는 스킬을 읽고 스타일 시트, 개요, 슬라이드마다 하나씩의 페이지 스펙을 작성하고, <code>genoffice image</code>로 사진 두 장을 생성하고, <code>genoffice slides check</code>가 넘치거나 겹치는 요소를 걸러낸 뒤, <code>genoffice create</code>로 <code>.pptx</code>를 조립하고 <code>slides render</code>로 슬라이드마다 PNG 한 장을 받아 확인합니다.</td>
-<td><b>설정 → 연동에서 한 번만 설치</b> — GenOffice가 이 컴퓨터에서 찾은 코딩 에이전트를 나열하고, 선택한 각 에이전트에 스킬을 기록합니다. 스킬을 zip으로 내려받거나 <code>npx skills add genspark-ai/genoffice</code>를 실행해도 됩니다. 명령과 전체 워크플로는 <a href="#command-line-and-agent-skill">명령줄과 에이전트 스킬</a>에 있습니다.</td>
+<td><b>설정 → 연동에서 한 번만 설치</b> — GenOffice가 이 컴퓨터에서 찾은 코딩 에이전트를 나열하고, 선택한 각 에이전트에 스킬을 기록합니다. 스킬을 zip으로 내려받거나 <code>npx skills add 361533652/genoffice</code>를 실행해도 됩니다. 명령과 전체 워크플로는 <a href="#command-line-and-agent-skill">명령줄과 에이전트 스킬</a>에 있습니다.</td>
 </tr>
 </table>
 
@@ -246,42 +246,6 @@ Cursor 및 다른 모든 MCP 클라이언트는 스킬을 설치하거나 창을
   에이전트가 쓸 수 있게 하며, 이 역시 기기 내에서 동작합니다.
 - **무료**로 개인과 팀 모두 사용할 수 있습니다.
 
-## AI 백엔드
-
-**Genspark로 로그인**하면 별도 설정이 전혀 필요 없습니다. 모델 호출은
-Genspark 프록시(Claude, GPT, Gemini 계열)를 거치고, 에이전트는 웹 및
-이미지 검색, 이미지 생성, 이미지/오디오/비디오 분석 기능까지 사용할 수
-있습니다.
-
-**직접 키를 가져올 수도 있습니다.** 설정 → AI에는 Claude, OpenAI, Gemini,
-DeepSeek, Kimi, GLM, Qwen, Doubao, MiniMax, Grok, Mistral, OpenRouter, Requesty, Opper, Cheaper Inference, Atlas Cloud, SiliconFlow, PPIO, Command Code,
-OpenCode Zen/Go가 있으며, 로컬 모델 서버를 포함한 모든 OpenAI 호환
-엔드포인트(기본 URL + 키)를 위한 사용자 지정 슬롯도 제공됩니다. 검색과
-미디어는 **AI 미디어 및 검색**에서 기능별로 별도 공급자를 설정할 수
-있습니다: 웹 검색은 Serper, Serply, SearchApi, Tavily, Parallel, Keenable, Exa
-또는 Firecrawl(Keenable도 키 없이 쓸 수 있으며, 키가 있으면 속도
-제한만 완화됩니다), 이미지 생성과 이미지/비디오 분석은 OpenAI,
-Gemini, Doubao/Seedream, GLM, Grok, Qwen, MiniMax, Stability, FLUX 또는 OpenAI 호환
-이미지 엔드포인트 중에서 선택합니다.
-
-전체 제품군은 라이트, 다크, 시스템 테마를 지원합니다. 테마는 화면에
-보이는 모습만 바꿀 뿐입니다: 내보내기, 인쇄, 저장된 파일은 항상 문서
-고유의 색상을 그대로 유지합니다.
-
-<a id="skills"></a>
-
-## 스킬
-
-스킬은 주간 보고서, NDA, 수업 계획처럼 한 가지 일을 잘 해내는 방법을 AI에 알려 주는 `SKILL.md` 파일입니다.
-GenOffice는 스킬 묶음을 기본 제공하고, 코딩 에이전트와 같은 형식의 사용자 스킬도 받습니다.
-
-- **설정 → 스킬.** 추천 스킬을 **설치**하거나 폴더, zip 또는 단일 `SKILL.md`를 **가져옵니다**. 가져오기 시 아무것도 실행되지 않습니다. **전체** 탭에는 추천 카탈로그 전체가 한곳에 표시되며, 설명은 앱 언어를 따릅니다.
-- **채팅에서.** 어느 AI 패널에서든 입력창 옆 **+** 메뉴를 열고 **스킬**을 선택해 하나를 체크한 뒤 보냅니다. 스킬은 그 메시지에만 함께 전달됩니다.
-
----
-
-<a id="command-line-and-agent-skill"></a>
-
 ## 명령줄과 에이전트 스킬
 
 앱이 파일에 할 수 있는 모든 일을 `genoffice` 명령줄은 터미널에서 할 수
@@ -302,7 +266,7 @@ OpenCode, Windsurf는 바로 사용할 수 있고, 스킬을 읽을 수 있는 �
 | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 앱의 **설정 → 연동**                   | 이 컴퓨터에서 찾은 에이전트를 나열하고, 클릭 한 번으로 선택한 각 에이전트에 스킬을 기록합니다. GenOffice 릴리스에 새 스킬이 포함되면 **업데이트** 버튼이 나타납니다. |
 | 같은 페이지의 **zip으로 다운로드**     | claude.ai, Claude 데스크톱 앱, 그 밖의 어시스턴트가 업로드 스킬로 받아들이는 구조입니다.                                                                             |
-| `npx skills add genspark-ai/genoffice` | 이 저장소에서 스킬을 지원하는 모든 에이전트에 설치합니다.                                                                                                            |
+| `npx skills add 361533652/genoffice` | 이 저장소에서 스킬을 지원하는 모든 에이전트에 설치합니다.                                                                                                            |
 
 그런 다음 새 대화를 시작해 문서를 요청하세요. 스킬은 언제 `genoffice`를
 꺼내야 하는지, 편집 전에 파일을 어떻게 읽어야 하는지, 자신의 작업을
@@ -411,16 +375,16 @@ deck_replace(dir, n, page) ×3 · slides_render(file, out)
 
 | 플랫폼                               | 요구 사항                                             | 다운로드                                                                                |
 | ------------------------------------ | ----------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| **macOS** — Apple Silicon (arm64)    | macOS 11+                                             | [최신 `.dmg` (arm64)](https://github.com/genspark-ai/genoffice/releases/latest)         |
-| **macOS** — Intel (x64)              | macOS 11+                                             | [최신 `.dmg` (x64)](https://github.com/genspark-ai/genoffice/releases/latest)           |
-| **Windows** (x64, 대부분의 PC)       | Windows 10+, Intel/AMD                                | [최신 `-x64.exe` 설치 파일](https://github.com/genspark-ai/genoffice/releases/latest)   |
-| **Windows** on Arm (ARM64)           | Windows 11 on Arm (Snapdragon X 및 유사 기종)         | [최신 `-arm64.exe` 설치 파일](https://github.com/genspark-ai/genoffice/releases/latest) |
-| **Linux** — Debian / Ubuntu          | x86_64, glibc 2.34+ (Ubuntu 22.04 이상)               | [최신 `.deb`](https://github.com/genspark-ai/genoffice/releases/latest)                 |
-| **Linux** — Fedora / RHEL / openSUSE | x86_64, glibc 2.34+ (Fedora 35+, RHEL 9+, Leap 15.6+) | [최신 `.rpm`](https://github.com/genspark-ai/genoffice/releases/latest)                 |
-| **Linux** — 기타 배포판              | x86_64, glibc 2.34+, FUSE 2                           | [최신 `.AppImage`](https://github.com/genspark-ai/genoffice/releases/latest)            |
+| **macOS** — Apple Silicon (arm64)    | macOS 11+                                             | [최신 `.dmg` (arm64)](https://github.com/361533652/genoffice/releases/latest)         |
+| **macOS** — Intel (x64)              | macOS 11+                                             | [최신 `.dmg` (x64)](https://github.com/361533652/genoffice/releases/latest)           |
+| **Windows** (x64, 대부분의 PC)       | Windows 10+, Intel/AMD                                | [최신 `-x64.exe` 설치 파일](https://github.com/361533652/genoffice/releases/latest)   |
+| **Windows** on Arm (ARM64)           | Windows 11 on Arm (Snapdragon X 및 유사 기종)         | [최신 `-arm64.exe` 설치 파일](https://github.com/361533652/genoffice/releases/latest) |
+| **Linux** — Debian / Ubuntu          | x86_64, glibc 2.34+ (Ubuntu 22.04 이상)               | [최신 `.deb`](https://github.com/361533652/genoffice/releases/latest)                 |
+| **Linux** — Fedora / RHEL / openSUSE | x86_64, glibc 2.34+ (Fedora 35+, RHEL 9+, Leap 15.6+) | [최신 `.rpm`](https://github.com/361533652/genoffice/releases/latest)                 |
+| **Linux** — 기타 배포판              | x86_64, glibc 2.34+, FUSE 2                           | [최신 `.AppImage`](https://github.com/361533652/genoffice/releases/latest)            |
 
 모든 빌드는 `main` 브랜치에서 만들어지며, macOS와 Windows 설치 파일에는
-서명이 되어 있습니다. 이전 버전은 [릴리스](https://github.com/genspark-ai/genoffice/releases) 페이지에서 확인할 수 있습니다.
+서명이 되어 있습니다. 이전 버전은 [릴리스](https://github.com/361533652/genoffice/releases) 페이지에서 확인할 수 있습니다.
 
 <details>
 <summary><b>Linux에 설치하기</b></summary>
@@ -497,7 +461,7 @@ GenOffice는 활발히 개발되고 있으며, 여러분의 피드백이 그 방
 만들어갑니다.
 
 - **버그를 신고하거나 기능을 요청**하려면
-  [GitHub Issues](https://github.com/genspark-ai/genoffice/issues)를 이용하세요.
+  [GitHub Issues](https://github.com/361533652/genoffice/issues)를 이용하세요.
 - **GenOffice 그룹 채팅에 참여**하려면
   [GenTeam](https://genoffice.ai/join)에서 팀 및 다른 사용자들과 대화할 수 있습니다.
 - GenOffice가 유용하다고 느끼셨다면 **저장소에 스타를 눌러주세요** —

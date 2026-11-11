@@ -13,10 +13,10 @@
 File Word, Excel, PowerPoint, dan PDF, diedit oleh Anda dan AI Anda, disimpan kembali dalam format aslinya.</p>
 
 <p align="center">
-  <a href="../../LICENSE"><img src="https://img.shields.io/github/license/genspark-ai/genoffice" alt="License: Apache-2.0"></a>
-  <a href="https://github.com/genspark-ai/genoffice/releases/latest"><img src="https://img.shields.io/github/v/release/genspark-ai/genoffice" alt="Latest release"></a>
-  <a href="https://github.com/genspark-ai/genoffice/releases"><img src="https://img.shields.io/github/downloads/genspark-ai/genoffice/total" alt="Downloads"></a>
-  <a href="https://github.com/genspark-ai/genoffice/stargazers"><img src="https://img.shields.io/github/stars/genspark-ai/genoffice?style=flat" alt="GitHub stars"></a>
+  <a href="../../LICENSE"><img src="https://img.shields.io/github/license/361533652/genoffice" alt="License: Apache-2.0"></a>
+  <a href="https://github.com/361533652/genoffice/releases/latest"><img src="https://img.shields.io/github/v/release/361533652/genoffice" alt="Latest release"></a>
+  <a href="https://github.com/361533652/genoffice/releases"><img src="https://img.shields.io/github/downloads/361533652/genoffice/total" alt="Downloads"></a>
+  <a href="https://github.com/361533652/genoffice/stargazers"><img src="https://img.shields.io/github/stars/361533652/genoffice?style=flat" alt="GitHub stars"></a>
 </p>
 
 <p align="center"><a href="../../README.md">English</a> · <a href="README.es.md">Español</a> · <a href="README.pt-BR.md">Português</a> · <a href="README.de.md">Deutsch</a> · <a href="README.fr.md">Français</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.zh-TW.md">繁體中文</a> · <a href="README.ko.md">한국어</a> · <a href="README.ja.md">日本語</a> · <a href="README.ar.md">العربية</a> · <a href="README.ru.md">Русский</a> · <a href="README.it.md">Italiano</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.pl.md">Polski</a> · <a href="README.cs.md">Čeština</a> · <b>Bahasa Indonesia</b> · <a href="README.ms.md">Bahasa Melayu</a> · <a href="README.th.md">ไทย</a> · <a href="README.hi.md">हिन्दी</a> · <a href="README.he.md">עברית</a> · <a href="README.vi.md">Tiếng Việt</a> · <a href="README.tr.md">Türkçe</a></p>
@@ -67,9 +67,9 @@ yang ditulis selalu OOXML, tidak pernah ODF.
   coding agent bisa membuat, mengonversi, membaca, dan mengedit file Office
   asli di mesin Anda tanpa membuka satu jendela pun.
 
-**Unduh di sini:** [macOS](https://github.com/genspark-ai/genoffice/releases/latest) (Apple Silicon dan Intel) ·
-[Windows](https://github.com/genspark-ai/genoffice/releases/latest) (x64 dan Arm) ·
-[Linux](https://github.com/genspark-ai/genoffice/releases/latest) (deb, rpm, AppImage) —
+**Unduh di sini:** [macOS](https://github.com/361533652/genoffice/releases/latest) (Apple Silicon dan Intel) ·
+[Windows](https://github.com/361533652/genoffice/releases/latest) (x64 dan Arm) ·
+[Linux](https://github.com/361533652/genoffice/releases/latest) (deb, rpm, AppImage) —
 detail dan persyaratan ada di bagian [Download](#download).
 
 ## Demo
@@ -201,7 +201,7 @@ lewat engine yang sama dengan aplikasinya, tanpa membuka satu jendela pun.
 </tr>
 <tr>
 <td><b>Satu prompt ke agen Anda</b> — "Buat deck delapan slide tentang Tata Surya." Agen membaca skill, menulis style sheet, outline, dan satu spesifikasi halaman per slide, menghasilkan dua foto dengan <code>genoffice image</code>, dan membiarkan <code>genoffice slides check</code> menolak apa pun yang meluap atau tumpang tindih sebelum <code>genoffice create</code> merakit <code>.pptx</code> dan <code>slides render</code> mengembalikan satu PNG per slide untuk dilihat.</td>
-<td><b>Pasang sekali, dari Pengaturan → Integrasi</b> — GenOffice menampilkan coding agent yang ditemukannya di komputer ini dan menulis skill ke setiap agen yang Anda pilih. Atau unduh skill sebagai zip, atau jalankan <code>npx skills add genspark-ai/genoffice</code>. Perintah dan alur kerja lengkapnya ada di <a href="#command-line-and-agent-skill">Baris perintah dan skill agen</a>.</td>
+<td><b>Pasang sekali, dari Pengaturan → Integrasi</b> — GenOffice menampilkan coding agent yang ditemukannya di komputer ini dan menulis skill ke setiap agen yang Anda pilih. Atau unduh skill sebagai zip, atau jalankan <code>npx skills add 361533652/genoffice</code>. Perintah dan alur kerja lengkapnya ada di <a href="#command-line-and-agent-skill">Baris perintah dan skill agen</a>.</td>
 </tr>
 </table>
 
@@ -252,42 +252,6 @@ terlihat sambil Anda menyaksikannya.
   Claude Desktop, Codex, Cursor, dan agen lainnya, tetap on-device.
 - **Gratis**, untuk individu maupun tim.
 
-## Backend AI
-
-**Masuk dengan Genspark** dan tidak ada yang perlu dikonfigurasi: panggilan
-model diarahkan lewat proxy Genspark (keluarga Claude, GPT, dan Gemini) dan
-agen mendapatkan akses pencarian web dan gambar, generasi gambar, serta
-analisis gambar/audio/video.
-
-**Atau bawa kunci Anda sendiri.** Settings → AI menampilkan Claude, OpenAI,
-Gemini, DeepSeek, Kimi, GLM, Qwen, Doubao, MiniMax, Grok, Mistral, OpenRouter, Requesty, Opper, Cheaper Inference, Atlas Cloud, SiliconFlow, PPIO, Command Code,
-dan OpenCode Zen/Go, plus slot khusus untuk endpoint apa pun yang kompatibel
-dengan OpenAI (base URL + kunci), termasuk server model lokal. Pencarian dan
-media memiliki penyedia tersendiri per kemampuan di bawah **AI Media &
-Search**: Serper, Serply, SearchApi, Tavily, Parallel, Keenable, Exa, atau Firecrawl
-untuk pencarian web — Keenable juga tanpa kunci; kunci hanya menaikkan batas
-lajunya — dan OpenAI, Gemini, Doubao/Seedream, GLM, Grok, Qwen, MiniMax, Stability, FLUX, atau
-endpoint apa pun yang kompatibel dengan OpenAI untuk generasi gambar serta
-analisis gambar/video.
-
-Seluruh suite mendukung tema terang, gelap, dan sistem. Tema hanya mengubah
-tampilan di layar: ekspor, cetakan, dan file yang disimpan selalu
-mempertahankan warna asli dokumen.
-
-<a id="skills"></a>
-
-## Skill
-
-Skill adalah berkas `SKILL.md` yang memberi tahu AI cara mengerjakan satu tugas dengan baik: laporan mingguan, NDA, rencana pelajaran.
-GenOffice menyertakan sekumpulan skill dan menerima skill buatan Anda, dalam format yang sama dengan yang dipakai agen pemrograman.
-
-- **Pengaturan → Skill.** **Pasang** skill yang direkomendasikan, atau **Impor** folder, zip, atau satu berkas `SKILL.md`. Tidak ada yang dijalankan saat impor. Tab **Semua** menampilkan seluruh katalog yang direkomendasikan di satu tempat, dengan deskripsi mengikuti bahasa aplikasi.
-- **Di obrolan.** Buka menu **+** di samping kotak pesan panel AI mana pun, pilih **Skill**, centang satu, lalu kirim. Skill hanya ikut dengan pesan itu.
-
----
-
-<a id="command-line-and-agent-skill"></a>
-
 ## Baris perintah dan skill agen
 
 Semua yang bisa dilakukan aplikasi terhadap sebuah file, bisa dilakukan baris
@@ -310,7 +274,7 @@ semua MCP client.
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Pengaturan → Integrasi** di aplikasi     | Menampilkan agen yang ditemukan di komputer ini; satu klik menulis skill ke setiap agen yang Anda pilih. Tombol **Update** muncul saat rilis GenOffice membawa skill yang lebih baru. |
 | **Unduh sebagai zip** di halaman yang sama | Tata letak yang diterima claude.ai, aplikasi desktop Claude, dan asisten lain sebagai skill yang diunggah.                                                                            |
-| `npx skills add genspark-ai/genoffice`     | Memasang dari repositori ini ke agen mana pun yang kompatibel dengan skill.                                                                                                           |
+| `npx skills add 361533652/genoffice`     | Memasang dari repositori ini ke agen mana pun yang kompatibel dengan skill.                                                                                                           |
 
 Lalu mulai chat baru dan minta sebuah dokumen. Skill ini mengajari agen kapan
 harus menggunakan `genoffice`, bagaimana membaca file sebelum mengeditnya,
@@ -424,17 +388,17 @@ yang keluar dari mesin, ke penyedia yang dikonfigurasi di GenOffice.
 
 | Platform                             | Persyaratan                                           | Unduh                                                                                      |
 | ------------------------------------ | ----------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| **macOS** — Apple Silicon (arm64)    | macOS 11+                                             | [`.dmg` terbaru (arm64)](https://github.com/genspark-ai/genoffice/releases/latest)         |
-| **macOS** — Intel (x64)              | macOS 11+                                             | [`.dmg` terbaru (x64)](https://github.com/genspark-ai/genoffice/releases/latest)           |
-| **Windows** (x64, kebanyakan PC)     | Windows 10+, Intel/AMD                                | [Installer `-x64.exe` terbaru](https://github.com/genspark-ai/genoffice/releases/latest)   |
-| **Windows** di Arm (ARM64)           | Windows 11 on Arm (Snapdragon X dan sejenisnya)       | [Installer `-arm64.exe` terbaru](https://github.com/genspark-ai/genoffice/releases/latest) |
-| **Linux** — Debian / Ubuntu          | x86_64, glibc 2.34+ (Ubuntu 22.04 atau lebih baru)    | [`.deb` terbaru](https://github.com/genspark-ai/genoffice/releases/latest)                 |
-| **Linux** — Fedora / RHEL / openSUSE | x86_64, glibc 2.34+ (Fedora 35+, RHEL 9+, Leap 15.6+) | [`.rpm` terbaru](https://github.com/genspark-ai/genoffice/releases/latest)                 |
-| **Linux** — distribusi lainnya       | x86_64, glibc 2.34+, FUSE 2                           | [`.AppImage` terbaru](https://github.com/genspark-ai/genoffice/releases/latest)            |
+| **macOS** — Apple Silicon (arm64)    | macOS 11+                                             | [`.dmg` terbaru (arm64)](https://github.com/361533652/genoffice/releases/latest)         |
+| **macOS** — Intel (x64)              | macOS 11+                                             | [`.dmg` terbaru (x64)](https://github.com/361533652/genoffice/releases/latest)           |
+| **Windows** (x64, kebanyakan PC)     | Windows 10+, Intel/AMD                                | [Installer `-x64.exe` terbaru](https://github.com/361533652/genoffice/releases/latest)   |
+| **Windows** di Arm (ARM64)           | Windows 11 on Arm (Snapdragon X dan sejenisnya)       | [Installer `-arm64.exe` terbaru](https://github.com/361533652/genoffice/releases/latest) |
+| **Linux** — Debian / Ubuntu          | x86_64, glibc 2.34+ (Ubuntu 22.04 atau lebih baru)    | [`.deb` terbaru](https://github.com/361533652/genoffice/releases/latest)                 |
+| **Linux** — Fedora / RHEL / openSUSE | x86_64, glibc 2.34+ (Fedora 35+, RHEL 9+, Leap 15.6+) | [`.rpm` terbaru](https://github.com/361533652/genoffice/releases/latest)                 |
+| **Linux** — distribusi lainnya       | x86_64, glibc 2.34+, FUSE 2                           | [`.AppImage` terbaru](https://github.com/361533652/genoffice/releases/latest)            |
 
 Semua build berasal dari `main`; installer macOS dan Windows sudah
 ditandatangani (signed). Versi lama ada di halaman
-[Releases](https://github.com/genspark-ai/genoffice/releases).
+[Releases](https://github.com/361533652/genoffice/releases).
 
 <details>
 <summary><b>Instalasi di Linux</b></summary>
@@ -512,7 +476,7 @@ diterima.
 GenOffice terus dikembangkan secara aktif dan masukan Anda membentuk arahnya.
 
 - **Laporkan bug atau ajukan permintaan fitur** di
-  [GitHub Issues](https://github.com/genspark-ai/genoffice/issues).
+  [GitHub Issues](https://github.com/361533652/genoffice/issues).
 - **Gabung ke grup chat GenOffice** di
   [GenTeam](https://genoffice.ai/join) untuk mengobrol dengan tim dan
   pengguna lain.

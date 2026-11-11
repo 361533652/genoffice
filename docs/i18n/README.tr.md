@@ -13,10 +13,10 @@
 Word, Excel, PowerPoint ve PDF dosyaları; siz ve yapay zekânız tarafından düzenlenir, gerçek biçimlerinde geri kaydedilir.</p>
 
 <p align="center">
-  <a href="../../LICENSE"><img src="https://img.shields.io/github/license/genspark-ai/genoffice" alt="Lisans: Apache-2.0"></a>
-  <a href="https://github.com/genspark-ai/genoffice/releases/latest"><img src="https://img.shields.io/github/v/release/genspark-ai/genoffice" alt="Son sürüm"></a>
-  <a href="https://github.com/genspark-ai/genoffice/releases"><img src="https://img.shields.io/github/downloads/genspark-ai/genoffice/total" alt="İndirmeler"></a>
-  <a href="https://github.com/genspark-ai/genoffice/stargazers"><img src="https://img.shields.io/github/stars/genspark-ai/genoffice?style=flat" alt="GitHub yıldızları"></a>
+  <a href="../../LICENSE"><img src="https://img.shields.io/github/license/361533652/genoffice" alt="Lisans: Apache-2.0"></a>
+  <a href="https://github.com/361533652/genoffice/releases/latest"><img src="https://img.shields.io/github/v/release/361533652/genoffice" alt="Son sürüm"></a>
+  <a href="https://github.com/361533652/genoffice/releases"><img src="https://img.shields.io/github/downloads/361533652/genoffice/total" alt="İndirmeler"></a>
+  <a href="https://github.com/361533652/genoffice/stargazers"><img src="https://img.shields.io/github/stars/361533652/genoffice?style=flat" alt="GitHub yıldızları"></a>
   <a href="https://x.com/merrickbuilds"><img src="https://img.shields.io/badge/follow-%40merrickbuilds-000000?logo=x&logoColor=white" alt="X'te @merrickbuilds'i takip edin"></a>
 </p>
 
@@ -79,9 +79,9 @@ yönündedir — kaydetme her zaman OOXML yazar, asla ODF yazmaz.
   açmadan makinenizde gerçek Office dosyaları oluşturabilir, dönüştürebilir,
   okuyabilir ve düzenleyebilir.
 
-**Edinin:** [macOS](https://github.com/genspark-ai/genoffice/releases/latest) (Apple Silicon ve Intel) ·
-[Windows](https://github.com/genspark-ai/genoffice/releases/latest) (x64 ve Arm) ·
-[Linux](https://github.com/genspark-ai/genoffice/releases/latest) (deb, rpm, AppImage) —
+**Edinin:** [macOS](https://github.com/361533652/genoffice/releases/latest) (Apple Silicon ve Intel) ·
+[Windows](https://github.com/361533652/genoffice/releases/latest) (x64 ve Arm) ·
+[Linux](https://github.com/361533652/genoffice/releases/latest) (deb, rpm, AppImage) —
 ayrıntılar ve gereksinimler [İndir](#download) bölümünde.
 
 ## Demo
@@ -222,28 +222,7 @@ uğrarsa yerel sıra korunur.
 </tr>
 </table>
 
-### 8 · Ask AI — yıldızlı dosyalarınız, kaynaklarıyla yanıtlanır
-
-Birlikte çalıştığınız dosyalara yıldız ekleyin; ana ekrandaki **Ask AI** onları
-bir bilgi tabanı olarak ele alır. Sorunuzu doğal dille sorun; ajan yıldızlı
-dosyaları arar, ihtiyaç duyduklarını okur ve her iddiadan sonra bir alıntıyla
-yanıtlar. Bir alıntıya tıklayın; dosya doğru uygulamada açılır. Soruya
-sürükleyerek, yapıştırarak ya da **+** menüsünden dosya ekleyin — görseller
-modele görsel girdi olarak gider — ve her soru kendi konuşması olarak
-saklanır: aralarında geçiş yapın, yenisini başlatın, birini silin; liste
-yeniden başlatmadan sonra da korunur.
-
-<img src="../assets/readme/home-ask-ai-motion.webp" alt="GenOffice Ask AI ekran kaydı: ana ekrana kısa özet, 3. çeyrek büyümemizi ne sürükledi ve Asya-Pasifik nasıl performans gösterdi sorusu yazılıyor; ajan iki yıldızlı dosyayı okuyup Aurora X1 lansmanı ve Asya-Pasifik genişlemesiyle yanıtlıyor, her iddiayı üç aylık raporu ya da bölgesel satış çalışma kitabını adlandıran bir alıntı çipi izliyor; çalışma kitabı çipine tıklamak onu Asya-Pasifik satırı vurgulanmış hâlde Sheets'te açıyor" width="100%">
-
-Ask AI,
-[Arama](#7--search--find-the-file-that-answers-the-question-with-typesafe-jev)
-ile aynı cihaz üzeri tam metin dizininde arar ve dosyaları sayfa sayfa okur;
-böylece model yalnızca isabetleri ve istediği pasajları, seçtiğiniz sağlayıcı
-üzerinden görür. Ayrıca dosyaları doğrudan oluşturmak için yerleşik
-`genoffice` CLI'yi çağırabilir; her biri yanıtın altında bir yapıt kartı
-olarak görünür ve bir tıklamayla açılır.
-
-### 9 · CLI — kodlama ajanınız GenOffice'i makinenizde yönetir
+### 8 · CLI — kodlama ajanınız GenOffice'i makinenizde yönetir
 
 GenOffice bir `genoffice` komut satırı ve bir ajan skill'i ile gelir. Skill'i
 kurun; Claude Code, Codex, Cursor, Gemini CLI, GitHub Copilot, OpenCode ya da
@@ -259,11 +238,11 @@ Office dosyaları oluşturabilir, dönüştürebilir, okuyabilir ve düzenleyebi
 </tr>
 <tr>
 <td><b>Ajanınıza tek bir istem</b> — "Güneş Sistemi hakkında sekiz slaytlık bir sunum oluştur." Ajan skill'i okur, bir stil sayfası, bir ana hat ve slayt başına bir sayfa spesifikasyonu yazar, iki fotoğrafı <code>genoffice image</code> ile üretir ve <code>genoffice create</code> dosyayı <code>.pptx</code> olarak birleştirip <code>slides render</code> bakmanız için slayt başına bir PNG vermeden önce <code>genoffice slides check</code> komutunun taşan ya da çakışan her şeyi reddetmesine izin verir.</td>
-<td><b>Bir kez kurun, Ayarlar → Integrations üzerinden</b> — GenOffice bu bilgisayarda bulduğu kodlama ajanlarını listeler ve skill'i seçtiğiniz her birine yazar. Ya da skill'i zip olarak indirin ya da <code>npx skills add genspark-ai/genoffice</code> çalıştırın. Komutlar ve tam iş akışı <a href="#command-line-and-agent-skill">Komut satırı ve ajan skill'i</a> bölümünde.</td>
+<td><b>Bir kez kurun, Ayarlar → Integrations üzerinden</b> — GenOffice bu bilgisayarda bulduğu kodlama ajanlarını listeler ve skill'i seçtiğiniz her birine yazar. Ya da skill'i zip olarak indirin ya da <code>npx skills add 361533652/genoffice</code> çalıştırın. Komutlar ve tam iş akışı <a href="#command-line-and-agent-skill">Komut satırı ve ajan skill'i</a> bölümünde.</td>
 </tr>
 </table>
 
-### 10 · MCP — aynı araçlar, Model Context Protocol üzerinden
+### 9 · MCP — aynı araçlar, Model Context Protocol üzerinden
 
 Her `genoffice` komutu aynı zamanda bir MCP aracıdır. Claude Code, Claude
 Desktop, Cursor ve diğer tüm MCP istemcileri, kurulacak skill ve açık pencere
@@ -317,62 +296,6 @@ belgesi oluşturmasına izin verir.
   ajanların hizmetine, yine cihaz üzerinde sunar.
 - **Ücretsiz**, bireyler ve ekipler için aynı şekilde.
 
-## Yapay zekâ arka uçları
-
-**Genspark ile oturum açın**; yapılandırılacak hiçbir şey yoktur: model
-çağrıları Genspark proxy'si üzerinden yönlendirilir (Claude, GPT ve Gemini
-aileleri) ve ajanlar web ve görsel arama, görsel üretimi ve görsel/ses/video
-analizi kazanır.
-
-**Ya da kendi anahtarınızı getirin.** Ayarlar → AI; Claude, OpenAI, Gemini,
-DeepSeek, Kimi, GLM, Qwen, Doubao, MiniMax, Grok, Mistral, OpenRouter,
-Requesty, SiliconFlow, PPIO, Command Code, Opper, Cheaper Inference, Atlas Cloud ve OpenCode Zen/Go'yu, ayrıca
-yerel model sunucuları dahil herhangi bir OpenAI uyumlu uç nokta (temel URL +
-anahtar) için özel bir yuvayı listeler. Arama ve medyanın **AI Media &
-Search** altında yetenek başına kendi sağlayıcıları vardır: web araması için
-Serper, Serply, SearchApi, Tavily, Parallel, Keenable, Exa ya da Firecrawl; görsel üretimi
-ve görsel/video analizi için OpenAI, Gemini, Doubao/Seedream, GLM, Grok, Qwen,
-MiniMax,
-Stability,
-FLUX ya da herhangi bir OpenAI uyumlu görsel uç noktası; görsel analizi için
-ayrıca DeepSeek V4.1 Flash.
-
-**TypeSafe Jev**, ana ekranın dosya aramasını yeniden sıralar. **AI Media &
-Search → Local file search** altında Jev search reranking seçeneğini açın ve
-bir uç nokta seçin: [OpenRouter](https://openrouter.ai/typesafe) (model
-`typesafe/jev-1.13`) ya da TypeSafe'in kendi API'si. Anahtar yalnızca bu
-cihazda saklanır. Varsayılan olarak kapalıdır; açıkken en iyi 20 yerel sonucun
-alıntıları değerlendirilmek üzere gönderilir ve makineden başka hiçbir şey
-çıkmaz.
-
-**Parallel** hesap olmadan çalışır: ücretsiz Search MCP'si (hız sınırlı),
-Genspark girişi ya da arama anahtarı yapılandırılmamışken varsayılan web
-aramasıdır ve DuckDuckGo kazımasından önce çalışır. Bunun yerine Search API'yi
-kullanmak için Web search altında Parallel'i seçin ve bir
-[Parallel](https://platform.parallel.ai/) anahtarı girin. Keenable de
-anahtarsızdır; anahtar yalnızca hız sınırlarını yükseltir.
-
-Paketin tamamı açık, koyu ve sistem temalarıyla gelir. Temalar yalnızca
-ekrandakini değiştirir: dışa aktarmalar, yazdırmalar ve kaydedilen dosyalar
-her zaman belgenin kendi renklerini korur.
-
-## Skills
-
-Bir skill, yapay zekâya tek bir işi iyi yapmayı anlatan bir `SKILL.md`
-dosyasıdır: haftalık rapor, gizlilik sözleşmesi, ders planı. GenOffice bunların
-bir setiyle gelir ve kodlama ajanlarının kullandığı biçimde kendi skill'lerinizi
-de kabul eder.
-
-- **Ayarlar → Skills.** Önerilen bir skill'i **Install** edin ya da bir
-  klasörü, bir zip'i veya tek bir `SKILL.md` dosyasını **Import** edin. İçe
-  aktarmada hiçbir şey çalışmaz. **Tümü** sekmesi, önerilen kataloğun tamamını
-  tek yerde, uygulama dilindeki açıklamalarla listeler.
-- **Bir sohbette.** Herhangi bir yapay zekâ panelinde oluşturucunun yanındaki
-  **+** menüsünü açın, **Skills**'i seçin, birini işaretleyin, gönderin. Skill
-  yalnızca o mesajla birlikte gider.
-
----
-
 ## Komut satırı ve ajan skill'i
 
 Uygulamaların bir dosyaya yapabildiği her şeyi `genoffice` komut satırı bir
@@ -394,7 +317,7 @@ istemcisi.
 | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Uygulamada **Ayarlar → Integrations**  | Bu bilgisayarda bulunan ajanları listeler; tek tık skill'i seçtiğiniz her birine yazar. Bir GenOffice sürümü daha yeni bir skill getirdiğinde bir **Update** düğmesi belirir. |
 | Aynı sayfadaki **Download as zip**     | claude.ai, Claude masaüstü uygulamaları ve diğer asistanların yüklenen skill olarak kabul ettiği düzen.                                                                       |
-| `npx skills add genspark-ai/genoffice` | Bu depodan skill uyumlu herhangi bir ajana kurar.                                                                                                                             |
+| `npx skills add 361533652/genoffice` | Bu depodan skill uyumlu herhangi bir ajana kurar.                                                                                                                             |
 
 Ardından yeni bir sohbet başlatın ve bir belge isteyin. Skill, ajana ne zaman
 `genoffice`'e başvuracağını, bir dosyayı düzenlemeden önce nasıl okuyacağını
@@ -523,16 +446,16 @@ MCP araç sonuçları olarak yolculuk etti. Makineden yalnızca `search` ve
 
 | Platform                             | Gereksinimler                                         | İndirme                                                                                |
 | ------------------------------------ | ----------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| **macOS** — Apple Silicon (arm64)    | macOS 11+                                             | [Son `.dmg` (arm64)](https://github.com/genspark-ai/genoffice/releases/latest)         |
-| **macOS** — Intel (x64)              | macOS 11+                                             | [Son `.dmg` (x64)](https://github.com/genspark-ai/genoffice/releases/latest)           |
-| **Windows** (x64, çoğu PC)           | Windows 10+, Intel/AMD                                | [Son `-x64.exe` yükleyici](https://github.com/genspark-ai/genoffice/releases/latest)   |
-| **Windows** Arm üzerinde (ARM64)     | Arm üzerinde Windows 11 (Snapdragon X ve benzerleri)  | [Son `-arm64.exe` yükleyici](https://github.com/genspark-ai/genoffice/releases/latest) |
-| **Linux** — Debian / Ubuntu          | x86_64, glibc 2.34+ (Ubuntu 22.04 veya daha yeni)     | [Son `.deb`](https://github.com/genspark-ai/genoffice/releases/latest)                 |
-| **Linux** — Fedora / RHEL / openSUSE | x86_64, glibc 2.34+ (Fedora 35+, RHEL 9+, Leap 15.6+) | [Son `.rpm`](https://github.com/genspark-ai/genoffice/releases/latest)                 |
-| **Linux** — diğer dağıtımlar         | x86_64, glibc 2.34+, FUSE 2                           | [Son `.AppImage`](https://github.com/genspark-ai/genoffice/releases/latest)            |
+| **macOS** — Apple Silicon (arm64)    | macOS 11+                                             | [Son `.dmg` (arm64)](https://github.com/361533652/genoffice/releases/latest)         |
+| **macOS** — Intel (x64)              | macOS 11+                                             | [Son `.dmg` (x64)](https://github.com/361533652/genoffice/releases/latest)           |
+| **Windows** (x64, çoğu PC)           | Windows 10+, Intel/AMD                                | [Son `-x64.exe` yükleyici](https://github.com/361533652/genoffice/releases/latest)   |
+| **Windows** Arm üzerinde (ARM64)     | Arm üzerinde Windows 11 (Snapdragon X ve benzerleri)  | [Son `-arm64.exe` yükleyici](https://github.com/361533652/genoffice/releases/latest) |
+| **Linux** — Debian / Ubuntu          | x86_64, glibc 2.34+ (Ubuntu 22.04 veya daha yeni)     | [Son `.deb`](https://github.com/361533652/genoffice/releases/latest)                 |
+| **Linux** — Fedora / RHEL / openSUSE | x86_64, glibc 2.34+ (Fedora 35+, RHEL 9+, Leap 15.6+) | [Son `.rpm`](https://github.com/361533652/genoffice/releases/latest)                 |
+| **Linux** — diğer dağıtımlar         | x86_64, glibc 2.34+, FUSE 2                           | [Son `.AppImage`](https://github.com/361533652/genoffice/releases/latest)            |
 
 Tüm derlemeler `main` dalından gelir; macOS ve Windows yükleyicileri imzalıdır.
-Eski sürümler [Releases](https://github.com/genspark-ai/genoffice/releases) sayfasındadır.
+Eski sürümler [Releases](https://github.com/361533652/genoffice/releases) sayfasındadır.
 
 <details>
 <summary><b>Linux'a kurulum</b></summary>
@@ -610,7 +533,7 @@ dosyasına bakın.
 GenOffice etkin geliştirme aşamasındadır ve geri bildiriminiz onu şekillendirir.
 
 - **Hata bildirin ya da özellik isteyin:**
-  [GitHub Issues](https://github.com/genspark-ai/genoffice/issues).
+  [GitHub Issues](https://github.com/361533652/genoffice/issues).
 - **GenOffice grup sohbetine katılın:** ekiple ve diğer kullanıcılarla konuşmak
   için [GenTeam](https://genoffice.ai/join).
 - **X'te [@merrickbuilds](https://x.com/merrickbuilds) hesabını takip edin:**
