@@ -50,9 +50,11 @@ const GREET_ASK_KEYS = [
 
 /* Formats the open-local card advertises. Too long for the card at any window
    width, so it ellipsizes and a hover ScreenTip carries the full list. Keep in
-   sync with the main-process open-dialog filter (OPEN_DIALOG_EXTENSIONS). */
+   sync with the main-process open-dialog filter (OPEN_DIALOG_EXTENSIONS) and
+   the shared SOURCE_CODE_EXTS list; the trailing entry stands for the ~90
+   source formats that ride the same editor rather than listing them all. */
 const OPEN_LOCAL_EXTENSIONS =
-  '.docx / .doc / .dot / .odt / .ott / .hwpx / .hwp / .xlsx / .xlsm / .xls / .csv / .tsv / .ods / .ots / .pptx / .odp / .otp / .pdf / .md / .html'
+  '.docx / .xlsx / .pptx / .pdf / .html / .md / .json / .xml / .yaml / .toml / .c / .cpp / .py / .java / .go / .rs / .js / .ts / .sql / .sh / …'
 
 /** drag payload of home file/folder rows (JSON array of absolute paths) */
 const DRAG_PATHS_MIME = 'application/x-genoffice-paths'

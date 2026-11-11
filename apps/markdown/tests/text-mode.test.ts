@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { isSourceMode, textModeForPath } from '../src/shared/text-mode'
+import { isSourceMode, sourceLanguageForPath, textModeForPath } from '../src/shared/text-mode'
+import { languageForName, languageLabel, hasGrammar } from '../src/shared/source-language'
 import { readSourceText, writeSourceText } from '../src/shared/source-text'
 
 describe('textModeForPath', () => {
@@ -9,14 +10,13 @@ describe('textModeForPath', () => {
     expect(textModeForPath('/a/NOTE.MD')).toBe('markdown')
   })
 
-  it('opens JSON as source with its own highlighting', () => {
-    expect(textModeForPath('/a/data.json')).toBe('json')
-    expect(textModeForPath('/a/DATA.JSON')).toBe('json')
-  })
-
-  it('opens everything else as plain source', () => {
-    expect(textModeForPath('/a/notes.txt')).toBe('plain')
-    expect(textModeForPath('/a/log.txt')).toBe('plain')
+  it('opens every other text format as source', () => {
+    expect(textModeForPath('/a/data.json')).toBe('source')
+    expect(textModeForPath('/a/notes.txt')).toBe('source')
+    expect(textModeForPath('/a/main.ts')).toBe('source')
+    expect(textModeForPath('/a/index.xml')).toBe('source')
+    expect(textModeForPath('/a/script.py')).toBe('source')
+    expect(textModeForPath('/a/Cargo.toml')).toBe('source')
   })
 
   it('treats an untitled document as markdown — that is what New creates', () => {
@@ -26,17 +26,68 @@ describe('textModeForPath', () => {
   })
 
   it('only claims a markdown extension at the very end', () => {
-    // data.json.md is markdown; a.json.bak is not JSON
+    // data.json.md is markdown; a.json.bak is still a source file, just an
+    // unknown language (`.bak` has no grammar)
     expect(textModeForPath('/a/data.json.md')).toBe('markdown')
-    expect(textModeForPath('/a/data.json.bak')).toBe('plain')
+    expect(textModeForPath('/a/data.json.bak')).toBe('source')
   })
 })
 
 describe('isSourceMode', () => {
   it('is false only for markdown', () => {
     expect(isSourceMode('markdown')).toBe(false)
-    expect(isSourceMode('plain')).toBe(true)
-    expect(isSourceMode('json')).toBe(true)
+    expect(isSourceMode('source')).toBe(true)
+  })
+})
+
+describe('languageForName', () => {
+  it('maps the common families', () => {
+    expect(languageForName('data.json')).toBe('json')
+    expect(languageForName('DATA.JSON')).toBe('json')
+    expect(languageForName('index.html')).toBe('html')
+    expect(languageForName('style.css')).toBe('css')
+    expect(languageForName('main.ts')).toBe('typescript')
+    expect(languageForName('main.tsx')).toBe('typescript')
+    expect(languageForName('app.js')).toBe('javascript')
+    expect(languageForName('script.py')).toBe('python')
+    expect(languageForName('Main.java')).toBe('java')
+    expect(languageForName('lib.rs')).toBe('rust')
+    expect(languageForName('main.go')).toBe('go')
+    expect(languageForName('query.sql')).toBe('sql')
+    expect(languageForName('config.yaml')).toBe('yaml')
+    expect(languageForName('Cargo.toml')).toBe('toml')
+    expect(languageForName('deploy.sh')).toBe('shell')
+    expect(languageForName('run.ps1')).toBe('powershell')
+  })
+
+  it('falls back to plain text for anything without a grammar', () => {
+    expect(languageForName('notes.txt')).toBe('plain')
+    expect(languageForName('app.log')).toBe('plain')
+    expect(languageForName('mystery.xyz')).toBe('plain')
+    expect(languageForName('noextension')).toBe('plain')
+    expect(languageForName('trailing.')).toBe('plain')
+  })
+
+  it('reports the language a source view should highlight with', () => {
+    expect(sourceLanguageForPath('/a/main.rs')).toBe('rust')
+    expect(sourceLanguageForPath(null)).toBe('plain')
+  })
+})
+
+describe('languageLabel', () => {
+  it('names a few families the way a status bar would', () => {
+    expect(languageLabel('json')).toBe('JSON')
+    expect(languageLabel('typescript')).toBe('TypeScript')
+    expect(languageLabel('cpp')).toBe('C++')
+    expect(languageLabel('plain')).toBe('Plain Text')
+  })
+})
+
+describe('hasGrammar', () => {
+  it('claims a parser only for the families the editor actually highlights', () => {
+    expect(hasGrammar('json')).toBe(true)
+    expect(hasGrammar('rust')).toBe(true)
+    expect(hasGrammar('plain')).toBe(false)
   })
 })
 

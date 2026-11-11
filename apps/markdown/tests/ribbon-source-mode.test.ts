@@ -91,11 +91,12 @@ describe('Ribbon source mode', () => {
     // the backlinks and graph buttons, which are markdown-only views like the
     // source-view toggle, plus the copy-block-link button beside the link one.
     expect(markdown.iconButtons).toBe(23)
-    // source mode keeps exactly two: the spellcheck toggle (the withhold
-    // toggle gates the block editor's marks, which source mode does not carry)
-    // and the paper-theme picker, disabled there (source text sits outside
-    // the themed paper)
-    expect(source.iconButtons).toBe(2)
+    // source mode keeps exactly three: the spellcheck toggle (the withhold
+    // toggle gates the block editor's marks, which source mode does not carry),
+    // the format button (a source buffer is the one thing a formatter can
+    // rewrite wholesale), and the paper-theme picker, disabled there (source
+    // text sits outside the themed paper)
+    expect(source.iconButtons).toBe(3)
     expect(source.themePickerDisabled).toBe(true)
     expect(markdown.themePickerDisabled).toBe(false)
   })

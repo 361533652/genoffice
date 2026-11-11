@@ -72,4 +72,26 @@ describe('handleDroppedFiles', () => {
     expect(deps.revealed).not.toHaveBeenCalled()
     expect(deps.warned).toEqual([])
   })
+
+  /**
+   * The bug this covers: `.json` and `.txt` were openable by double-click (the
+   * packaged file associations) but absent from the drop bridge's pattern, so
+   * dragging the very same file did nothing at all.
+   */
+  it('opens dropped plain-text and source files, not just office formats', () => {
+    const deps = fakeDeps()
+    handleDroppedFiles(
+      ['/tmp/data.json', '/tmp/notes.txt', '/tmp/main.rs', '/tmp/style.css', '/tmp/x.yaml'],
+      deps,
+    )
+    expect(deps.opened).toEqual([
+      '/tmp/data.json',
+      '/tmp/notes.txt',
+      '/tmp/main.rs',
+      '/tmp/style.css',
+      '/tmp/x.yaml',
+    ])
+    expect(deps.revealed).toHaveBeenCalledOnce()
+    expect(deps.warned).toEqual([])
+  })
 })

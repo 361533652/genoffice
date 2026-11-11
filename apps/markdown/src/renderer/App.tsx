@@ -27,10 +27,16 @@ import {
 } from './markdown/docText'
 import { buildSourceMap, spliceMarkdown, type SourceMap } from './markdown/sourceSplice'
 import { applySourceText } from './markdown/sourceView'
-import { isSourceMode, textModeForPath, type TextMode } from '../shared/text-mode'
+import {
+  isSourceMode,
+  sourceLanguageForPath,
+  textModeForPath,
+  type TextMode,
+} from '../shared/text-mode'
 import { renameAction } from '../shared/rename-mode'
 import { readSourceText, writeSourceText, type SourceTextFormat } from '../shared/source-text'
 import { PlainTextEditor, type PlainTextEditorHandle } from './source/PlainTextEditor'
+import { formatSource } from './source/format-source'
 import { buildExtensions } from './editor/extensions'
 import { tiptapFindTarget } from './editor/findTarget'
 import { collectOutline, type OutlineItem } from './editor/outline'
@@ -945,6 +951,29 @@ export default function App() {
     [sourceRev, sourceMode],
   )
 
+  // Formatting the source buffer. Prettier's parser loads on first use, so the
+  // first click is slower than the rest; formatBusy keeps the button honest.
+  const [formatBusy, setFormatBusy] = useState(false)
+  const formatSourceText = useCallback(async () => {
+    const handle = sourceRef.current
+    if (!handle || formatBusy) return
+    setFormatBusy(true)
+    try {
+      const language = sourceLanguageForPath(filePathRef.current)
+      const outcome = await formatSource({ text: handle.getText(), language })
+      if (outcome.text === null) {
+        setImageExportStatus({
+          key: outcome.reason === 'parse-error' ? 'formatFailedSyntax' : 'formatUnavailable',
+        })
+        return
+      }
+      handle.replaceAll(outcome.text)
+      handle.focus()
+    } finally {
+      setFormatBusy(false)
+    }
+  }, [formatBusy])
+
   const printingRef = useRef(false)
   const printDoc = useCallback(async () => {
     const current = editorRef.current
@@ -1258,6 +1287,8 @@ export default function App() {
         onToggleSpellcheck={() => setSpellcheck((v) => !v)}
         sourceMode={sourceMode}
         sourceHistory={sourceMode ? sourceHistory : undefined}
+        onFormat={() => void formatSourceText()}
+        formatBusy={formatBusy}
         redactEnabled={redactEnabled}
         onToggleRedact={(on) => {
           setRedactEnabled(on)
@@ -1314,7 +1345,7 @@ export default function App() {
               <PlainTextEditor
                 ref={sourceRef}
                 initialText={sourceTextRef.current}
-                mode={textMode === 'json' ? 'json' : 'plain'}
+                language={sourceLanguageForPath(filePath)}
                 spellcheck={spellcheck}
                 onChange={(text) => {
                   sourceTextRef.current = text

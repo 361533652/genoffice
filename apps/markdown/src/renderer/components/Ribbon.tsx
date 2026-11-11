@@ -33,6 +33,7 @@ import {
   IconTag,
   IconGraph,
   IconSpellcheck,
+  IconFormat,
   IconTable,
   IconTaskList,
   IconUndo,
@@ -80,6 +81,10 @@ interface Props {
   sourceMode?: boolean
   /** source mode: history lives in CodeMirror, not the TipTap editor */
   sourceHistory?: { canUndo: boolean; canRedo: boolean; undo(): void; redo(): void }
+  /** source mode: reformat the buffer (Prettier where it has a parser) */
+  onFormat?: () => void
+  /** a format pass is in flight (Prettier is loaded lazily on first use) */
+  formatBusy?: boolean
   /** withheld spans: right-click a selection to hide it from the model */
   redactEnabled: boolean
   onToggleRedact: (on: boolean) => void
@@ -238,6 +243,8 @@ export function Ribbon({
   onMarkdownTheme,
   sourceMode = false,
   sourceHistory,
+  onFormat,
+  formatBusy = false,
   redactEnabled,
   onToggleRedact,
 }: Props) {
@@ -617,6 +624,15 @@ export function Ribbon({
             >
               <IconSpellcheck size={ICON} />
             </IconBtn>
+            {sourceMode && (
+              <IconBtn
+                title={formatBusy ? t('formatBusy') : t('formatDocument')}
+                disabled={disabled || formatBusy}
+                onClick={() => onFormat?.()}
+              >
+                <IconFormat size={ICON} />
+              </IconBtn>
+            )}
             {!sourceMode && (
               <IconBtn
                 title={t('redactEnable')}

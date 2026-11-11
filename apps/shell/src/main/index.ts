@@ -87,6 +87,8 @@ import {
   systemAuthorName,
   readLegacyImportPrompt,
   writeLegacyImportPrompt,
+  HTML_EXTS,
+  SOURCE_CODE_EXTS,
 } from '@genoffice/electron-utils'
 import { createMainProcessProxyDispatcher } from '@genoffice/electron-utils/main-proxy'
 import {
@@ -3865,7 +3867,7 @@ const SEARCH_EXT_FAMILY: Record<string, readonly string[]> = {
   docx: ['docx', 'doc', 'dot', 'odt', 'ott', 'hwpx', 'hwp'],
   xlsx: ['xlsx', 'xlsm', 'xls', 'csv', 'tsv', 'ods', 'ots'],
   pptx: ['pptx', 'ppt', 'odp', 'otp'],
-  md: ['md', 'markdown', 'txt', 'json'],
+  md: SOURCE_CODE_EXTS,
   html: ['html', 'htm'],
 }
 
@@ -4372,12 +4374,8 @@ const OPEN_DIALOG_EXTENSIONS = [
   'odp',
   'otp',
   'pdf',
-  'md',
-  'markdown',
-  'txt',
-  'json',
-  'html',
-  'htm',
+  ...SOURCE_CODE_EXTS,
+  ...HTML_EXTS,
 ]
 
 function notifyUnsupportedFile(filePath: string): void {
@@ -5036,7 +5034,7 @@ function registerHomeIpc(): void {
         },
         { name: tm('filterPpt'), extensions: ['pptx', 'ppt', 'odp', 'otp'] },
         { name: tm('filterPdf'), extensions: ['pdf'] },
-        { name: tm('filterMarkdown'), extensions: ['md', 'markdown', 'txt', 'json'] },
+        { name: tm('filterMarkdown'), extensions: [...SOURCE_CODE_EXTS] },
         { name: tm('filterHtml'), extensions: ['html', 'htm'] },
       ],
       properties: ['openFile', 'multiSelections'],

@@ -86,6 +86,17 @@ export function IconSourceCode(props: IconProps) {
   )
 }
 
+/* three ragged lines snapping to one flush left edge: the visual claim of
+ * every formatter, and distinct from IconSourceCode's static lines */
+export function IconFormat(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M2 3.2h12M2 6.4h8.4M2 9.6h12M2 12.8h6.6" />
+      <path d="M13.4 6.4h1.2M13.4 12.8h1.2" strokeDasharray="1 1.2" opacity="0.5" />
+    </Svg>
+  )
+}
+
 /* knobs sit at different offsets on purpose: three flush-left lines read as a
  * hamburger/overflow menu, and left-aligned dots collide with IconBullets */
 export function IconProperties(props: IconProps) {

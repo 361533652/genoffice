@@ -13,6 +13,7 @@ import {
   type FSWatcher,
 } from 'node:fs'
 import { basename, dirname, extname, join, resolve, sep } from 'node:path'
+import { SOURCE_CODE_EXTS } from '@genoffice/electron-utils'
 import type {
   FolderEntry,
   FolderListing,
@@ -46,12 +47,9 @@ export const TREE_FILE_EXTENSIONS: ReadonlySet<string> = new Set([
   'odp',
   'otp',
   'pdf',
-  'md',
-  'markdown',
-  'txt',
-  'json',
   'html',
   'htm',
+  ...SOURCE_CODE_EXTS,
 ])
 
 const HIDDEN_DIR_NAMES = new Set(['node_modules', '__macosx'])

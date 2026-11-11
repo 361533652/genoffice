@@ -74,6 +74,27 @@ export {
 } from './drop-open'
 export { safeExternalUrl, type SafeExternalUrlOptions } from './safe-external-url'
 export {
+  C_EXTS,
+  CSS_EXTS,
+  DATA_EXTS,
+  extOfName,
+  FUNCTIONAL_EXTS,
+  HTML_EXTS,
+  isSourceExt,
+  JSON_EXTS,
+  JS_EXTS,
+  JVM_EXTS,
+  MARKDOWN_SOURCE_EXTS,
+  OTHER_EXTS,
+  PLAIN_EXTS,
+  SCRIPT_EXTS,
+  SHELL_EXTS,
+  SOURCE_CODE_EXTS,
+  SOURCE_EXTS_RE_PART,
+  SYSTEMS_EXTS,
+  XML_EXTS,
+} from './source-exts'
+export {
   fetchWithSsrfGuard,
   isBlockedAddress,
   isFakeIpDnsArtifact,

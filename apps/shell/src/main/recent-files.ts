@@ -1,5 +1,6 @@
 import { statSync } from 'node:fs'
 import { basename, extname } from 'node:path'
+import { SOURCE_CODE_EXTS } from '@genoffice/electron-utils'
 import type { RecentEntry, RecentPage, RecentQuery } from '../shared/home-api'
 
 const RECENT_PAGE_DEFAULT = 50
@@ -80,7 +81,7 @@ export const EXT_FAMILY: Record<string, readonly string[]> = {
   // the text app opens txt/json as source too, so the sidebar "md" filter has
   // to page them in the same way Home's FILTER_FAMILY already does — otherwise
   // the two views disagree about which files the filter means.
-  md: ['md', 'markdown', 'txt', 'json'],
+  md: SOURCE_CODE_EXTS,
   html: ['html', 'htm'],
 }
 
