@@ -27,8 +27,43 @@ function loadConfig(env: Record<string, string> = {}) {
   return module.exports as {
     publish?: Array<Record<string, unknown>>
     nsis?: { artifactName?: string }
+    extraMetadata?: { version?: string }
   }
 }
+
+describe('the release version', () => {
+  /**
+   * The bug this pins down: the workflow used to pass
+   * `-c.extraMetadata.version=...`, which loses its leading dash through
+   * cmd/npx on Windows. electron-builder then read the flag as a config FILE
+   * path and every release build died with
+   *   ENOENT ... apps\shell\.extraMetadata.version=0.12.6
+   * The version now travels in an env var, which has no parsing to lose.
+   */
+  it('comes from GENOFFICE_APP_VERSION when the workflow sets it', () => {
+    const config = loadConfig({ GENOFFICE_APP_VERSION: '0.12.42' })
+    expect(config.extraMetadata?.version).toBe('0.12.42')
+  })
+
+  it('leaves the packaged version alone for a plain local build', () => {
+    expect(loadConfig({}).extraMetadata?.version).toBeUndefined()
+  })
+
+  it('is not passed on the command line by the workflow', () => {
+    const workflow = readFileSync(
+      resolve(import.meta.dirname, '../../../.github/workflows/release-win.yml'),
+      'utf8',
+    )
+    // the exact shape that failed: -c.extraMetadata.version=...
+    // comments may mention it (the file explains the trap), run lines may not
+    const runLines = workflow
+      .split('\n')
+      .filter((line) => !/^\s*#/.test(line))
+      .join('\n')
+    expect(runLines).not.toMatch(/-c\.extraMetadata/)
+    expect(workflow).toContain('GENOFFICE_APP_VERSION')
+  })
+})
 
 describe('the GitHub release feed', () => {
   it('bakes a github publish config when GENOFFICE_UPDATE_REPO is set', () => {

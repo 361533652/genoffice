@@ -84,15 +84,21 @@ jobs:
       # resources/app-update.yml AND emit latest.yml — the file electron-updater
       # reads to discover a newer version. --publish never still applies: the
       # release upload is the next step, not electron-builder's.
+      #
+      # The version rides in an env var, NOT -c.extraMetadata.version=...: on
+      # Windows that argument loses its leading dash through cmd/npx, and
+      # electron-builder then reads ".extraMetadata.version=0.12.6" as a config
+      # file path and dies with ENOENT. That is what broke every release build.
       - name: Package NSIS installer
         shell: pwsh
         working-directory: apps/shell
         env:
           GENOFFICE_UPDATE_REPO: ${{ github.repository }}
+          GENOFFICE_APP_VERSION: ${{ steps.ver.outputs.version }}
         run: |
           npm run notices
           npx electron-vite build
-          npx electron-builder --win --publish never -c.extraMetadata.version=${{ steps.ver.outputs.version }}
+          npx electron-builder --win --publish never
 
       - name: Collect artifacts
         shell: pwsh

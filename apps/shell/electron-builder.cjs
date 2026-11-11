@@ -303,12 +303,26 @@ const CLI_VERSION_ENV = 'GENOFFICE_APP_VERSION'
 const CLI_VERSION_BANNER = /^const __cliAppVersion = ("(?:[^"\\]|\\.)*");$/m
 
 /**
- * The version the packaged app reports: CI's -c.extraMetadata.version deep-merges
- * into the block below, and without it electron-builder ships apps/shell/package.json.
+ * Release version override, read from the environment rather than the
+ * command line.
+ *
+ * `-c.extraMetadata.version=...` is the documented switch, but it does not
+ * survive a Windows shell hop: cmd/npx strips the leading `-`, electron-builder
+ * then treats `.extraMetadata.version=0.12.6` as a CONFIG FILE path and dies
+ * with `ENOENT ... apps\shell\.extraMetadata.version=0.12.6`. Every Windows
+ * release build failed that way. An env var has no argument parsing to lose.
+ */
+const APP_VERSION_ENV = 'GENOFFICE_APP_VERSION'
+
+/**
+ * The version the packaged app reports: the release workflow injects it, and
+ * without it electron-builder ships apps/shell/package.json's version.
  */
 function packagedAppVersion() {
-  const injected = config.extraMetadata && config.extraMetadata.version
+  const injected = process.env[APP_VERSION_ENV]
   if (typeof injected === 'string' && injected.trim()) return injected.trim()
+  const fromConfig = config.extraMetadata && config.extraMetadata.version
+  if (typeof fromConfig === 'string' && fromConfig.trim()) return fromConfig.trim()
   return require('./package.json').version
 }
 
@@ -1676,9 +1690,16 @@ if (!updateUrl && updateRepo) {
   ]
 }
 
-// CI's "-c.extraMetadata.version=..." CLI override deep-merges with this block,
-// so the version and all injected feature settings survive together.
+// Notes: the release version and the injected feature settings are merged into
+// one block here rather than split across a CLI override and this object —
+// see APP_VERSION_ENV above for why the CLI route is not usable on Windows.
 const extraMetadata = {}
+// The release version, when the workflow injected one. Without this the app
+// would report apps/shell/package.json's version and electron-updater would
+// compare a fresh release against a stale local number — it would either
+// re-download the same build forever or refuse a genuine update.
+const injectedVersion = (process.env[APP_VERSION_ENV] || '').trim()
+if (injectedVersion) extraMetadata.version = injectedVersion
 if (ga4MeasurementId && ga4ApiSecret) {
   extraMetadata.genofficeAnalytics = {
     measurementId: ga4MeasurementId,
