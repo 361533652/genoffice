@@ -22,7 +22,8 @@
   --pdf-swatch-ring: rgb(0 0 0 / 15%);
   --pdf-scroll-thumb: rgb(0 0 0 / 25%);
 
-  /* content-side constants: pages are paper, page overlays sit on paper 鈥?   * these never follow the theme */
+  /* content-side constants: pages are paper, page overlays sit on paper —
+   * these never follow the theme */
   --pdf-paper: #fff;
   --pdf-on-accent: #fff;
   --pdf-select: #c43e1c;
@@ -74,12 +75,12 @@
   --pdf-shadow-popup: 0 4px 16px rgb(0 0 0 / 15%);
   --pdf-shadow-toast: 0 4px 16px rgb(0 0 0 / 25%);
   --pdf-shadow-modal: 0 3px 30px rgb(0 0 0 / 8%);
-  /* dim behind the conversion progress card; light page, so a soft scrim */
-  --pdf-overlay-dim: rgb(0 0 0 / 18%);
   --pdf-shadow-modal-gs: 0 12px 40px rgb(0 0 0 / 16%);
   --pdf-input-focus: #0f7fff;
   --pdf-input-ring: rgb(15 127 255 / 10%);
   --pdf-error-ring: rgb(239 68 68 / 10%);
+  /* scrim behind the conversion progress card (light page: a soft dim) */
+  --pdf-overlay-dim: rgb(0 0 0 / 18%);
   --pdf-shadow-page: 0 1px 4px rgb(0 0 0 / 18%);
   --pdf-shadow-pin: 0 1px 4px rgb(0 0 0 / 30%);
   --pdf-shadow-drop: 0 6px 20px rgb(0 0 0 / 14%), 0 1px 3px rgb(0 0 0 / 8%);
@@ -109,7 +110,7 @@
   --pdf-input-focus: #4a9eff;
   --pdf-input-ring: rgb(74 158 255 / 20%);
   --pdf-error-ring: rgb(242 139 130 / 20%);
-  /* a dark page needs a heavier scrim for the progress card to stand out */
+  /* a dark page needs a heavier scrim for the progress card to read */
   --pdf-overlay-dim: rgb(0 0 0 / 45%);
 }
 
@@ -137,7 +138,7 @@
     --pdf-input-focus: #4a9eff;
     --pdf-input-ring: rgb(74 158 255 / 20%);
     --pdf-error-ring: rgb(242 139 130 / 20%);
-    /* a dark page needs a heavier scrim for the progress card to stand out */
+    /* a dark page needs a heavier scrim for the progress card to read */
     --pdf-overlay-dim: rgb(0 0 0 / 45%);
   }
 }
@@ -261,7 +262,7 @@ button {
   flex-shrink: 0;
 }
 
-/* 鈹€鈹€ ribbon tab strip (docs/Word-style: semibold labels, accent underline on the active tab) 鈹€鈹€ */
+/* ── ribbon tab strip (docs/Word-style: semibold labels, accent underline on the active tab) ── */
 .ribbon-tab {
   position: relative;
   border: none;
@@ -306,7 +307,7 @@ button {
      band */
   height: 80px;
   /* `scroll`, not `auto`: styled scrollbars are classic (non-overlay), so
-     `scroll` keeps the 5px lane reserved even without overflow 鈥?the content
+     `scroll` keeps the 5px lane reserved even without overflow — the content
      area never changes and crossing the overflow threshold cannot cause a
      vertical layout jump (same reasoning as .ai-attachments). */
   overflow-x: scroll;
@@ -377,7 +378,7 @@ button {
   align-items: center;
   justify-content: center;
   color: var(--text-primary);
-  /* hover/active plate box: sheets .tool-icon-row parity 鈥?stretches edge to
+  /* hover/active plate box: sheets .tool-icon-row parity — stretches edge to
      edge of the button and rounds, while the label below stays outside */
   align-self: stretch;
   border-radius: 4px;
@@ -394,12 +395,12 @@ button {
   cursor: default;
 }
 
-/* Active state paints only the gray icon plate 鈥?label/ink stays the standard color */
+/* Active state paints only the gray icon plate — label/ink stays the standard color */
 .rb-big.active .rb-big-icon {
   background: var(--active-bg);
 }
 
-/* AI button: brand logo only 鈥?no accent plate behind the icon, label stays black (same as docs) */
+/* AI button: brand logo only — no accent plate behind the icon, label stays black (same as docs) */
 .rb-big.rb-ai {
   font-size: 11px;
   font-weight: 500;
@@ -486,7 +487,7 @@ button {
   background: var(--hover);
 }
 
-/* ---- Compact ribbon (鈱モ寴K / Ctrl+Alt+K), docs parity, see #362 ----
+/* ---- Compact ribbon (⌥⌘K / Ctrl+Alt+K), docs parity, see #362 ----
  * The middle density: the band stays and every command stays reachable, it
  * just drops to icon-only on a shorter band. The band keeps the HARD-fixed
  * height contract (switching tabs, including the contextual fill/form tabs,
@@ -537,7 +538,7 @@ button {
 }
 
 /* `.rb-col` stacks two rows (the page-number/zoom block) that cannot fit a
- * short band 鈥?side by side, exactly the docs treatment of .rb-col. */
+ * short band — side by side, exactly the docs treatment of .rb-col. */
 .ribbon-compact .rb-col {
   flex-direction: row;
   align-items: center;
@@ -637,7 +638,7 @@ button {
   white-space: nowrap;
 }
 
-/* 鈹€鈹€ Thumbnail context menu 鈹€鈹€ */
+/* ── Thumbnail context menu ── */
 
 .thumb-menu {
   position: fixed;
@@ -678,7 +679,7 @@ button {
   background: var(--border);
 }
 
-/* 鈹€鈹€ Markup floating bar for selected text 鈹€鈹€ */
+/* ── Markup floating bar for selected text ── */
 
 .pdf-sel-popup {
   position: fixed;
@@ -742,7 +743,7 @@ button {
   text-decoration: line-through;
 }
 
-/* 鈹€鈹€ Unsaved markup overlay 鈹€鈹€ */
+/* ── Unsaved markup overlay ── */
 
 /* pointer-events: none so the text underneath stays selectable (stacking more
    markups on already-marked text); clicks select via hit-testing in App.tsx */
@@ -762,7 +763,7 @@ button {
   background-position: 0 46%;
 }
 
-/* 鈹€鈹€ Annotation selection (click selects; deletion via the popup or Delete key) 鈹€鈹€ */
+/* ── Annotation selection (click selects; deletion via the popup or Delete key) ── */
 
 .pdf-markup-selected,
 .pdf-markup-selected:hover,
@@ -842,7 +843,7 @@ button {
   box-shadow: var(--pdf-shadow-popup);
 }
 
-/* 鈹€鈹€ Transient toast (deleted annotation + undo) 鈹€鈹€ */
+/* ── Transient toast (deleted annotation + undo) ── */
 
 .pdf-toast {
   position: fixed;
@@ -882,7 +883,7 @@ button {
   max-width: min(70vw, 560px);
 }
 
-/* 鈹€鈹€ AcroForm form overlay 鈹€鈹€ */
+/* ── AcroForm form overlay ── */
 
 .pdf-form-layer {
   position: absolute;
@@ -1036,7 +1037,7 @@ button {
 }
 
 /* Choice widget: shared dropdown (@genoffice/ui gs-dd) sized to the AcroForm
- * rect 鈥?the wrapper carries the absolute position, the trigger the field look */
+ * rect — the wrapper carries the absolute position, the trigger the field look */
 .pdf-form-select {
   position: absolute;
   box-sizing: border-box;
@@ -1084,7 +1085,7 @@ button {
   user-select: none;
 }
 
-/* drag handle between the sidebar and the page area 鈥?resize the sidebar
+/* drag handle between the sidebar and the page area — resize the sidebar
  * horizontally (overlaps the pane's right border; cursor-only affordance),
  * same pattern as slides' .thumb-resizer */
 .pdf-side-resizer {
@@ -1161,7 +1162,7 @@ button {
   font-weight: 600;
 }
 
-/* the page stays ltr under an RTL UI 鈥?the chrome mirrors, the content does not */
+/* the page stays ltr under an RTL UI — the chrome mirrors, the content does not */
 
 .pdf-scroll {
   direction: ltr;
@@ -1246,7 +1247,7 @@ button {
   top: 0;
 }
 
-/* 鈹€鈹€ Outline sidebar 鈹€鈹€ */
+/* ── Outline sidebar ── */
 
 .pdf-outline-pane {
   display: flex;
@@ -1364,10 +1365,10 @@ button {
   color: var(--text-muted);
 }
 
-/* 鈹€鈹€ Encrypted document password 鈹€鈹€ */
+/* ── Encrypted document password ── */
 
 /* ---- encrypted-PDF password dialog (Genspark DS form dialog, matching the
-   docs PasswordDialog and mockups/protect-dialogs-genspark.html 搂1/2) ---- */
+   docs PasswordDialog and mockups/protect-dialogs-genspark.html §1/2) ---- */
 
 /* base .pdf-modal-mask (defined below) top-aligns dialogs; this one centers */
 .pdf-modal-mask.pdf-pwd-mask {
@@ -1532,7 +1533,7 @@ button {
   margin-right: 6px;
 }
 
-/* 鈹€鈹€ Generic small dialogs (extract range etc.) 鈹€鈹€ */
+/* ── Generic small dialogs (extract range etc.) ── */
 
 .pdf-modal-mask {
   position: absolute;
@@ -1822,7 +1823,7 @@ button {
   color: var(--color-btn-primary-text);
 }
 
-/* 鈹€鈹€ Full-text search 鈹€鈹€ */
+/* ── Full-text search ── */
 
 .pdf-search-bar {
   position: absolute;
@@ -1892,7 +1893,7 @@ button {
   outline: 1.5px solid var(--pdf-search-hit-cur-outline);
 }
 
-/* 鈹€鈹€ Drawing annotation layer 鈹€鈹€ */
+/* ── Drawing annotation layer ── */
 
 .pdf-draw-layer {
   position: absolute;
@@ -2223,7 +2224,7 @@ button {
   opacity: 0.75;
 }
 
-/* 鈹€鈹€ WPS-style comments margin: cards beside the page, leader lines to their pins 鈹€鈹€ */
+/* ── WPS-style comments margin: cards beside the page, leader lines to their pins ── */
 
 .pdf-note-margin {
   position: relative;
@@ -2466,7 +2467,7 @@ button {
   font-size: 12.5px;
 }
 
-/* 鈹€鈹€ Text edit (content-stream replacement) 鈹€鈹€ */
+/* ── Text edit (content-stream replacement) ── */
 
 /* Covers the original run with page background; the saved PDF gets the real rewrite */
 /* Blanks the matched run's real ink; the preview/editor boxes only cover the layout rect */
@@ -2646,7 +2647,7 @@ button {
 }
 
 /* Block (paragraph) editor: width is locked to the block, so the textarea's own
-   soft wrap is the reflow preview 鈥?no x-scroll, break anywhere like the committed
+   soft wrap is the reflow preview — no x-scroll, break anywhere like the committed
    CJK-aware wrap */
 .pdf-textedit-editor .pdf-textedit-input.pdf-textedit-block {
   overflow: hidden;
@@ -2656,7 +2657,7 @@ button {
 
 /* Selection-color mirror: sits exactly over the textarea (same box metrics, border
    kept but transparent) and paints the per-run colors while the textarea's own text
-   is transparent 鈥?caret and selection highlight stay the textarea's */
+   is transparent — caret and selection highlight stay the textarea's */
 .pdf-textedit-editor .pdf-textedit-ghost {
   position: absolute;
   top: 0;
@@ -2816,7 +2817,7 @@ button {
   border-radius: 3px;
 }
 
-/* 鈹€鈹€ Image edit (content-stream image ops) 鈹€鈹€ */
+/* ── Image edit (content-stream image ops) ── */
 
 .pdf-imgedit-layer {
   position: absolute;
@@ -2921,7 +2922,7 @@ button {
   touch-action: none;
 }
 
-/* 鈹€鈹€ Stamp (watermark/header-footer) preview and config 鈹€鈹€ */
+/* ── Stamp (watermark/header-footer) preview and config ── */
 
 .pdf-stamp-preview {
   position: absolute;
@@ -3062,7 +3063,7 @@ button {
   overflow: hidden;
 }
 
-/* 鈹€鈹€ Read-only document properties area 鈹€鈹€ */
+/* ── Read-only document properties area ── */
 
 .pdf-prop-table {
   display: flex;
@@ -3093,7 +3094,7 @@ button {
   white-space: nowrap;
 }
 
-/* 鈹€鈹€ Thumbnail drag-to-reorder 鈹€鈹€ */
+/* ── Thumbnail drag-to-reorder ── */
 
 .pdf-thumb[draggable='true'] {
   cursor: grab;
@@ -3114,7 +3115,7 @@ button {
   background: var(--accent);
 }
 
-/* 鈹€鈹€ Signature dialog 鈹€鈹€ */
+/* ── Signature dialog ── */
 
 .pdf-sign-tabs {
   display: flex;
@@ -3226,7 +3227,7 @@ button {
   cursor: default;
 }
 
-/* 鈹€鈹€ Saved signatures (persisted in userData, reusable across documents) 鈹€鈹€ */
+/* ── Saved signatures (persisted in userData, reusable across documents) ── */
 
 .pdf-sign-saved-label {
   font-size: 11.5px;
@@ -3306,7 +3307,7 @@ button {
   stroke-width: 1.5;
 }
 
-/* 鈹€鈹€ Drawing color split button + palette (same pattern as slides' font color) 鈹€鈹€ */
+/* ── Drawing color split button + palette (same pattern as slides' font color) ── */
 
 .rb-caret {
   flex-shrink: 0;
@@ -3486,7 +3487,7 @@ button {
   border-color: var(--accent);
 }
 
-/* 鈹€鈹€ Link annotation hit areas 鈹€鈹€ */
+/* ── Link annotation hit areas ── */
 
 .pdf-link-layer {
   position: absolute;
@@ -3513,7 +3514,7 @@ button {
   box-shadow: 0 0 0 1px var(--pdf-link-hover-ring);
 }
 
-/* 鈹€鈹€ AI tool rows (unified with docs/slides/sheets) 鈹€鈹€ */
+/* ── AI tool rows (unified with docs/slides/sheets) ── */
 
 /* Collapsible tool-activity group.
    Unlike docs/slides, this app renders the group BEFORE the reply text, so the
@@ -3815,7 +3816,7 @@ button {
   line-height: 1.5;
 }
 
-/* 鈹€鈹€ Print container: hidden on screen, the only thing shown when printing 鈹€鈹€ */
+/* ── Print container: hidden on screen, the only thing shown when printing ── */
 
 .pdf-print-root {
   display: none;
@@ -3850,7 +3851,7 @@ button {
   }
 }
 
-/* 鈹€鈹€ AI sidebar (aligned with docs/sheets panel language) 鈹€鈹€ */
+/* ── AI sidebar (aligned with docs/sheets panel language) ── */
 
 /* dock wrapper: its width animates between the panel and the 34px collapsed rail
  * (docs-parity 180ms ease); the panel inside keeps its natural width and is clipped */
@@ -3930,7 +3931,7 @@ button {
   color: var(--color-text-primary);
 }
 
-/* drag handle on the panel's right edge 鈥?resize the panel horizontally */
+/* drag handle on the panel's right edge — resize the panel horizontally */
 .ai-panel-resizer {
   position: absolute;
   right: 0;
@@ -4132,7 +4133,7 @@ button {
   margin-bottom: 0;
 }
 
-/* blank markdown paragraphs would each eat a 16px margin 鈥?the stream never renders them */
+/* blank markdown paragraphs would each eat a 16px margin — the stream never renders them */
 .ai-md p:empty {
   display: none;
 }
@@ -4524,7 +4525,7 @@ button {
   }
 }
 
-/* Composer floats over the chat scroll area 鈥?no top border (agent-shell 搂4.6) */
+/* Composer floats over the chat scroll area — no top border (agent-shell §4.6) */
 .ai-composer {
   border-top: none;
   padding: 8px 12px 12px;
@@ -4532,7 +4533,7 @@ button {
   font-family: var(--gs-font-sans);
 }
 
-/* composer card 鈥?16px radius, default border, production float shadow */
+/* composer card — 16px radius, default border, production float shadow */
 .ai-input-box {
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-16);
@@ -4587,7 +4588,7 @@ button {
 }
 
 /* icon-only enter key: transparent button chrome, visuals come from brand-supplied PNGs
- * (gray arrow = disabled, black arrow = enabled), 36脳36, same as the other AI panels */
+ * (gray arrow = disabled, black arrow = enabled), 36×36, same as the other AI panels */
 .ai-send-btn {
   display: inline-flex;
   align-items: center;
@@ -4632,7 +4633,7 @@ button {
   filter: brightness(0.92);
 }
 
-/* 鈹€鈹€ pdfjs text layer (select/copy); structure requirements per pdfjs TextLayer 鈹€鈹€ */
+/* ── pdfjs text layer (select/copy); structure requirements per pdfjs TextLayer ── */
 
 /* Matches pdf.js's official text_layer.css: spans laid out in unrotated page space,
    whole layer rotated via data-main-rotation; font size/scale driven by --font-height/--scale-x vars */
@@ -4818,7 +4819,7 @@ button {
   text-align: right;
 }
 
-/* body row (AI dock + content column) 鈥?the status bar spans only the content
+/* body row (AI dock + content column) — the status bar spans only the content
    column so the dock runs the full height of the window */
 .app-main {
   display: flex;
@@ -4833,7 +4834,7 @@ button {
   min-width: 0;
 }
 
-/* 鈹€鈹€ Digital signatures: banner, panel, certificate dialog 鈹€鈹€ */
+/* ── Digital signatures: banner, panel, certificate dialog ── */
 
 .pdf-sig-banner {
   display: flex;
@@ -5098,12 +5099,9 @@ button {
   font-size: 12px;
 }
 
-/* 鈹€鈹€ Conversion progress overlay 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
- * A PDF conversion is a long CPU-bound run in the shell's main process. The
- * overlay is the only feedback the user gets while it works, so it sits above
- * everything and must not be dismissable mid-run. Colors come from the shared
- * tokens per CLAUDE.md. */
-
+/* Conversion progress card. A PDF conversion is a long CPU-bound run in the
+ * shell's main process; this overlay is the only feedback while it works, so it
+ * covers everything and offers no way to dismiss it mid-run. */
 .convert-overlay {
   position: fixed;
   inset: 0;

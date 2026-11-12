@@ -565,8 +565,8 @@ export default function App() {
   const [convertOpen, setConvertOpen] = useState(false)
   const [convertBusy, setConvertBusy] = useState(false)
   // live tick from the shell while a conversion runs: the pipeline reports once
-  // per page and per pass, so the overlay can show real progress instead of a
-  // spinner that means "something is happening, probably"
+  // per page in each pass, so the overlay shows real progress rather than a
+  // spinner whose only meaning is "something is happening"
   const [convertProgress, setConvertProgress] = useState<PdfConvertProgress | null>(null)
   const [drawings, setDrawings] = useState<LocalDrawing[]>([])
   const drawingsRef = useRef(drawings)
@@ -7624,6 +7624,22 @@ export default function App() {
     return () => el.removeEventListener('wheel', onWheel)
   })
 
+  // Progress ticks for a running conversion. Clearing on unmount keeps a closed
+  // tab from leaving a stuck overlay behind. The effect must not RETURN the
+  // optional unsubscriber directly: `?.()` can yield undefined, and an effect
+  // that returns a non-function is a React invariant violation that takes the
+  // whole tree down (a blank window, not just a missing overlay).
+  //
+  // It also has to sit ABOVE the `status` early returns below: a hook after a
+  // conditional return changes the hook count between renders, which is the
+  // same class of crash (React #310).
+  useEffect(() => {
+    const off = window.pdfApi.onConvertProgress?.((progress) => setConvertProgress(progress))
+    return () => {
+      off?.()
+    }
+  }, [])
+
   if (status === 'password') {
     return (
       <div className="app">
@@ -7689,13 +7705,6 @@ export default function App() {
       setConvertProgress(null)
     }
   }
-
-  // Progress ticks for a running conversion. The shell drops a tick when the
-  // conversion starts and one per page in each pass; clearing on unmount keeps
-  // a closed tab from leaving a stuck overlay behind.
-  useEffect(() => {
-    return window.pdfApi.onConvertProgress?.((progress) => setConvertProgress(progress))
-  }, [])
 
   // ── shared ribbon groups (rendered on more than one tab) ──
   // mousedown preventDefault: the browser clears the text selection the instant the button is pressed, so applyMarkup would lose it
@@ -11219,11 +11228,10 @@ export default function App() {
                 onSigned={(path) => void adoptSignedFile(path)}
               />
             )}
-            {/* Conversion progress. The pipeline runs two passes over every
-                page (extract, then analyze/OCR), so the bar is split in half:
-                a first pass that quietly fills one half and then appears to
-                stall would read as a hang. Sits above the dialogs on purpose —
-                nothing else should be reachable while a file is converting. */}
+            {/* Conversion progress. The bar fills 0-50% while pages are
+                extracted and 50-100% while they are analyzed, so a long second
+                pass never looks like a stall. Above the dialogs on purpose:
+                nothing else should be reachable mid-conversion. */}
             {convertProgress && (
               <div className="convert-overlay">
                 <div className="convert-card">
@@ -11232,7 +11240,6 @@ export default function App() {
                     <div
                       className="convert-bar"
                       style={{
-                        // extract fills the first half, analyze the second
                         width: `${Math.round(
                           (convertProgress.phase === 'extract' ? 0 : 50) +
                             (convertProgress.page / Math.max(1, convertProgress.total)) * 50,
