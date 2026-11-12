@@ -80,7 +80,7 @@ export function ensurePdfium(): Promise<PdfiumModule> {
 /** Convert a PDF file on disk to docx bytes, fully locally. */
 export async function convertPdfFileToDocxLocal(
   pdfPath: string,
-  onProgress?: (page: number, total: number) => void,
+  onProgress?: (page: number, total: number, phase: 'extract' | 'analyze') => void,
   password?: string,
 ): Promise<ConvertResult> {
   const pdfium = await ensurePdfium()
@@ -130,7 +130,7 @@ export async function convertWithPasswordRetry<T>(
 export function convertPdfFileToDocxLocalWithPrompt(
   pdfPath: string,
   promptPassword: (retry: boolean) => Promise<string | null>,
-  onProgress?: (page: number, total: number) => void,
+  onProgress?: (page: number, total: number, phase: 'extract' | 'analyze') => void,
 ): Promise<ConvertResult | null> {
   return convertWithPasswordRetry(
     (password) => convertPdfFileToDocxLocal(pdfPath, onProgress, password),

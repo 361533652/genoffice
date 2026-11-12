@@ -30,7 +30,7 @@ export async function convertPdfToXlsx(
   pdf: Uint8Array,
   opts: ConvertOptions,
 ): Promise<ConvertXlsxResult> {
-  const { irPages, warnings, pageResults, furnitureHf } = extractIrDocument(pdf, {
+  const { irPages, warnings, pageResults, furnitureHf } = await extractIrDocument(pdf, {
     ...opts,
     cellData: true,
   })

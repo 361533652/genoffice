@@ -29,7 +29,7 @@ export async function convertPdfToPptx(
   pdf: Uint8Array,
   opts: ConvertOptions,
 ): Promise<ConvertPptxResult> {
-  const { irPages, warnings, pageResults } = extractIrDocument(pdf, {
+  const { irPages, warnings, pageResults } = await extractIrDocument(pdf, {
     ...opts,
     absoluteLayout: true,
   })

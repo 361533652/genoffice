@@ -44,7 +44,7 @@ export async function convertPdfToDocx(
   pdf: Uint8Array,
   opts: ConvertOptions,
 ): Promise<ConvertResult> {
-  const { irPages, warnings, pageResults, furnitureHf } = extractIrDocument(pdf, opts)
+  const { irPages, warnings, pageResults, furnitureHf } = await extractIrDocument(pdf, opts)
   const docx = await rebuildDocx(irPages, { furnitureHf })
   return {
     docx,

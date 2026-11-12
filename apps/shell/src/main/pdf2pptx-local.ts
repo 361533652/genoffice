@@ -15,7 +15,7 @@ export type { ConvertPptxResult } from '../../../../packages/pdf2docx/src'
 /** Convert a PDF file on disk to pptx bytes, fully locally. */
 export async function convertPdfFileToPptxLocal(
   pdfPath: string,
-  onProgress?: (page: number, total: number) => void,
+  onProgress?: (page: number, total: number, phase: 'extract' | 'analyze') => void,
   password?: string,
 ): Promise<ConvertPptxResult> {
   const pdfium = await ensurePdfium()
@@ -36,7 +36,7 @@ export async function convertPdfFileToPptxLocal(
 export function convertPdfFileToPptxLocalWithPrompt(
   pdfPath: string,
   promptPassword: (retry: boolean) => Promise<string | null>,
-  onProgress?: (page: number, total: number) => void,
+  onProgress?: (page: number, total: number, phase: 'extract' | 'analyze') => void,
 ): Promise<ConvertPptxResult | null> {
   return convertWithPasswordRetry(
     (password) => convertPdfFileToPptxLocal(pdfPath, onProgress, password),

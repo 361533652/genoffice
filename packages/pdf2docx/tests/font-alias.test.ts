@@ -49,7 +49,7 @@ describe('PDF font aliases in DOCX', () => {
   ])('keeps %s resolved as %s from font metadata to rFonts', async (psName, family) => {
     const pdfium = await loadPdfium()
     const pdf = fontMetadataPdf(psName!)
-    const ir = extractIrDocument(pdf, { pdfium })
+    const ir = await extractIrDocument(pdf, { pdfium })
     const spans = ir.irPages.flatMap((p) =>
       p.blocks.flatMap((b) => (b.kind === 'text' ? b.lines.flatMap((l) => l.spans) : [])),
     )

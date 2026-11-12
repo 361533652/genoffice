@@ -15,7 +15,7 @@ export type { ConvertXlsxResult } from '../../../../packages/pdf2docx/src'
 /** Convert a PDF file on disk to xlsx bytes, fully locally. */
 export async function convertPdfFileToXlsxLocal(
   pdfPath: string,
-  onProgress?: (page: number, total: number) => void,
+  onProgress?: (page: number, total: number, phase: 'extract' | 'analyze') => void,
   password?: string,
 ): Promise<ConvertXlsxResult> {
   const pdfium = await ensurePdfium()
@@ -36,7 +36,7 @@ export async function convertPdfFileToXlsxLocal(
 export function convertPdfFileToXlsxLocalWithPrompt(
   pdfPath: string,
   promptPassword: (retry: boolean) => Promise<string | null>,
-  onProgress?: (page: number, total: number) => void,
+  onProgress?: (page: number, total: number, phase: 'extract' | 'analyze') => void,
 ): Promise<ConvertXlsxResult | null> {
   return convertWithPasswordRetry(
     (password) => convertPdfFileToXlsxLocal(pdfPath, onProgress, password),

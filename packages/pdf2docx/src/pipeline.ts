@@ -15,6 +15,7 @@ import {
   renderPageByIndexPng,
   renderPageWithoutTextPng,
   withPdfDocument,
+  withPdfDocumentAsync,
 } from './extract'
 import type { ExtractedPage, PdfiumModule } from './extract'
 import type { IrPage, PageBlock, PageRender, TextBlock } from './ir'
@@ -24,7 +25,11 @@ import { tryOcrScannedPage, type OcrEngine } from './ocr'
 export interface ConvertOptions {
   /** initialized @embedpdf/pdfium module (see package header comment) */
   pdfium: PdfiumModule
-  onProgress?: (page: number, total: number) => void
+  /**
+   * Called once per page in BOTH passes. `phase` lets a caller reset a progress
+   * bar between them instead of seeing it run 0→100 twice.
+   */
+  onProgress?: (page: number, total: number, phase: 'extract' | 'analyze') => void
   /** raster scale for fallback page renders (pixels per point), default 2 */
   renderScale?: number
   /** user password for encrypted PDFs (P22); load failures throw PdfLoadError */
@@ -295,17 +300,38 @@ export function isScannedDocument(pageResults: PageResult[], pages: number): boo
   return pages > 0 && scannedPages > pages / 2
 }
 
-export function extractIrDocument(pdf: Uint8Array, opts: ConvertOptions): IrDocument {
+/**
+ * Hand control back to the event loop between pages.
+ *
+ * A conversion is one long synchronous run of PDFium calls, and callers drive
+ * it from Electron's main process — which means a synchronous pipeline freezes
+ * every window and cannot paint the progress it is reporting. Awaiting between
+ * pages costs a few milliseconds each and keeps the app responsive.
+ *
+ * `setImmediate` where the host has it (Node, so the shell); `setTimeout(0)`
+ * elsewhere. A microtask would not do: it runs before the event loop can paint.
+ */
+function yieldToEventLoop(): Promise<void> {
+  return new Promise((resolve) => {
+    if (typeof setImmediate === 'function') setImmediate(resolve)
+    else setTimeout(resolve, 0)
+  })
+}
+
+export async function extractIrDocument(
+  pdf: Uint8Array,
+  opts: ConvertOptions,
+): Promise<IrDocument> {
   const m = opts.pdfium
   const irPages: IrPage[] = []
   const warnings: string[] = []
   const pageResults: PageResult[] = []
   let furnitureHf: FurnitureHf[] = []
 
-  withPdfDocument(
+  await withPdfDocumentAsync(
     m,
     pdf,
-    (doc) => {
+    async (doc) => {
       const total = m._FPDF_GetPageCount(doc)
       // a document that opens but exposes ZERO pages is unreadable in practice
       // (e.g. PDF 2.0 BrotliDecode page trees PDFium cannot decompress) — a
@@ -320,6 +346,9 @@ export function extractIrDocument(pdf: Uint8Array, opts: ConvertOptions): IrDocu
             cellData: opts.cellData,
           }),
         )
+        // the extraction pass is usually the expensive one (page rendering)
+        opts.onProgress?.(i + 1, total, 'extract')
+        await yieldToEventLoop()
       }
 
       // P6: the source document renders its headers/footers/page numbers onto
@@ -526,7 +555,10 @@ export function extractIrDocument(pdf: Uint8Array, opts: ConvertOptions): IrDocu
               : {}),
         })
         irPages.push(page)
-        opts.onProgress?.(i + 1, total)
+        opts.onProgress?.(i + 1, total, 'analyze')
+        // analysis + OCR is the other expensive pass: yield here too so the
+        // reported percentage actually reaches the screen
+        await yieldToEventLoop()
       }
 
       // P19 canvas classifier: high-confidence slide pages leave the flow path

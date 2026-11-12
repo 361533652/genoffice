@@ -93,7 +93,7 @@ describe('graphics-lost page in absolute layout', () => {
     const docx = await convertPdfToDocx(pdf, { pdfium })
     expect(docx.pageResults[0]).toMatchObject({ status: 'degraded', reason: 'graphics-lost' })
 
-    const { irPages, pageResults, warnings } = extractIrDocument(pdf, {
+    const { irPages, pageResults, warnings } = await extractIrDocument(pdf, {
       pdfium,
       absoluteLayout: true,
     })
@@ -257,7 +257,10 @@ describe('cross-page paragraph stitching in absolute layout', () => {
 
   it('no page flows from the previous one and no block takes in the next page', async () => {
     const pdfium = await loadPdfium()
-    const { irPages } = extractIrDocument(await runningTextPdf(), { pdfium, absoluteLayout: true })
+    const { irPages } = await extractIrDocument(await runningTextPdf(), {
+      pdfium,
+      absoluteLayout: true,
+    })
     expect(irPages).toHaveLength(PAGES)
     expect(irPages.filter((page) => page.flowsFromPrev)).toEqual([])
     const stitched = irPages.flatMap((page) =>

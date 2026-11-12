@@ -45,7 +45,7 @@ import { familyFromPsName, italicFromPsName, SUBSET_PREFIX, weightFromPsName } f
 import type { PsNameWeight } from './fontname'
 import { encodeRgbaPng } from './png'
 
-export { withPdfDocument, withAlloc, PdfLoadError } from './pdfium'
+export { withPdfDocument, withPdfDocumentAsync, withAlloc, PdfLoadError } from './pdfium'
 export type { PdfiumModule, PdfLoadErrorCode } from './pdfium'
 export { encodeRgbaPng } from './png'
 export { familyFromPsName } from './fontname'

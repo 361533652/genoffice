@@ -142,6 +142,7 @@ import type {
   PrintDuplex,
   PrinterInfo,
   PrinterOption,
+  PdfConvertProgress,
 } from '../shared/ipc'
 import { mayChangeProtection } from './protection-gate'
 import { PasswordDialog } from './PasswordDialog'
@@ -563,6 +564,10 @@ export default function App() {
   const [highlightColorOpen, setHighlightColorOpen] = useState(false)
   const [convertOpen, setConvertOpen] = useState(false)
   const [convertBusy, setConvertBusy] = useState(false)
+  // live tick from the shell while a conversion runs: the pipeline reports once
+  // per page and per pass, so the overlay can show real progress instead of a
+  // spinner that means "something is happening, probably"
+  const [convertProgress, setConvertProgress] = useState<PdfConvertProgress | null>(null)
   const [drawings, setDrawings] = useState<LocalDrawing[]>([])
   const drawingsRef = useRef(drawings)
   drawingsRef.current = drawings
@@ -7681,8 +7686,16 @@ export default function App() {
       // No shell conversion flow in standalone mode; shell-side errors show their own dialogs
     } finally {
       setConvertBusy(false)
+      setConvertProgress(null)
     }
   }
+
+  // Progress ticks for a running conversion. The shell drops a tick when the
+  // conversion starts and one per page in each pass; clearing on unmount keeps
+  // a closed tab from leaving a stuck overlay behind.
+  useEffect(() => {
+    return window.pdfApi.onConvertProgress?.((progress) => setConvertProgress(progress))
+  }, [])
 
   // ── shared ribbon groups (rendered on more than one tab) ──
   // mousedown preventDefault: the browser clears the text selection the instant the button is pressed, so applyMarkup would lose it
@@ -11205,6 +11218,36 @@ export default function App() {
                 onCancel={() => setCertSignDlg(false)}
                 onSigned={(path) => void adoptSignedFile(path)}
               />
+            )}
+            {/* Conversion progress. The pipeline runs two passes over every
+                page (extract, then analyze/OCR), so the bar is split in half:
+                a first pass that quietly fills one half and then appears to
+                stall would read as a hang. Sits above the dialogs on purpose —
+                nothing else should be reachable while a file is converting. */}
+            {convertProgress && (
+              <div className="convert-overlay">
+                <div className="convert-card">
+                  <div className="convert-title">{t('exporting')}</div>
+                  <div className="convert-track">
+                    <div
+                      className="convert-bar"
+                      style={{
+                        // extract fills the first half, analyze the second
+                        width: `${Math.round(
+                          (convertProgress.phase === 'extract' ? 0 : 50) +
+                            (convertProgress.page / Math.max(1, convertProgress.total)) * 50,
+                        )}%`,
+                      }}
+                    />
+                  </div>
+                  <div className="convert-detail">
+                    {t('appPageOf', {
+                      current: String(convertProgress.page),
+                      total: String(convertProgress.total),
+                    })}
+                  </div>
+                </div>
+              </div>
             )}
             {signaturesDlg && (
               <SignaturesDialog

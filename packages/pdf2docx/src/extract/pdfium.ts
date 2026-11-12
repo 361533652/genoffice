@@ -347,3 +347,42 @@ export function withPdfDocument<T>(
     m._free(ptr)
   }
 }
+
+/**
+ * Async form of {@link withPdfDocument} for callers that hand each page back
+ * to the event loop.
+ *
+ * The `await` inside the try block is the whole point: the synchronous version
+ * frees the document in `finally` as soon as `fn` returns a promise, which
+ * would close PDFium out from under the work still queued behind it. Awaiting
+ * first means the document stays open until the last page is done.
+ */
+export async function withPdfDocumentAsync<T>(
+  m: PdfiumModule,
+  bytes: Uint8Array,
+  fn: (doc: number) => Promise<T>,
+  password?: string,
+): Promise<T> {
+  const ptr = m._malloc(bytes.length)
+  m.HEAPU8.set(bytes, ptr)
+  let pwPtr = 0
+  if (password !== undefined) {
+    const pw = new TextEncoder().encode(password + '\0')
+    pwPtr = m._malloc(pw.length)
+    m.HEAPU8.set(pw, pwPtr)
+  }
+  const doc = m._FPDF_LoadMemDocument(ptr, bytes.length, pwPtr)
+  if (!doc) {
+    if (pwPtr) m._free(pwPtr)
+    m._free(ptr)
+    const err = m._FPDF_GetLastError()
+    throw new PdfLoadError(classifyLoadError(err), err)
+  }
+  try {
+    return await fn(doc)
+  } finally {
+    m._FPDF_CloseDocument(doc)
+    if (pwPtr) m._free(pwPtr)
+    m._free(ptr)
+  }
+}

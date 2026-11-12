@@ -253,6 +253,7 @@ import {
   setPdfSaveAsInFlight,
 } from '../../../pdf/src/main/pdf-main'
 import { PDF_CHANNELS } from '../../../pdf/src/shared/ipc'
+import type { PdfConvertProgress } from '../../../pdf/src/shared/ipc'
 import { convertPdfFileToDocxLocalWithPrompt, PdfLoadError } from './pdf2docx-local'
 import { convertPdfFileToPptxLocalWithPrompt } from './pdf2pptx-local'
 import { convertPdfFileToXlsxLocalWithPrompt } from './pdf2xlsx-local'
@@ -6455,6 +6456,19 @@ async function exportPdfAsDocxLocal(format: 'docx' | 'md' | 'html' = 'docx'): Pr
     // encrypted PDFs prompt for the password (P23), looping on wrong entries;
     // null result = user cancelled the prompt → abort silently
     const pdfPath = tab.filePath
+    // Two consumers for one progress tick: the taskbar bar (works even when the
+    // window is behind something) and the renderer's own overlay, which is the
+    // only thing the user actually sees while the conversion runs.
+    const sendConvertProgress = (page: number, total: number, phase: 'extract' | 'analyze') => {
+      if (!host || host.isDestroyed() || total <= 0) return
+      host.setProgressBar(page / total)
+      tab?.webContents.send('pdf:convert-progress', {
+        format,
+        page,
+        total,
+        phase,
+      } satisfies PdfConvertProgress)
+    }
     const result = await convertPdfFileToDocxLocalWithPrompt(
       pdfPath,
       (retry) =>
@@ -6476,11 +6490,7 @@ async function exportPdfAsDocxLocal(format: 'docx' | 'md' | 'html' = 'docx'): Pr
             hide: tm('pdfPwdHide'),
           },
         }),
-      (page, total) => {
-        if (host && !host.isDestroyed() && total > 0) {
-          host.setProgressBar(page / total)
-        }
-      },
+      sendConvertProgress,
     )
     if (result === null) return
     if (format === 'docx') await atomicWriteFile(picked.filePath, result.docx)
@@ -6649,10 +6659,15 @@ async function exportPdfAsPptxLocal(): Promise<void> {
             hide: tm('pdfPwdHide'),
           },
         }),
-      (page, total) => {
-        if (host && !host.isDestroyed() && total > 0) {
-          host.setProgressBar(page / total)
-        }
+      (page, total, phase) => {
+        if (!host || host.isDestroyed() || total <= 0) return
+        host.setProgressBar(page / total)
+        tab?.webContents.send('pdf:convert-progress', {
+          format: 'pptx',
+          page,
+          total,
+          phase,
+        } satisfies PdfConvertProgress)
       },
     )
     if (result === null) return
@@ -6760,10 +6775,15 @@ async function exportPdfAsXlsxLocal(): Promise<void> {
             hide: tm('pdfPwdHide'),
           },
         }),
-      (page, total) => {
-        if (host && !host.isDestroyed() && total > 0) {
-          host.setProgressBar(page / total)
-        }
+      (page, total, phase) => {
+        if (!host || host.isDestroyed() || total <= 0) return
+        host.setProgressBar(page / total)
+        tab?.webContents.send('pdf:convert-progress', {
+          format: 'xlsx',
+          page,
+          total,
+          phase,
+        } satisfies PdfConvertProgress)
       },
     )
     if (result === null) return

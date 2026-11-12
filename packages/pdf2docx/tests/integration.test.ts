@@ -35,15 +35,20 @@ describe('integration: latin PDF (pdf-lib fixture)', () => {
   it('converts a two-paragraph text PDF with correct word spacing and paragraph splits', async () => {
     const pdfium = await loadPdfium()
     const pdf = await buildLatinPdf()
-    const progress: Array<[number, number]> = []
+    const progress: Array<[number, number, string]> = []
     const result = await convertPdfToDocx(pdf, {
       pdfium,
-      onProgress: (p, t) => progress.push([p, t]),
+      onProgress: (p, t, phase) => progress.push([p, t, phase]),
     })
 
     expect(result.pages).toBe(1)
     expect(result.warnings).toEqual([])
-    expect(progress).toEqual([[1, 1]])
+    // both passes report, so a caller can drive a bar that fills once instead
+    // of jumping to 100% twice
+    expect(progress).toEqual([
+      [1, 1, 'extract'],
+      [1, 1, 'analyze'],
+    ])
 
     const texts = await paraTexts(result.docx)
     expect(texts).toContain('Sample Document')

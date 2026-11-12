@@ -61,6 +61,8 @@ export const PDF_CHANNELS = {
   saveAsRequest: 'pdf:save-as-request',
   saveAsResult: 'pdf:save-as-result',
   saveAsFlow: 'pdf:save-as-flow',
+  /** progress ticks for a conversion started by the converter dropdown */
+  convertProgress: 'pdf:convert-progress',
   printRequest: 'pdf:print-request',
   print: 'pdf:print',
   printFile: 'pdf:print-file',
@@ -239,6 +241,21 @@ export interface SavedSignature {
 }
 
 export type PdfConvertFormat = 'docx' | 'xlsx' | 'pptx' | 'md' | 'html'
+
+/**
+ * Progress of a running PDF conversion, pushed from the shell main process.
+ *
+ * The conversion itself is a long CPU-bound run: without a visible indicator
+ * the window simply stops responding until it finishes, which reads as a hang.
+ * `phase` separates the two passes the pipeline makes (page extraction, then
+ * analysis/OCR), because a big scan can sit in either for a while.
+ */
+export interface PdfConvertProgress {
+  format: PdfConvertFormat
+  page: number
+  total: number
+  phase: 'extract' | 'analyze'
+}
 
 /** target file type of the AI create_document tool (mirrors the docs app's contract) */
 export type CreateDocumentType = 'docx' | 'pdf' | 'md' | 'html'
@@ -1202,6 +1219,8 @@ export interface PdfApi {
   /** Shell menu Save As → renderer writes pending edits to targetPath only (original untouched) and replies via sendSaveAsResult */
   onSaveAsRequest(handler: (targetPath: string) => void): () => void
   sendSaveAsResult(ok: boolean): void
+  /** progress ticks while the shell converts this PDF; unsubscribe on unmount */
+  onConvertProgress(handler: (progress: PdfConvertProgress) => void): () => void
   /** True while the shell's Save As flow (dialog included) is open — the renderer pauses autosave, since the dialog's window blur would otherwise trigger a save into the original */
   onSaveAsFlow(handler: (inFlight: boolean) => void): () => void
   /** Shell menu Print → renderer runs its print flow (save, rasterize, system dialog) */

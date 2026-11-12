@@ -4,7 +4,7 @@ import type { Lang } from '@genoffice/i18n'
 import type { AiStreamChunk } from '@genoffice/ai-provider'
 import { installDropOpenBridge } from '@genoffice/electron-utils/drop-open'
 import { AI_CHANNELS, PDF_CHANNELS } from '../shared/ipc'
-import type { PdfApi, UiTheme } from '../shared/ipc'
+import type { PdfApi, PdfConvertProgress, UiTheme } from '../shared/ipc'
 
 const api: PdfApi = {
   consumePending: () => ipcRenderer.invoke(PDF_CHANNELS.consumePending),
@@ -83,6 +83,12 @@ const api: PdfApi = {
     return () => ipcRenderer.removeListener(PDF_CHANNELS.saveAsRequest, listener)
   },
   sendSaveAsResult: (ok) => ipcRenderer.send(PDF_CHANNELS.saveAsResult, ok),
+  onConvertProgress: (handler) => {
+    const listener = (_e: Electron.IpcRendererEvent, progress: PdfConvertProgress) =>
+      handler(progress)
+    ipcRenderer.on(PDF_CHANNELS.convertProgress, listener)
+    return () => ipcRenderer.removeListener(PDF_CHANNELS.convertProgress, listener)
+  },
   onSaveAsFlow: (handler) => {
     const listener = (_e: Electron.IpcRendererEvent, inFlight: boolean) => handler(inFlight)
     ipcRenderer.on(PDF_CHANNELS.saveAsFlow, listener)

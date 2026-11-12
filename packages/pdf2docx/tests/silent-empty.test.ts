@@ -103,7 +103,7 @@ describe('P27 A1: flipped media boxes', () => {
     })
     content += 'ET\n'
     const pdf = textPdf('0 0 612 -792', content)
-    const { irPages, pageResults } = extractIrDocument(pdf, { pdfium })
+    const { irPages, pageResults } = await extractIrDocument(pdf, { pdfium })
     expect(irText(irPages)).toContain('quick brown fox')
     expect(pageResults[0]!.status).toBe('ok')
   })
@@ -111,7 +111,7 @@ describe('P27 A1: flipped media boxes', () => {
   it('recovers text when bottom/top are swapped (MediaBox [0 792 612 0])', async () => {
     const pdfium = await loadPdfium()
     const pdf = textPdf('0 792 612 0', bodyContent())
-    const { irPages } = extractIrDocument(pdf, { pdfium })
+    const { irPages } = await extractIrDocument(pdf, { pdfium })
     expect(irText(irPages)).toContain('quick brown fox')
   })
 })
@@ -124,7 +124,7 @@ describe('P27 A2: searchable-scan OCR overlay', () => {
       // render mode 3 = invisible: the classic OCR text layer
       bodyContent('3 Tr ')
     const pdf = textPdf('0 0 612 792', content, '/XObject << /Im1 6 0 R >> ', [rawImageObj(6)])
-    const { irPages, warnings } = extractIrDocument(pdf, { pdfium })
+    const { irPages, warnings } = await extractIrDocument(pdf, { pdfium })
     expect(irText(irPages)).toContain('quick brown fox')
     expect(warnings.some((w) => w.includes('OCR text layer recovered'))).toBe(true)
     // the scan bitmap must NOT ride along (it would paint the words twice)
@@ -138,7 +138,7 @@ describe('P27 A2: searchable-scan OCR overlay', () => {
       bodyContent() +
       'BT /F1 12 Tf 3 Tr 1 0 0 1 72 100 Tm (hidden) Tj ET\n'
     const pdf = textPdf('0 0 612 792', content, '/XObject << /Im1 6 0 R >> ', [rawImageObj(6)])
-    const { warnings } = extractIrDocument(pdf, { pdfium })
+    const { warnings } = await extractIrDocument(pdf, { pdfium })
     expect(warnings.some((w) => w.includes('OCR text layer recovered'))).toBe(false)
   })
 })
@@ -152,7 +152,7 @@ describe('P27 A3: page-covering transparent watermark', () => {
       rawImageObj(6, '/SMask 7 0 R '),
       smaskObj(7),
     ])
-    const { irPages, pageResults } = extractIrDocument(pdf, { pdfium })
+    const { irPages, pageResults } = await extractIrDocument(pdf, { pdfium })
     expect(irText(irPages)).toContain('quick brown fox')
     expect(pageResults[0]!.status).toBe('ok')
   })
@@ -168,7 +168,7 @@ describe('P27 A4: content-lost guard', () => {
     })
     content += 'ET\n'
     const pdf = textPdf('0 0 612 792', content)
-    const { warnings, pageResults } = extractIrDocument(pdf, { pdfium })
+    const { warnings, pageResults } = await extractIrDocument(pdf, { pdfium })
     expect(pageResults[0]!.status).toBe('degraded')
     expect(pageResults[0]!.reason).toBe('content-lost')
     expect(warnings.some((w) => w.includes('content could not be recovered'))).toBe(true)
@@ -177,7 +177,7 @@ describe('P27 A4: content-lost guard', () => {
   it('stays quiet on genuinely blank pages', async () => {
     const pdfium = await loadPdfium()
     const pdf = textPdf('0 0 612 792', '')
-    const { warnings, pageResults } = extractIrDocument(pdf, { pdfium })
+    const { warnings, pageResults } = await extractIrDocument(pdf, { pdfium })
     expect(pageResults[0]!.status).toBe('ok')
     expect(warnings).toEqual([])
   })
@@ -190,7 +190,7 @@ describe('P27: zero-page documents', () => {
       '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n',
       '2 0 obj\n<< /Type /Pages /Kids [] /Count 0 >>\nendobj\n',
     ])
-    expect(() => extractIrDocument(pdf, { pdfium })).toThrowError(
+    await expect(extractIrDocument(pdf, { pdfium })).rejects.toThrow(
       expect.objectContaining({ name: 'PdfLoadError', code: 'corrupt' }),
     )
   })
