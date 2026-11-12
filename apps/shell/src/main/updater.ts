@@ -51,6 +51,8 @@ const tUpd = createI18n({
     updDownload: '立即更新',
     updLater: '最小化',
     updInstall: '立即重启安装',
+    updInstallHint:
+      '安装会关闭 GenOffice，然后由安装程序卸载旧版本、写入新文件，大约需要 2 分钟。过程中会显示安装进度窗口。',
     updDownloading: '正在下载更新…',
     updFailed: '更新下载失败，请检查网络后重试。',
     updRetry: '重试',
@@ -67,6 +69,8 @@ const tUpd = createI18n({
     updDownload: 'Update Now',
     updLater: 'Minimize',
     updInstall: 'Restart & Install',
+    updInstallHint:
+      'Installing closes GenOffice, then the installer removes the old version and writes the new one. It takes about 2 minutes and shows its own progress window.',
     updDownloading: 'Downloading update…',
     updFailed: 'Update download failed. Check your network and try again.',
     updRetry: 'Retry',
@@ -84,6 +88,8 @@ const tUpd = createI18n({
     updDownload: 'Cập nhật ngay',
     updLater: 'Thu nhỏ',
     updInstall: 'Khởi động lại & Cài đặt',
+    updInstallHint:
+      'Quá trình cài đặt sẽ đóng GenOffice, sau đó trình cài đặt gỡ phiên bản cũ và ghi phiên bản mới. Mất khoảng 2 phút và có cửa sổ tiến trình riêng.',
     updDownloading: 'Đang tải xuống bản cập nhật…',
     updFailed: 'Tải xuống bản cập nhật thất bại. Kiểm tra mạng của bạn và thử lại.',
     updRetry: 'Thử lại',
@@ -101,6 +107,8 @@ const tUpd = createI18n({
     updDownload: 'Şimdi Güncelle',
     updLater: 'Simge Durumuna Küçült',
     updInstall: 'Yeniden Başlat ve Yükle',
+    updInstallHint:
+      'Kurulum GenOffice’i kapatır, ardından yükleyici eski sürümü kaldırıp yenisini yazar. Yaklaşık 2 dakika sürer ve kendi ilerleme penceresini gösterir.',
     updDownloading: 'Güncelleme indiriliyor…',
     updFailed: 'Güncelleme indirilemedi. Ağ bağlantınızı kontrol edip yeniden deneyin.',
     updRetry: 'Yeniden Dene',
@@ -118,6 +126,8 @@ const tUpd = createI18n({
     updDownload: '今すぐ更新',
     updLater: '最小化',
     updInstall: '再起動してインストール',
+    updInstallHint:
+      'インストールすると GenOffice は終了し、インストーラーが旧バージョンを削除して新しいファイルを書き込みます。約2分かかり、その間は専用の進捗ウィンドウが表示されます。',
     updDownloading: 'アップデートをダウンロード中…',
     updFailed: 'ダウンロードに失敗しました。ネットワークを確認して再試行してください。',
     updRetry: '再試行',
@@ -135,6 +145,8 @@ const tUpd = createI18n({
     updDownload: '지금 업데이트',
     updLater: '최소화',
     updInstall: '다시 시작 및 설치',
+    updInstallHint:
+      '설치하면 GenOffice가 종료되고, 설치 프로그램이 이전 버전을 제거한 뒤 새 파일을 기록합니다. 약 2분이 걸리며 진행 창이 표시됩니다.',
     updDownloading: '업데이트 다운로드 중…',
     updFailed: '업데이트 다운로드에 실패했습니다. 네트워크를 확인한 후 다시 시도하세요.',
     updRetry: '다시 시도',
@@ -152,6 +164,8 @@ const tUpd = createI18n({
     updDownload: 'Mettre à jour',
     updLater: 'Réduire',
     updInstall: 'Redémarrer et installer',
+    updInstallHint:
+      'L’installation ferme GenOffice, puis l’installateur supprime l’ancienne version et écrit la nouvelle. Cela prend environ 2 minutes et affiche sa propre fenêtre de progression.',
     updDownloading: 'Téléchargement de la mise à jour…',
     updFailed: 'Échec du téléchargement. Vérifiez votre réseau et réessayez.',
     updRetry: 'Réessayer',
@@ -170,6 +184,8 @@ const tUpd = createI18n({
     updDownload: 'Jetzt aktualisieren',
     updLater: 'Minimieren',
     updInstall: 'Neu starten und installieren',
+    updInstallHint:
+      'Die Installation beendet GenOffice, danach entfernt das Setup die alte Version und schreibt die neue. Das dauert etwa 2 Minuten und zeigt ein eigenes Fortschrittsfenster.',
     updDownloading: 'Update wird heruntergeladen…',
     updFailed:
       'Download fehlgeschlagen. Prüfen Sie Ihre Netzwerkverbindung und versuchen Sie es erneut.',
@@ -189,6 +205,8 @@ const tUpd = createI18n({
     updDownload: 'Actualizar ahora',
     updLater: 'Minimizar',
     updInstall: 'Reiniciar e instalar',
+    updInstallHint:
+      'La instalación cierra GenOffice y después el instalador elimina la versión anterior y escribe la nueva. Tarda unos 2 minutos y muestra su propia ventana de progreso.',
     updDownloading: 'Descargando la actualización…',
     updFailed: 'Error al descargar. Compruebe su red e inténtelo de nuevo.',
     updRetry: 'Reintentar',
@@ -205,6 +223,8 @@ const tUpd = createI18n({
     updDownload: 'อัปเดตเลย',
     updLater: 'ย่อเก็บ',
     updInstall: 'รีสตาร์ทและติดตั้ง',
+    updInstallHint:
+      'การติดตั้งจะปิด GenOffice แล้วตัวติดตั้งจะถอนเวอร์ชันเก่าและเขียนไฟล์ใหม่ ใช้เวลาประมาณ 2 นาที และมีหน้าต่างแสดงความคืบหน้าแยกต่างหาก',
     updDownloading: 'กำลังดาวน์โหลดอัปเดต…',
     updFailed: 'ดาวน์โหลดไม่สำเร็จ โปรดตรวจสอบเครือข่ายแล้วลองอีกครั้ง',
     updRetry: 'ลองอีกครั้ง',
@@ -222,6 +242,8 @@ const tUpd = createI18n({
     updDownload: 'Perbarui Sekarang',
     updLater: 'Minimalkan',
     updInstall: 'Mulai Ulang & Pasang',
+    updInstallHint:
+      'Pemasangan menutup GenOffice, lalu penginstal menghapus versi lama dan menulis yang baru. Prosesnya sekitar 2 menit dan menampilkan jendela kemajuannya sendiri.',
     updDownloading: 'Mengunduh pembaruan…',
     updFailed: 'Unduhan gagal. Periksa jaringan Anda dan coba lagi.',
     updRetry: 'Coba Lagi',
@@ -239,6 +261,8 @@ const tUpd = createI18n({
     updDownload: 'Обновить сейчас',
     updLater: 'Свернуть',
     updInstall: 'Перезапустить и установить',
+    updInstallHint:
+      'При установке GenOffice закрывается, затем установщик удаляет старую версию и записывает новую. Это занимает около 2 минут и показывает собственное окно прогресса.',
     updDownloading: 'Загрузка обновления…',
     updFailed: 'Не удалось загрузить обновление. Проверьте сеть и повторите попытку.',
     updRetry: 'Повторить',
@@ -255,6 +279,8 @@ const tUpd = createI18n({
     updDownload: 'التحديث الآن',
     updLater: 'تصغير',
     updInstall: 'إعادة التشغيل والتثبيت',
+    updInstallHint:
+      'عملية التثبيت تُغلق GenOffice، ثم يزيل المُثبِّت الإصدار القديم ويكتب الجديد. يستغرق ذلك نحو دقيقتين ويعرض نافذة تقدّم خاصة به.',
     updDownloading: 'جارٍ تنزيل التحديث…',
     updFailed: 'فشل تنزيل التحديث. تحقق من الشبكة وحاول مرة أخرى.',
     updRetry: 'إعادة المحاولة',
@@ -271,6 +297,8 @@ const tUpd = createI18n({
     updDownload: 'Atualizar agora',
     updLater: 'Minimizar',
     updInstall: 'Reiniciar e instalar',
+    updInstallHint:
+      'A instalação fecha o GenOffice, depois o instalador remove a versão antiga e grava a nova. Leva cerca de 2 minutos e mostra sua própria janela de progresso.',
     updDownloading: 'Baixando a atualização…',
     updFailed: 'Falha no download. Verifique sua rede e tente novamente.',
     updRetry: 'Tentar novamente',
@@ -288,6 +316,8 @@ const tUpd = createI18n({
     updDownload: 'Aggiorna ora',
     updLater: 'Riduci a icona',
     updInstall: 'Riavvia e installa',
+    updInstallHint:
+      'L’installazione chiude GenOffice, poi il programma di installazione rimuove la versione precedente e scrive quella nuova. Richiede circa 2 minuti e mostra una propria finestra di avanzamento.',
     updDownloading: "Download dell'aggiornamento…",
     updFailed: 'Download non riuscito. Controlla la rete e riprova.',
     updRetry: 'Riprova',
@@ -305,6 +335,8 @@ const tUpd = createI18n({
     updDownload: 'Aktualizuj teraz',
     updLater: 'Zminimalizuj',
     updInstall: 'Uruchom ponownie i zainstaluj',
+    updInstallHint:
+      'Instalacja zamyka GenOffice, następnie instalator usuwa poprzednią wersję i zapisuje nową. Trwa to około 2 minuty i pokazuje własne okno postępu.',
     updDownloading: 'Pobieranie aktualizacji…',
     updFailed: 'Pobieranie nie powiodło się. Sprawdź sieć i spróbuj ponownie.',
     updRetry: 'Spróbuj ponownie',
@@ -322,6 +354,8 @@ const tUpd = createI18n({
     updDownload: 'Aktualizovat nyní',
     updLater: 'Minimalizovat',
     updInstall: 'Restartovat a nainstalovat',
+    updInstallHint:
+      'Instalace zavře GenOffice, poté instalační program odebere starou verzi a zapíše novou. Trvá to asi 2 minuty a zobrazuje vlastní okno průběhu.',
     updDownloading: 'Stahování aktualizace…',
     updFailed: 'Stažení aktualizace se nezdařilo. Zkontrolujte síť a zkuste to znovu.',
     updRetry: 'Zkusit znovu',
@@ -339,6 +373,8 @@ const tUpd = createI18n({
     updDownload: 'Nu bijwerken',
     updLater: 'Minimaliseren',
     updInstall: 'Opnieuw starten en installeren',
+    updInstallHint:
+      'Bij het installeren sluit GenOffice, daarna verwijdert het installatieprogramma de oude versie en schrijft de nieuwe. Dat duurt ongeveer 2 minuten en toont een eigen voortgangsvenster.',
     updDownloading: 'Update wordt gedownload…',
     updFailed: 'Download mislukt. Controleer uw netwerk en probeer het opnieuw.',
     updRetry: 'Opnieuw proberen',
@@ -357,6 +393,8 @@ const tUpd = createI18n({
     updDownload: 'Kemas Kini Sekarang',
     updLater: 'Minimumkan',
     updInstall: 'Mula Semula & Pasang',
+    updInstallHint:
+      'Pemasangan menutup GenOffice, kemudian pemasang membuang versi lama dan menulis yang baharu. Ia mengambil masa kira-kira 2 minit dan memaparkan tetingkap kemajuannya sendiri.',
     updDownloading: 'Memuat turun kemas kini…',
     updFailed: 'Muat turun gagal. Semak rangkaian anda dan cuba lagi.',
     updRetry: 'Cuba Lagi',
@@ -373,6 +411,8 @@ const tUpd = createI18n({
     updDownload: 'עדכן עכשיו',
     updLater: 'מזער',
     updInstall: 'הפעל מחדש והתקן',
+    updInstallHint:
+      'ההתקנה סוגרת את GenOffice, ואז המתקין מסיר את הגרסה הקודמת וכותב את החדשה. זה אורך כשתי דקות ומוצג חלון התקדמות נפרד.',
     updDownloading: 'מוריד את העדכון…',
     updFailed: 'ההורדה נכשלה. בדוק את הרשת ונסה שוב.',
     updRetry: 'נסה שוב',
@@ -389,6 +429,8 @@ const tUpd = createI18n({
     updDownload: 'अभी अपडेट करें',
     updLater: 'छोटा करें',
     updInstall: 'पुनरारंभ करें और इंस्टॉल करें',
+    updInstallHint:
+      'इंस्टॉल करने पर GenOffice बंद हो जाता है, फिर इंस्टॉलर पुराना संस्करण हटाकर नई फ़ाइलें लिखता है। इसमें लगभग 2 मिनट लगते हैं और अपनी प्रगति विंडो दिखती है।',
     updDownloading: 'अपडेट डाउनलोड हो रहा है…',
     updFailed: 'डाउनलोड विफल रहा। अपना नेटवर्क जाँचें और पुनः प्रयास करें।',
     updRetry: 'पुनः प्रयास करें',
@@ -405,6 +447,8 @@ const tUpd = createI18n({
     updDownload: '立即更新',
     updLater: '最小化',
     updInstall: '立即重新啟動安裝',
+    updInstallHint:
+      '安裝會關閉 GenOffice，然後由安裝程式解除安裝舊版本、寫入新檔案，大約需要 2 分鐘。過程中會顯示安裝進度視窗。',
     updDownloading: '正在下載更新…',
     updFailed: '更新下載失敗，請檢查網路後重試。',
     updRetry: '重試',
@@ -563,6 +607,7 @@ function uiStrings(): UpdateUiStrings {
     download: tUpd(lang, 'updDownload'),
     later: tUpd(lang, 'updLater'),
     install: tUpd(lang, 'updInstall'),
+    installHint: tUpd(lang, 'updInstallHint'),
     downloading: tUpd(lang, 'updDownloading'),
     failed: tUpd(lang, 'updFailed'),
     retry: tUpd(lang, 'updRetry'),
@@ -693,8 +738,12 @@ export function initAutoUpdater(
   // back off since a beta user switching to stable must not downgrade
   autoUpdater.allowDowngrade = false
   autoUpdater.autoDownload = false
-  // if the user picked "later" after download, install on normal quit
-  autoUpdater.autoInstallOnAppQuit = true
+  // Never install behind the user's back. electron-updater can run the
+  // installer silently when the app quits; that is how a "the app just
+  // uninstalled itself" report happens — the window is gone, the uninstaller
+  // runs, and nothing on screen says so. Installation is now only ever started
+  // from the update card's button, which opens the visible NSIS wizard.
+  autoUpdater.autoInstallOnAppQuit = false
   // Full-package downloads only. The release does publish a .blockmap, but a
   // differential that fails to assemble leaves the user stuck on an old build,
   // and the installer is already small enough that the saving is not worth it.
@@ -775,7 +824,13 @@ export function initAutoUpdater(
       closeUpdateWindow()
       if (latestSeenVersion === null) return
       // let the window fully close before tearing the app down
-      setImmediate(() => autoUpdater.quitAndInstall(true, true))
+      //
+      // isSilent = false on purpose. The installer replaces the app by running
+      // the old version's uninstaller and then extracting ~160 MB, which takes
+      // a couple of minutes; doing that with no window at all left the user
+      // looking at a dead screen with no idea whether anything was happening.
+      // The NSIS assisted installer now shows its own wizard and progress bar.
+      setImmediate(() => autoUpdater.quitAndInstall(false, true))
     },
     onLater: () => {
       dismissedVersion = latestSeenVersion
@@ -843,7 +898,6 @@ export function initAutoUpdater(
       return
     }
     log('downloaded:', info.version)
-    autoUpdater.autoInstallOnAppQuit = true
     downloadInFlight = false
     failedAttempts = 0
     setPhase({ phase: 'downloaded', percent: 100 })

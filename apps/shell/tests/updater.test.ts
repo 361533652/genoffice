@@ -203,7 +203,8 @@ describe('initAutoUpdater', () => {
     const { initAutoUpdater } = await loadUpdater()
     initAutoUpdater(() => null)
     expect(updaterState.autoDownload).toBe(false)
-    expect(updaterState.autoInstallOnAppQuit).toBe(true)
+    // install-on-quit is off: installation only ever starts from the dialog
+    expect(updaterState.autoInstallOnAppQuit).toBe(false)
     expect(updaterState.disableDifferentialDownload).toBe(true)
     expect(checkForUpdates).not.toHaveBeenCalled()
     vi.advanceTimersByTime(FIRST_CHECK_DELAY_MS)
@@ -294,7 +295,7 @@ describe('initAutoUpdater', () => {
     // quitAndInstall is deferred so the window can finish closing first
     expect(quitAndInstall).not.toHaveBeenCalled()
     vi.advanceTimersByTime(0)
-    expect(quitAndInstall).toHaveBeenCalledWith(true, true)
+    expect(quitAndInstall).toHaveBeenCalledWith(false, true)
   })
 
   it('does not re-prompt for a version the user dismissed this session', async () => {
@@ -362,7 +363,6 @@ describe('initAutoUpdater', () => {
     available({ version: '0.2.0' })
     lastShownActions().onDownload()
     updaterState.listeners.get('update-downloaded')!({ version: '0.2.0' })
-    expect(updaterState.autoInstallOnAppQuit).toBe(true)
     lastShownActions().onLater()
 
     applyUpdateChannel('beta')
@@ -384,10 +384,12 @@ describe('initAutoUpdater', () => {
     expect(pushUpdateState).not.toHaveBeenLastCalledWith({ phase: 'downloaded', percent: 100 })
     updaterState.listeners.get('update-downloaded')!({ version: '0.3.0-beta.1' })
     expect(pushUpdateState).toHaveBeenLastCalledWith({ phase: 'downloaded', percent: 100 })
-    expect(updaterState.autoInstallOnAppQuit).toBe(true)
+    // still not armed for install-on-quit: the new channel's package is offered
+    // through the dialog like any other
+    expect(updaterState.autoInstallOnAppQuit).toBe(false)
     lastShownActions().onInstall()
     vi.advanceTimersByTime(0)
-    expect(quitAndInstall).toHaveBeenCalledWith(true, true)
+    expect(quitAndInstall).toHaveBeenCalledWith(false, true)
   })
 
   it('applyUpdateChannel cancels an in-flight download and shields the new one from its leftovers', async () => {
@@ -480,7 +482,8 @@ describe('quiet background updates (genoffice#2389)', () => {
     updaterState.listeners.get('update-downloaded')!({ version: '0.2.0' })
 
     expect(showUpdateWindow).not.toHaveBeenCalled()
-    expect(updaterState.autoInstallOnAppQuit).toBe(true)
+    // ready to install, but nothing installs on quit any more
+    expect(updaterState.autoInstallOnAppQuit).toBe(false)
   })
 
   it('a failed quiet download stays quiet too: the next check retries', async () => {

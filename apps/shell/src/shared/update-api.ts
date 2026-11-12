@@ -28,6 +28,10 @@ export interface UpdateUiStrings {
   download: string
   later: string
   install: string
+  /** what pressing Install actually does: the app closes and the installer
+   *  wizard replaces it, which takes a couple of minutes and shows its own
+   *  window. Without this line the screen just goes blank mid-install. */
+  installHint: string
   downloading: string
   failed: string
   retry: string

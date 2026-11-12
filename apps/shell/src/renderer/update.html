@@ -165,6 +165,19 @@
       #later:hover {
         color: var(--text);
       }
+      /* The install button closes the app and hands over to the installer, so
+         the card says so before the screen goes away. Muted and secondary: it is
+         an explanation, not an action. */
+      #install-hint {
+        display: none;
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--text-muted);
+        text-align: center;
+      }
+      #install-hint.visible {
+        display: block;
+      }
     </style>
   </head>
   <body>
@@ -185,6 +198,7 @@
           <div class="label"><span id="progress-text"></span><span id="percent"></span></div>
         </div>
         <button id="action"></button>
+        <div id="install-hint"></div>
         <button id="later"></button>
       </div>
     </div>

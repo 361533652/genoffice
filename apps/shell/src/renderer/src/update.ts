@@ -13,6 +13,7 @@ const bar = el('bar')
 const progressText = el('progress-text')
 const percentText = el('percent')
 const action = el('action') as HTMLButtonElement
+const installHint = el('install-hint')
 const later = el('later') as HTMLButtonElement
 
 let phase: UpdateUiState['phase'] = 'available'
@@ -29,6 +30,8 @@ function render(state: UpdateUiState): void {
   later.textContent = s.later
 
   desc.classList.toggle('error', state.phase === 'error' || state.phase === 'manual')
+  // reset each render: the note only belongs to the "ready to install" state
+  installHint.classList.remove('visible')
 
   switch (state.phase) {
     case 'available':
@@ -52,6 +55,10 @@ function render(state: UpdateUiState): void {
       progress.style.display = 'none'
       action.style.display = ''
       action.textContent = s.install
+      // Only here: the button actually closes the app, so the note explains the
+      // hand-off to the installer before the window goes away.
+      installHint.textContent = s.installHint
+      installHint.classList.add('visible')
       break
     case 'error':
       desc.textContent = s.failed
