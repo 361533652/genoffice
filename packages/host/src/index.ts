@@ -66,6 +66,16 @@ export interface Host {
   theme(): Promise<'light' | 'dark' | 'system'>
   documentTheme(): Promise<'light' | 'dark' | 'follow'>
   authorName(): Promise<string>
+  /**
+   * Subscribe to a settings change; returns an unsubscribe.
+   *
+   * A host with no shell never publishes any of these — the browser host returns
+   * a no-op unsubscribe rather than making the caller branch on host kind.
+   */
+  onThemeChanged(handler: (theme: 'light' | 'dark' | 'system') => void): () => void
+  onDocumentThemeChanged(handler: (theme: 'light' | 'dark' | 'follow') => void): () => void
+  onLanguageChanged(handler: (lang: HostLanguage) => void): () => void
+  onAuthorNameChanged(handler: (name: string) => void): () => void
   openDocument(kind?: string): Promise<OpenResult>
   saveDocumentAs(data: Uint8Array, suggestedName: string): Promise<OpenResult>
   saveDocumentInPlace(handleId: string, data: Uint8Array): Promise<{ ok: boolean; error?: string }>
@@ -124,6 +134,12 @@ export function resolveHost(): Host {
       openDocument: async () => ({ ok: false, reason: 'unsupported' }),
       saveDocumentAs: async () => ({ ok: false, reason: 'unsupported' }),
       saveDocumentInPlace: async () => ({ ok: false, error: 'use window.desktop on the desktop host' }),
+      // the preload publishes these; forward with the loose language narrowed
+      onThemeChanged: (handler) => preload.onThemeChanged?.(handler) ?? (() => {}),
+      onDocumentThemeChanged: (handler) => preload.onDocumentThemeChanged?.(handler) ?? (() => {}),
+      onLanguageChanged: (handler) =>
+        preload.onLanguageChanged?.((lang) => handler(asHostLanguage(lang))) ?? (() => {}),
+      onAuthorNameChanged: (handler) => preload.onAuthorNameChanged?.(handler) ?? (() => {}),
     }
     return cached
   }
@@ -141,6 +157,12 @@ export function resolveHost(): Host {
     openDocument: (kind) => openViaPicker(kind as never),
     saveDocumentAs: (data, name) => saveViaPicker(data, name),
     saveDocumentInPlace: (id, data) => writeToHandle({ id, name: '' }, data),
+    // nothing publishes settings on a browser host, so these are honest no-ops
+    // rather than a signal the caller has to interpret
+    onThemeChanged: () => () => {},
+    onDocumentThemeChanged: () => () => {},
+    onLanguageChanged: () => () => {},
+    onAuthorNameChanged: () => () => {},
   }
   return cached
 }

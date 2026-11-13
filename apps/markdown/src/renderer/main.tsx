@@ -63,8 +63,8 @@ void (async () => {
   applyTheme(theme)
   applyDocumentTheme(docTheme ?? 'follow')
   applyMarkdownTheme(mdTheme)
-  window.markdownApi.onThemeChanged(applyTheme)
-  window.markdownApi.onDocumentThemeChanged?.(applyDocumentTheme)
+  getHost().onThemeChanged(applyTheme)
+  getHost().onDocumentThemeChanged(applyDocumentTheme)
   await window.markdownApi
     ?.getAiPanelPrefs?.()
     .then(applyAiPanelPrefs)

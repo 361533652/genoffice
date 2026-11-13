@@ -41,7 +41,7 @@ void (async () => {
   document.documentElement.lang = htmlLang(lang as Lang)
   document.documentElement.dir = htmlDir(lang)
   applyTheme(theme)
-  window.pdfApi.onThemeChanged(applyTheme)
+  getHost().onThemeChanged(applyTheme)
   await window.pdfApi
     ?.getAiPanelPrefs?.()
     .then(applyAiPanelPrefs)

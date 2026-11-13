@@ -1,3 +1,4 @@
+import { getHost } from '@genoffice/host'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   Dropdown,
@@ -1366,7 +1367,7 @@ export default function App() {
     // Shell menu Print / ⌘P. The menu owns the accelerator, so this subscription
     // is the only route the keystroke takes; without it ⌘P did nothing at all.
     const offPrint = window.htmlApi.onPrintRequest(() => void runPrint())
-    const offTheme = window.htmlApi.onThemeChanged(() => {
+    const offTheme = getHost().onThemeChanged(() => {
       // let main.tsx flip data-theme first
       window.setTimeout(
         () => previewRef.current?.post({ type: 'gx:theme', dark: isDarkTheme() }),

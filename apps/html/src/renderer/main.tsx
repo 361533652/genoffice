@@ -43,7 +43,7 @@ void (async () => {
   document.documentElement.lang = htmlLang(lang as Lang)
   document.documentElement.dir = htmlDir(lang)
   applyTheme(theme)
-  window.htmlApi.onThemeChanged(applyTheme)
+  getHost().onThemeChanged(applyTheme)
   await window.htmlApi
     ?.getAiPanelPrefs?.()
     .then(applyAiPanelPrefs)

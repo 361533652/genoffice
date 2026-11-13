@@ -5,6 +5,7 @@
  * Function…. Dialog entries hand their ribbon command to the shell through
  * the sink ExcelShell registers; the rest run Univer commands directly.
  */
+import { getHost } from '@genoffice/host'
 import {
   ColorKit,
   CommandType,
@@ -448,7 +449,7 @@ export function installCellContextMenu(runtime: UniverRuntime): IDisposable {
   )
   disposables.push(
     { dispose: () => localeSubscription.unsubscribe() },
-    { dispose: window.desktopApi.onLanguageChanged((lang) => loadMenuLocale(localeService, lang)) },
+    { dispose: getHost().onLanguageChanged((lang) => loadMenuLocale(localeService, lang)) },
   )
   const header = schemaFor(headerContextMenuLayout())
   injector.get(IMenuManagerService).mergeMenu({
