@@ -52,10 +52,24 @@ export function rawFileFor(id: string): File | null {
   return rawFiles.get(id) ?? null
 }
 
-/** Register a File and return the handle id callers should store. */
-export function grantFile(file: File, id = 'granted-' + (++counter)): string {
-  rawFiles.set(id, file)
-  return id
+/**
+ * Register a File and return the handle id callers should store.
+ *
+ * The id is shaped like `host/granted-3/filename.docx`, not a bare token. A
+ * renderer with no path still derives its displayed filename by splitting on a
+ * separator (`filePath.split(/[\\/]/).pop()`), and several of them do that
+ * before any handle-aware code runs. A bare id like `granted-3` came out in the
+ * title bar and status line as the literal string "granted-3"; the trailing
+ * segment makes those call sites keep working without teaching every one of them
+ * about handles.
+ *
+ * The id stays opaque: nothing may parse it beyond that last segment, and a
+ * real Android host will put a SAF document name there for the same reason.
+ */
+export function grantFile(file: File, id?: string): string {
+  const handleId = id ?? `host/granted-${++counter}/${file.name}`
+  rawFiles.set(handleId, file)
+  return handleId
 }
 
 export function hasFilePicker(): boolean {
@@ -64,7 +78,9 @@ export function hasFilePicker(): boolean {
 }
 
 export function rememberHandle(handle: FileSystemFileHandle, kind?: DocumentKind): BrowserFileHandle {
-  const id = 'browser-' + ++counter
+  // same shape as grantFile: the last segment is the display name, because
+  // callers split the string rather than reading handle.name
+  const id = `host/browser-${++counter}/${handle.name}`
   liveHandles.set(id, handle)
   // exactOptionalPropertyTypes: an absent kind must be an absent key, not
   // `kind: undefined`, which the `DocumentKind` optional property rejects
