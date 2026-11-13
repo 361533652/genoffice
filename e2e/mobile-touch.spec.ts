@@ -113,8 +113,11 @@ test.describe('touch on a mobile host', () => {
     // the name box is DOM, so it is the reliable "a cell is selected" signal
     await expect(page.locator('[data-u-comp="defined-name"] input')).toHaveValue(/^[A-Z]+\d+$/)
 
-    // type the way a soft keyboard delivers text, then commit the edit
-    await page.keyboard.type('触摸77', { delay: 90 })
+    // type the way a soft keyboard delivers text, then commit the edit.
+    // Mixed CJK + digits on purpose: a soft keyboard sends both through the
+    // same path, and a grid that drops one but not the other would still pass
+    // a digits-only test.
+    await page.keyboard.type('手机表格88', { delay: 90 })
     await page.keyboard.press('Enter')
     await page.waitForTimeout(1_000)
 
