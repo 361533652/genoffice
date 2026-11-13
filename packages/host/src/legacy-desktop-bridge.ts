@@ -138,6 +138,37 @@ const REQUIRES_DESKTOP = new Set([
   'spellReplace',
   'spellAddWord',
   'spellIgnoreWord',
+  // AI: every one of these proxies a request through the main process, which
+  // holds the provider keys and does the streaming. Returning undefined made the
+  // panel show "thinking" and then nothing, forever.
+  'aiChat',
+  'aiStream',
+  'aiStreamCancel',
+  'webSearch',
+  'imageSearch',
+  'fetchImage',
+  'analyzeMedia',
+  'aiGenerateImage',
+  'generateImage',
+  'aiGskStatus',
+  'aiGskLogin',
+  'setAiSettings',
+  'openAiModelSettings',
+  'openSkillsSettings',
+  'createDocument',
+  'kbList',
+  'kbSearch',
+  'kbRead',
+  'skillsList',
+  'skillText',
+  'gskStatus',
+  'runCli',
+  'pickAttachments',
+  'addAttachmentPaths',
+  'addPastedImage',
+  'readAttachment',
+  'readAttachmentImage',
+  'copyImageToClipboard',
 ])
 
 /** What a call to a desktop-only method does on a host that lacks it. */

@@ -112,6 +112,18 @@ describe('host resolution', () => {
     await expect(bridge.signWithCertificate()).rejects.toThrow(/desktop app/)
   })
 
+  it('fails loudly for AI actions rather than showing "thinking" forever', async () => {
+    // a resolved-undefined aiStream left the panel in a thinking state and never
+    // produced a token: the user waits on a request nobody sent
+    installLegacyDesktopBridge()
+    const bridge = (globalThis as Record<string, unknown>).desktop as Record<string, () => Promise<unknown>>
+    await expect(bridge.aiChat()).rejects.toThrow(/desktop app/)
+    await expect(bridge.aiStream()).rejects.toThrow(/desktop app/)
+    await expect(bridge.webSearch()).rejects.toThrow(/desktop app/)
+    // settings are still a probe, not an action
+    await expect(bridge.getAiSettings()).resolves.toEqual({})
+  })
+
   it('still answers probes neutrally', async () => {
     // the distinction is action vs probe, not "everything throws"
     installLegacyDesktopBridge()
