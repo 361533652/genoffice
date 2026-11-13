@@ -90,6 +90,36 @@ test.describe('file access contract on a mobile host', () => {
     expect(result.reason).toBe('error')
   })
 
+  test('reads a late chunk without materialising the whole file', async ({ page }) => {
+    await page.goto(DOCS_URL, { waitUntil: 'load' })
+    await expect(page.locator('.ProseMirror')).toBeVisible({ timeout: 30_000 })
+
+    const result = await page.evaluate(async () => {
+      const entry = '/@fs/' + 'E:/gitbub-project/genoffice'.replace(/\\/g, '/') + '/packages/host/src/index.ts'
+      const host = await import(entry)
+
+      // a 32MB file whose last 8 bytes are a marker
+      const size = 32 * 1024 * 1024
+      const bytes = new Uint8Array(size)
+      bytes.set([0xde, 0xad, 0xbe, 0xef, 0xca, 0xfe, 0xba, 0xbe], size - 8)
+      const file = new File([bytes], 'big.bin')
+      host.grantBrowserFile(file, 'big-handle')
+      const handle = { id: 'big-handle', name: 'big.bin', writable: false }
+
+      const access = host.createBrowserFileAccess()
+      const started = performance.now()
+      const tail = await access.readChunk(handle, size - 8, size)
+      const elapsed = performance.now() - started
+      return { bytes: Array.from(tail), elapsedMs: elapsed }
+    })
+
+    // the marker came back, so the chunk was read from the right offset
+    expect(result.bytes).toEqual([0xde, 0xad, 0xbe, 0xef, 0xca, 0xfe, 0xba, 0xbe])
+    // reading 8 bytes out of 32MB must not cost a 32MB allocation; a full read
+    // plus slice is well over this on any machine
+    expect(result.elapsedMs).toBeLessThan(50)
+  })
+
   test('reports a handle it does not hold instead of returning junk', async ({ page }) => {
     await page.goto(DOCS_URL, { waitUntil: 'load' })
     await expect(page.locator('.ProseMirror')).toBeVisible({ timeout: 30_000 })

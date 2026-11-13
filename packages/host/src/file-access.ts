@@ -9,6 +9,7 @@ import type { DocumentKind, FileAccess, FileHandle, OpenedFile, SaveOutcome } fr
 import {
   hasFilePicker,
   openViaPicker,
+  rawFileFor,
   readFromHandle,
   saveViaPicker,
   toArrayBuffer,
@@ -35,9 +36,17 @@ export function createBrowserFileAccess(): FileAccess {
     },
 
     async readChunk(handle: FileHandle, offset: number, end: number): Promise<Uint8Array> {
-      // the reference implementation reads the whole file and slices: the
-      // picker hands out a File, and slicing it costs one copy. SAF will stream
-      // from a descriptor instead.
+      // slice the File itself, not a decoded copy of it. pdf.js calls this in a
+      // loop, so reading the whole document per chunk would turn one 50MB open
+      // into dozens of full-size allocations — the browser equivalent of the
+      // memory spike the desktop "chunked route" was built to avoid.
+      const file = rawFileFor(handle.id)
+      if (file) {
+        const stop = Math.min(end, file.size)
+        if (offset >= stop) return new Uint8Array(0)
+        return new Uint8Array(await file.slice(offset, stop).arrayBuffer())
+      }
+      // a host with no File (a synthetic handle) can only answer from memory
       const all = await this.readAll(handle)
       return all.subarray(offset, Math.min(end, all.byteLength))
     },

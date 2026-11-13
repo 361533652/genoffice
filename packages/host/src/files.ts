@@ -93,7 +93,11 @@ export async function openViaPicker(kind?: DocumentKind): Promise<OpenResult> {
     const file = await picked.getFile()
     const data = new Uint8Array(await file.arrayBuffer())
     const hash = await sha256Hex(data)
-    return { ok: true, handle: rememberHandle(picked, kind), data, hash }
+    const handle = rememberHandle(picked, kind)
+    // keep the File too: a caller that only needs a URL for the bytes can hand
+    // out URL.createObjectURL(file) instead of re-encoding what we just read
+    rawFiles.set(handle.id, file)
+    return { ok: true, handle, data, hash }
   } catch (error) {
     // an aborted picker rejects with AbortError; that is a cancel, not a fault
     if (error instanceof Error && error.name === 'AbortError') return { ok: false, reason: 'canceled' }
