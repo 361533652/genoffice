@@ -1,7 +1,6 @@
-import { createHash } from 'node:crypto'
-import { closeSync, fsyncSync, openSync, readFileSync, writeFileSync } from 'node:fs'
-import { rename, rm } from 'node:fs/promises'
-import { basename, dirname, join } from 'node:path'
+import { sha256HexSync } from './sha256-sync'
+import { ensureGatewayHost, gatewayHost } from './gateway-host'
+
 
 import JSZip from 'jszip'
 import { assertZipInflatesWithinLimits } from '@genoffice/zip-gate'
@@ -533,11 +532,15 @@ export async function assembleWithJsZip(source: Buffer, plan: MutationPlan): Pro
   for (const [path, content] of plan.replaced) zip.file(path, content, { createFolders: false })
   for (const [path, content] of plan.added) zip.file(path, content, { createFolders: false })
   for (const [path, bytes] of plan.addedBinary) zip.file(path, bytes, { createFolders: false })
-  const buffer = await zip.generateAsync({
-    type: 'nodebuffer',
+  // 'uint8array' rather than 'nodebuffer': JSZip refuses nodebuffer in a
+  // browser, and the only difference is the Buffer wrapper this code does not
+  // need (every consumer takes Uint8Array)
+  const generated = await zip.generateAsync({
+    type: 'uint8array',
     compression: 'DEFLATE',
     compressionOptions: { level: 6 },
   })
+  const buffer = Buffer.from(generated)
   return {
     buffer,
     touchedEntries: plan.touchedEntries,
@@ -754,7 +757,9 @@ export async function inventoryXlsx(buffer: Buffer): Promise<readonly PackageEnt
   let totalSize = 0
   for (const [path, file] of Object.entries(zip.files)) {
     if (file.dir) continue
-    const bytes = await file.async('nodebuffer')
+    // 'uint8array' instead of 'nodebuffer': JSZip's nodebuffer mode does not
+    // exist in a browser, and `sha256`/`.length` need neither
+    const bytes = await file.async('uint8array')
     totalSize += bytes.length
     if (totalSize > MAX_UNCOMPRESSED_BYTES) {
       throw new Error('Workbook exceeds the uncompressed size limit.')
@@ -2301,34 +2306,28 @@ export function toA1Address(row: number, column: number): string {
  * durability and must not fail the save itself.
  */
 export async function syncFileBestEffort(path: string): Promise<void> {
-  const tolerated = (error: unknown) =>
-    ['EPERM', 'EACCES', 'EBUSY', 'EINVAL', 'ENOSYS'].includes(
-      (error as NodeJS.ErrnoException).code ?? '',
-    )
-  let descriptor: number
+  // delegated to the host port: a Node host fsyncs, a WebView host has nothing
+  // to flush. See fs-port.ts and ADR 3.
   try {
-    descriptor = openSync(path, 'r+')
-  } catch (error: unknown) {
-    if (tolerated(error)) return
-    throw error
-  }
-  try {
-    fsyncSync(descriptor)
-  } catch (error: unknown) {
-    if (!tolerated(error)) throw error
-  } finally {
-    closeSync(descriptor)
+    await (await ensureGatewayHost()).fs.syncFile(path)
+  } catch {
+    // durability only: the bytes are already written, so a refused flush must
+    // not fail the save itself
   }
 }
 
 export async function writeXlsxAtomically(path: string, buffer: Buffer): Promise<void> {
-  const temporaryPath = join(dirname(path), `${basename(path)}.${crypto.randomUUID()}.tmp`)
+  const host = await ensureGatewayHost()
+  const temporaryPath = host.paths.join(
+    host.paths.dirname(path),
+    `${host.paths.basename(path)}.${host.uuid()}.tmp`,
+  )
   try {
-    writeFileSync(temporaryPath, buffer, { flag: 'wx' })
+    await host.fs.writeFile(temporaryPath, buffer)
     await syncFileBestEffort(temporaryPath)
-    await rename(temporaryPath, path)
+    await host.fs.replaceFile(temporaryPath, path)
   } catch (error: unknown) {
-    await rm(temporaryPath, { force: true })
+    await host.fs.remove(temporaryPath).catch(() => {})
     throw error
   }
 }
@@ -2339,7 +2338,7 @@ export async function mutateXlsxFile(
   plan: ChangePlan,
   sheetNamesById: Readonly<Record<string, string>>,
 ): Promise<XlsxMutation> {
-  const source = readFileSync(path)
+  const source = Buffer.from(await (await ensureGatewayHost()).fs.readFile(path))
   if (sha256(source) !== expectedSha256) {
     throw new Error('The workbook changed on disk after preview.')
   }
@@ -2348,8 +2347,16 @@ export async function mutateXlsxFile(
   return mutation
 }
 
-export function sha256(input: Buffer | string): string {
-  return createHash('sha256').update(input).digest('hex')
+/**
+ * SHA-256 as lowercase hex.
+ *
+ * Was `createHash('sha256')`; the checkout carries a small synchronous
+ * implementation so the gateway can be imported in a browser, where
+ * `node:crypto` is not available. Synchronous on purpose: the callers compare
+ * hashes inline while planning, not in an async path.
+ */
+export function sha256(input: Uint8Array | string): string {
+  return sha256HexSync(typeof input === 'string' ? new TextEncoder().encode(input) : input)
 }
 
 /// Package-relative form of a ZIP entry name, null when it escapes the root.
@@ -2385,7 +2392,7 @@ async function loadSafeZip(buffer: Buffer): Promise<JSZip> {
     if (canonical === path) continue
     zip.remove(path)
     if (file && !file.dir && canonical && !zip.files[canonical]) {
-      zip.file(canonical, await file.async('nodebuffer'), { createFolders: false, date: file.date })
+      zip.file(canonical, await file.async('uint8array'), { createFolders: false, date: file.date })
     }
   }
   return zip

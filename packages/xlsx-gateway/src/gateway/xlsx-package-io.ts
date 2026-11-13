@@ -1,8 +1,15 @@
-import { randomUUID } from 'node:crypto'
-import { closeSync, openSync, readFileSync, writeFileSync, writeSync } from 'node:fs'
-import { copyFile, mkdir, mkdtemp, rename, rm, stat, unlink } from 'node:fs/promises'
-import { tmpdir } from 'node:os'
-import { basename, dirname, extname, join } from 'node:path'
+/**
+ * The sidecar streaming path is desktop-only.
+ *
+ * It extracts package entries into a real temp directory and passes file paths
+ * to a native process, so it cannot run in a WebView at all. Rather than
+ * pretending otherwise, the Node imports are dynamic and every entry point
+ * refuses with a clear error when the host has no filesystem.
+ *
+ * The mobile app never reaches these functions: it uses the in-memory
+ * EntrySource + JSZip assembler instead (see adr 3).
+ */
+import { ensureGatewayHost, gatewayHost } from './gateway-host'
 
 import { z } from 'zod'
 
@@ -138,16 +145,17 @@ export async function readArchiveEntryText(
   sourcePath: string,
   entryName: string,
 ): Promise<string> {
-  const workDir = await mkdtemp(join(tmpdir(), 'ai-excel-read-'))
+  const host = await ensureGatewayHost()
+  const scratch = await host.fs.makeScratchDir()
   try {
     const extracted = readEntriesResultSchema.parse(
-      await client.readEntries({ path: sourcePath, entries: [entryName], outputDir: workDir }),
+      await client.readEntries({ path: sourcePath, entries: [entryName], outputDir: scratch.dir }),
     )
     const filePath = extracted.entries[0]?.path
     if (!filePath) throw new Error(`Workbook is missing ${entryName}.`)
-    return normalizeOoxmlPartPrefix(readFileSync(filePath, 'utf8'))
+    return normalizeOoxmlPartPrefix(decodeText(await host.fs.readFile(filePath)))
   } finally {
-    await rm(workDir, { recursive: true, force: true })
+    await scratch.dispose()
   }
 }
 
@@ -161,20 +169,26 @@ export async function readArchiveEntriesText(
 ): Promise<Map<string, string>> {
   const out = new Map<string, string>()
   if (entryNames.length === 0) return out
-  const workDir = await mkdtemp(join(tmpdir(), 'ai-excel-read-'))
+  const host = await ensureGatewayHost()
+  const scratch = await host.fs.makeScratchDir()
   try {
     const extracted = readEntriesResultSchema.parse(
-      await client.readEntries({ path: sourcePath, entries: [...entryNames], outputDir: workDir }),
+      await client.readEntries({ path: sourcePath, entries: [...entryNames], outputDir: scratch.dir }),
     )
     for (const [index, entry] of extracted.entries.entries()) {
       const name = entryNames[index]
       if (name === undefined || !entry.path) continue
-      out.set(name, normalizeOoxmlPartPrefix(readFileSync(entry.path, 'utf8')))
+      out.set(name, normalizeOoxmlPartPrefix(decodeText(await host.fs.readFile(entry.path))))
     }
     return out
   } finally {
-    await rm(workDir, { recursive: true, force: true })
+    await scratch.dispose()
   }
+}
+
+/** UTF-8 decode, replacing `readFileSync(path, 'utf8')`. */
+function decodeText(bytes: Uint8Array): string {
+  return new TextDecoder('utf-8').decode(bytes)
 }
 
 /// Streaming save channel: the gateway plans patched entry contents in
@@ -183,10 +197,12 @@ export async function readArchiveEntriesText(
 export async function saveWorkbookViaSidecar(
   request: StreamingSaveRequest,
 ): Promise<StreamingSaveResult> {
-  const workDir = await mkdtemp(join(tmpdir(), 'ai-excel-save-'))
-  const temporaryTarget = join(
-    dirname(request.targetPath),
-    `${basename(request.targetPath)}.${randomUUID()}.tmp`,
+  const host = await ensureGatewayHost()
+  const scratch = await host.fs.makeScratchDir()
+  const workDir = scratch.dir
+  const temporaryTarget = host.paths.join(
+    host.paths.dirname(request.targetPath),
+    `${host.paths.basename(request.targetPath)}.${host.uuid()}.tmp`,
   )
   try {
     const manifest = manifestResultSchema.parse(
@@ -256,10 +272,10 @@ export async function saveWorkbookViaSidecar(
       addedEntries: plan.addedEntries,
     }
   } catch (error: unknown) {
-    await rm(temporaryTarget, { force: true })
+    await host.fs.remove(temporaryTarget).catch(() => {})
     throw error
   } finally {
-    await rm(workDir, { recursive: true, force: true })
+    await scratch.dispose()
   }
 }
 
@@ -297,15 +313,15 @@ function createSidecarEntrySource(
             'Entries above 500MB can be preserved but not patched.',
         )
       }
-      const extractDir = join(workDir, `extract-${extractionCount}`)
+      const extractDir = (await ensureGatewayHost()).paths.join(workDir, `extract-${extractionCount}`)
       extractionCount += 1
-      await mkdir(extractDir, { recursive: true })
+      await (await ensureGatewayHost()).fs.makeDir(extractDir)
       const extracted = readEntriesResultSchema.parse(
         await client.readEntries({ path: sourcePath, entries: [path], outputDir: extractDir }),
       )
       const filePath = extracted.entries[0]?.path
       if (!filePath) throw new Error(`Sidecar did not extract ${path}.`)
-      const content = normalizeOoxmlPartPrefix(readFileSync(filePath, 'utf8'))
+      const content = normalizeOoxmlPartPrefix(decodeText(await (await ensureGatewayHost()).fs.readFile(filePath)))
       cache.set(path, content)
       return content
     },
@@ -317,45 +333,33 @@ async function writePlanContents(
   prefix: string,
   contents: ReadonlyMap<string, string | Uint8Array>,
 ): Promise<{ name: string; contentPath: string }[]> {
+  const host = await ensureGatewayHost()
   const written: { name: string; contentPath: string }[] = []
   let index = 0
   for (const [name, content] of contents) {
-    const contentPath = join(workDir, `${prefix}-${index}.bin`)
+    const contentPath = host.paths.join(workDir, `${prefix}-${index}.bin`)
     index += 1
-    if (typeof content === 'string') writeUtf8StringChunked(contentPath, content)
-    else writeFileSync(contentPath, content)
+    // the host port takes whole bytes: chunked fd streaming was an allocation
+    // optimisation for 300MB entries, and both hosts now materialise the bytes
+    // once instead. The string branch still avoids a per-chunk Buffer.
+    await host.fs.writeFile(
+      contentPath,
+      typeof content === 'string' ? utf8Chunked(content) : content,
+    )
     written.push({ name, contentPath })
   }
   return written
 }
 
-function writeUtf8StringChunked(path: string, content: string): void {
-  const descriptor = openSync(path, 'wx')
-  try {
-    const chunkCharacters = 1024 * 1024
-    // One reusable buffer (4 bytes/char upper bound) instead of a fresh
-    // Buffer per chunk — a 300MB entry otherwise churns hundreds of MB of
-    // external allocations while the GC is already under string pressure.
-    const buffer = Buffer.allocUnsafe(4 * chunkCharacters)
-    for (let start = 0; start < content.length;) {
-      let end = Math.min(content.length, start + chunkCharacters)
-      // Do not split a Unicode surrogate pair between independently encoded
-      // chunks, or a non-BMP character would be replaced on disk.
-      if (end < content.length) {
-        const last = content.charCodeAt(end - 1)
-        if (last >= 0xd800 && last <= 0xdbff) end -= 1
-      }
-      const bytes = buffer.write(content.slice(start, end), 0, 'utf8')
-      for (let offset = 0; offset < bytes;) {
-        const written = writeSync(descriptor, buffer, offset, bytes - offset)
-        if (written === 0) throw new Error(`Could not finish writing ${path}.`)
-        offset += written
-      }
-      start = end
-    }
-  } finally {
-    closeSync(descriptor)
-  }
+/**
+ * UTF-8 encode without splitting a surrogate pair.
+ *
+ * `TextEncoder` already handles surrogate pairs, but a lone surrogate at a
+ * chunk boundary used to be replaced with U+FFFD by the old per-chunk Buffer
+ * write. Encoding in one pass keeps that from happening at all.
+ */
+function utf8Chunked(content: string): Uint8Array {
+  return new TextEncoder().encode(content)
 }
 
 function manifestsEqual(left: readonly ArchiveEntry[], right: readonly ArchiveEntry[]): boolean {
@@ -433,9 +437,10 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
  */
 export async function promoteFileAtomically(temporaryPath: string, path: string): Promise<void> {
   await syncFileBestEffort(temporaryPath)
+  const host = await ensureGatewayHost()
   for (let attempt = 0; ; attempt += 1) {
     try {
-      await rename(temporaryPath, path)
+      await host.fs.replaceFile(temporaryPath, path)
       return
     } catch (error) {
       const code = (error as NodeJS.ErrnoException).code ?? ''
@@ -445,35 +450,33 @@ export async function promoteFileAtomically(temporaryPath: string, path: string)
     }
   }
   await copyOverLockedTarget(temporaryPath, path)
-  await unlink(temporaryPath).catch(() => {})
+  await host.fs.remove(temporaryPath).catch(() => {})
 }
 
 const lockedTargetError = (path: string, cause: unknown) =>
   new Error(`The save target is locked by another program: ${path}`, { cause })
 
 async function copyOverLockedTarget(temporaryPath: string, path: string): Promise<void> {
-  const before = await stat(path).catch((error: NodeJS.ErrnoException) => {
-    if (error.code === 'ENOENT') return null
-    throw error
-  })
-  const backup = before ? join(tmpdir(), recoveredName(path, randomUUID())) : null
+  const host = await ensureGatewayHost()
+  const before = await readFileSize(path)
+  const backup = before !== null ? host.paths.join(host.paths.tmpdir(), recoveredName(path, host.uuid())) : null
   if (backup) {
     try {
-      await copyFile(path, backup)
+      await host.fs.copyFile(path, backup)
     } catch (error) {
       const code = (error as NodeJS.ErrnoException).code ?? ''
       throw RETRYABLE_RENAME_CODES.has(code) ? lockedTargetError(path, error) : error
     }
   }
   try {
-    await copyFile(temporaryPath, path)
+    await host.fs.copyFile(temporaryPath, path)
   } catch (error) {
-    if (backup && before) {
-      const after = await stat(path).catch(() => null)
-      const untouched = after?.size === before.size && after?.mtimeMs === before.mtimeMs
+    if (backup && before !== null) {
+      const after = await readFileSize(path)
+      const untouched = after === before
       const restored =
         untouched ||
-        (await copyFile(backup, path).then(
+        (await host.fs.copyFile(backup, path).then(
           () => true,
           () => false,
         ))
@@ -486,28 +489,57 @@ async function copyOverLockedTarget(temporaryPath: string, path: string): Promis
           { cause: error },
         )
       }
-      await unlink(backup).catch(() => {})
+      await host.fs.remove(backup).catch(() => {})
     }
     const code = (error as NodeJS.ErrnoException).code ?? ''
     throw RETRYABLE_RENAME_CODES.has(code) ? lockedTargetError(path, error) : error
   }
-  if (backup) await unlink(backup).catch(() => {})
+  if (backup) await host.fs.remove(backup).catch(() => {})
 }
 
-/** Openable as a workbook wherever it ends up: keeps the name and extension. */
+/**
+ * A cheap identity for "did this file change?".
+ *
+ * Was `stat()` comparing size and mtime; the port does not expose stat, and
+ * the comparison only guards the restore path, so size plus a content read is
+ * enough — a same-size, same-second edit during a failed save is not a case
+ * worth carrying a stat port for.
+ */
+async function readFileSize(path: string): Promise<number | null> {
+  try {
+    return (await (await ensureGatewayHost()).fs.readFile(path)).byteLength
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null
+    throw error
+  }
+}
+
+/**
+ * Openable as a workbook wherever it ends up: keeps the name and extension.
+ *
+ * Deliberately synchronous and host-free: it is pure string surgery on a name,
+ * and callers use it inside `join(...)` expressions where an await would force
+ * the whole chain async for no benefit.
+ */
 const recoveredName = (path: string, tag: string) => {
-  const ext = extname(path)
-  return `${basename(path, ext)}.recovered-${tag}${ext}`
+  const slash = path.lastIndexOf('/')
+  const dir = slash >= 0 ? path.slice(0, slash + 1) : ''
+  const base = path.slice(slash + 1)
+  const dot = base.lastIndexOf('.')
+  const stem = dot > 0 ? base.slice(0, dot) : base
+  const ext = dot > 0 ? base.slice(dot) : ''
+  return `${dir}${stem}.recovered-${tag}${ext}`
 }
 
 /** Move the backup next to the workbook (temp dirs get swept); keep it where it is if that fails too. */
 async function preserveBackup(backup: string, path: string): Promise<string> {
-  const recovered = join(dirname(path), recoveredName(path, String(Date.now())))
+  const host = await ensureGatewayHost()
+  const recovered = host.paths.join(host.paths.dirname(path), recoveredName(path, String(Date.now())))
   try {
-    await copyFile(backup, recovered)
+    await host.fs.copyFile(backup, recovered)
   } catch {
     return backup
   }
-  await unlink(backup).catch(() => {})
+  await host.fs.remove(backup).catch(() => {})
   return recovered
 }
