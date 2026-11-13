@@ -74,6 +74,66 @@ export function browserFileFor(handleId: string): File | null {
   return rawFileFor(handleId)
 }
 
+/**
+ * Methods that must fail loudly rather than silently answer `undefined`.
+ *
+ * A generic no-op is right for a *probe* ("are there any recent files?") — the
+ * honest answer is an empty list. It is wrong for an *action*: `splitPdf()`
+ * returning undefined tells the UI its split succeeded when nothing happened,
+ * and the user loses a file operation they believed they had performed.
+ *
+ * These are all desktop-only (native sidecars, certificates, printing, Zotero).
+ * On a host without them the caller gets a rejected promise with a readable
+ * message, which the app already surfaces as an error.
+ */
+const REQUIRES_DESKTOP = new Set([
+  // pdf: file surgery runs in the main process
+  'splitPdf',
+  'mergePdf',
+  'cropPages',
+  'extractPages',
+  'replacePages',
+  'setPageSize',
+  'mergePages',
+  'reduceFileSize',
+  'rewriteInPlace',
+  'autoRename',
+  'exportAttachment',
+  'inspectCertificate',
+  'listSystemCertificates',
+  'pickCertificate',
+  'releaseCertificate',
+  'signWithCertificate',
+  'addSavedSignature',
+  'removeSavedSignature',
+  'listStaticFormFills',
+  'ocrPage',
+  'convertOffice',
+  'compareReadPdf',
+  'compareReadOpen',
+  // printing and native integrations
+  'print',
+  'printFile',
+  'printPdfBuffer',
+  'exportPdf',
+  'runCli',
+  'zoteroCommand',
+  'openSourcePath',
+  'openNewTab',
+  'spellReplace',
+  'spellAddWord',
+  'spellIgnoreWord',
+])
+
+/** What a call to a desktop-only method does on a host that lacks it. */
+function desktopOnly(name: string): Promise<never> {
+  return Promise.reject(
+    new Error(
+      `${name}() is only available in the GenOffice desktop app: it needs the main process, which a browser or WebView host does not have.`,
+    ),
+  )
+}
+
 /** The empty value to answer with when an unknown method is called. */
 function fallbackAnswer(name: string): unknown {
   if (OBJECT_LIKE_GETTERS.has(name)) return {}
@@ -275,6 +335,8 @@ export function installLegacyDesktopBridge(
           return () => {}
         }
       }
+      // an action the desktop owns fails loudly; a probe gets a neutral answer
+      if (REQUIRES_DESKTOP.has(prop)) return () => desktopOnly(prop)
       // list-shaped answers come back as [], not undefined: the renderer reads
       // `.length` off them without a guard
       const answer = fallbackAnswer(prop)

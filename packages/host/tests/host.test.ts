@@ -95,11 +95,29 @@ describe('host resolution', () => {
     expect((globalThis as Record<string, unknown>).desktop).toBe(real)
   })
 
-  it('does not throw on an unknown method call', async () => {
+  it('does not throw on an unknown probe', async () => {
     const stats = installLegacyDesktopBridge()
     const bridge = (globalThis as Record<string, unknown>).desktop as Record<string, (...a: unknown[]) => Promise<unknown>>
     await expect(bridge.someMethodNobodyImplemented()).resolves.toBeUndefined()
     expect(stats.unmapped.has('someMethodNobodyImplemented')).toBe(true)
+  })
+
+  it('fails loudly for a desktop-only action instead of reporting success', async () => {
+    // splitPdf() returning undefined told the UI its split had worked when
+    // nothing happened — the user believes a file operation they never got
+    installLegacyDesktopBridge()
+    const bridge = (globalThis as Record<string, unknown>).desktop as Record<string, () => Promise<unknown>>
+    await expect(bridge.splitPdf()).rejects.toThrow(/desktop app/)
+    await expect(bridge.ocrPage()).rejects.toThrow(/desktop app/)
+    await expect(bridge.signWithCertificate()).rejects.toThrow(/desktop app/)
+  })
+
+  it('still answers probes neutrally', async () => {
+    // the distinction is action vs probe, not "everything throws"
+    installLegacyDesktopBridge()
+    const bridge = (globalThis as Record<string, unknown>).desktop as Record<string, () => Promise<unknown>>
+    await expect(bridge.getRecentFiles()).resolves.toEqual([])
+    await expect(bridge.getLanguage()).resolves.toBe('zh')
   })
 
   it('returns an unsubscribe function for subscription-style names', () => {
