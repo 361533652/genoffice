@@ -1,0 +1,197 @@
+/**
+ * Legacy `window.desktop` bridge for hosts that have no Electron preload.
+ *
+ * The renderer has ~500 direct `window.desktop.*` call sites across six apps.
+ * Rewriting them all before the mobile host can boot would mean shipping the
+ * mobile app last instead of first, so this shim gives the existing call sites
+ * a working object while the migration proceeds group by group:
+ *
+ *  - settings reads answer from the host's own store
+ *  - file open/save use the File System Access API where available
+ *  - event subscriptions (`onLanguageChanged`, `onThemeChanged`, …) return a
+ *    no-op unsubscribe, because there is no shell to publish them
+ *  - everything else resolves to `undefined` instead of throwing
+ *
+ * Every method here is a migration marker: delete the entry once the call site
+ * has moved to `@genoffice/host`. The `console.debug` trace exists so a test can
+ * assert which capabilities a screen actually reached for.
+ */
+import { openViaPicker, saveViaPicker, hasFilePicker } from './files.js'
+import { createSettingsStore } from './settings.js'
+
+/** Methods that return an unsubscribe function rather than a value. */
+const SUBSCRIPTION_PATTERN = /^(on[A-Z]|arm[A-Z]|install[A-Z])/
+
+type AnyFn = (...args: unknown[]) => unknown
+
+export interface LegacyBridgeStats {
+  /** number of distinct method names resolved so far */
+  called: Set<string>
+  /** method names that fell through to the default no-op */
+  unmapped: Set<string>
+}
+
+/**
+ * Global bridge names the six apps use today.
+ *
+ * Each app invented its own: docs reads `window.desktop`, sheets
+ * `window.desktopApi`, slides `window.slidesApi`, and so on. The shim answers
+ * all of them so an app can boot on a host that has none.
+ */
+export const LEGACY_BRIDGE_NAMES = [
+  'desktop',
+  'desktopApi',
+  'aiOffice',
+  'pdfApi',
+  'sheetsApi',
+  'slidesApi',
+  'markdownApi',
+  'htmlApi',
+] as const
+
+export function installLegacyDesktopBridge(
+  target: Record<string, unknown> = globalThis as unknown as Record<string, unknown>,
+  stats: LegacyBridgeStats = { called: new Set(), unmapped: new Set() },
+  names: readonly string[] = LEGACY_BRIDGE_NAMES,
+): LegacyBridgeStats {
+  if (isLegacyDesktopBridge(target)) return stats
+
+  const store = createSettingsStore()
+  const noop = (): (() => void) => () => {}
+
+  const explicit: Record<string, AnyFn> = {
+    getLanguage: async () => store.read().language,
+    getSystemLocale: async () => store.read().language,
+    getTheme: async () => store.read().theme,
+    getDocumentTheme: async () => store.read().documentTheme,
+    getAuthorName: async () => store.read().authorName,
+    // sheets shows this on comment threads; an empty string is the documented
+    // "fall back to the built-in author" answer, undefined is not
+    getUserDisplayName: async () => store.read().authorName,
+    onUserDisplayNameChanged: noop,
+    getAutoSaveDefault: async () => store.read().autoSave,
+    getAiPanelPrefs: async () => store.read().aiPanelPrefs,
+    setAiPanelPrefs: async (patch) => {
+      const next = { ...store.read().aiPanelPrefs, ...(patch as Record<string, unknown>) }
+      store.patch({ aiPanelPrefs: next })
+      return next
+    },
+    openDocx: async () => {
+      const picked = await openViaPicker('docx')
+      if (!picked.ok) return null
+      return {
+        path: picked.handle.id,
+        name: picked.handle.name,
+        dataUrl: bytesToDataUrl(picked.data),
+        hash: picked.hash ?? '',
+      }
+    },
+    saveDocxAs: async (_path: unknown, data: unknown) => {
+      const bytes = toBytes(data)
+      if (!bytes) return null
+      const saved = await saveViaPicker(bytes, 'document.docx', 'docx')
+      return saved.ok ? { path: saved.handle.id, name: saved.handle.name } : null
+    },
+    confirmDocumentReplace: async () => true,
+    onLanguageChanged: noop,
+    onThemeChanged: noop,
+    onDocumentThemeChanged: noop,
+    onAuthorNameChanged: noop,
+    onAutoSaveDefaultChanged: noop,
+    onAiPanelPrefsChanged: noop,
+    onChromePressed: noop,
+    onContextMenuRequest: noop,
+    onViewImage: noop,
+    onMenuCommand: noop,
+    armContextMenu: () => undefined,
+    claimContextMenu: () => undefined,
+    listPrinters: async () => [],
+    listDocsTabs: async () => [],
+
+    // ---- startup probes -------------------------------------------------
+    // Every app asks "is there a document waiting to be opened?" on mount and
+    // treats a thrown error as "this file is broken". On a host with no shell
+    // the honest answer is "nothing pending", never undefined-for-a-value.
+    consumePending: async () => null,
+    consumePendingOpenDocx: async () => null,
+    consumePendingOpen: async () => null,
+    consumePendingOpenSheet: async () => null,
+    consumeNewBlankDoc: async () => null,
+    consumeAiDocContent: async () => null,
+    consumeHeadlessExport: async () => null,
+    getPreviewInfo: async () => ({ url: 'about:blank', version: 0 }),
+    readFile: async () => '',
+    updatePreview: async () => undefined,
+
+    // ---- recent files / tabs -------------------------------------------
+    getRecentFiles: async () => [],
+    getRecentProjects: async () => ({ items: [], page: 0 }),
+    getUserSettings: async () => ({}),
+  }
+
+  const bridge = new Proxy(explicit, {
+    get(known, prop: string) {
+      if (prop in known) {
+        stats.called.add(prop)
+        return known[prop]
+      }
+      if (typeof prop !== 'string') return undefined
+      stats.called.add(prop)
+      stats.unmapped.add(prop)
+      if (SUBSCRIPTION_PATTERN.test(prop)) {
+        return (...args: unknown[]) => {
+          const handler = args.find((a) => typeof a === 'function')
+          if (handler) return () => {}
+          return () => {}
+        }
+      }
+      return async () => undefined
+    },
+    has: () => true,
+  })
+
+  // brand the shim itself, not the window: a real preload assigned later must
+  // read as a real preload without any extra bookkeeping
+  Object.defineProperty(bridge, LEGACY_BRIDGE_BRAND, { value: true, enumerable: false })
+  for (const name of names) {
+    if (!target[name]) target[name] = bridge
+  }
+  return stats
+}
+
+/** Marker property carried by the shim object itself. */
+export const LEGACY_BRIDGE_BRAND = '__genofficeLegacyBridge'
+
+/**
+ * True when a global bridge namespace is our own fallback, not a real preload.
+ *
+ * Without this check the facade would mistake the shim for an Electron bridge
+ * and report the desktop capability set on a phone (measured: the ribbon
+ * reserved 150px of Windows caption-button space in a 390px browser viewport).
+ */
+export function isLegacyDesktopBridge(target: unknown = globalThis): boolean {
+  const scope = target as Record<string, unknown> | null
+  if (!scope) return false
+  return Boolean(scope.desktop && (scope.desktop as Record<string, unknown>)[LEGACY_BRIDGE_BRAND] === true)
+}
+
+/** Does this host have any way to pick files at all? */
+export function legacyBridgeHasFileAccess(): boolean {
+  return hasFilePicker()
+}
+
+function toBytes(data: unknown): Uint8Array | null {
+  if (data instanceof Uint8Array) return data
+  if (data instanceof ArrayBuffer) return new Uint8Array(data)
+  if (ArrayBuffer.isView(data)) return new Uint8Array(data.buffer, data.byteOffset, data.byteLength)
+  return null
+}
+
+function bytesToDataUrl(bytes: Uint8Array): string {
+  let binary = ''
+  const chunk = 0x8000
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk))
+  }
+  return 'data:application/octet-stream;base64,' + (globalThis.btoa ? globalThis.btoa(binary) : '')
+}

@@ -43,7 +43,9 @@
     "licenses": "node tools/check-licenses.mjs",
     "dist:mac": "npm run notices && npm run build:all && npm run native:build:universal -w @genoffice/sheets && npm run dist:mac -w @genoffice/shell",
     "dist:win": "npm run notices && npm run build:all && npm run dist:win -w @genoffice/shell",
-    "dist:linux": "npm run notices && npm run build:all && npm run dist:linux -w @genoffice/shell"
+    "dist:linux": "npm run notices && npm run build:all && npm run dist:linux -w @genoffice/shell",
+    "test:mobile": "playwright test --config e2e/playwright.mobile.config.ts",
+    "dev:mobile": "npm run dev:renderer -w @genoffice/docs"
   },
   "dependencies": {
     "ws": "^8.21.1"

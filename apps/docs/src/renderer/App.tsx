@@ -1232,8 +1232,8 @@ export function App() {
   const [ctxMenu, setCtxMenu] = useState<ContextMenuState | null>(null)
   const ctxSeq = useRef(0)
   useEffect(() => {
-    window.desktop.armContextMenu?.()
-    return window.desktop.onContextMenuRequest?.((req) => {
+    window.desktop?.armContextMenu?.()
+    return window.desktop?.onContextMenuRequest?.((req) => {
       setCtxMenu((prev) =>
         prev && prev.seq === req.seq
           ? {

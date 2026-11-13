@@ -2566,9 +2566,14 @@ export function App({
       recordNoteChange(state.editJournal, sheetId)
       setPendingEdits(journalSize(state.editJournal))
     }
-    void window.desktopApi.getUserDisplayName?.().then((name) => threadStore.setAuthor(name))
+    // a host without a user-profile bridge answers undefined; setAuthor trims
+    // the name, so guard here rather than teaching it to accept undefined
+    void window.desktopApi
+      .getUserDisplayName?.()
+      .then((name) => threadStore.setAuthor(name ?? ''))
+      .catch(() => {})
     const offAuthorChanged = window.desktopApi.onUserDisplayNameChanged?.((name) =>
-      threadStore.setAuthor(name),
+      threadStore.setAuthor(name ?? ''),
     )
     // Univer's own UI (rule-management panels, dialogs) follows the app
     // language instead of hard-coded English.

@@ -28,6 +28,7 @@ electron-builder.env
 
 # Playwright artifacts
 /test-results/
+/e2e/test-results-mobile/
 
 .cursor/rules/git-remote.mdc
 __pycache__/
@@ -41,3 +42,6 @@ __pycache__/
 # One-off verification tests kept while chasing a fix; promote to a real test
 # file (or delete) instead of committing them under this name.
 _scratch-*
+
+# meow-memory 本地记忆库（隐藏目录，误删不可恢复；不要提交）
+/.dsh-meow/

@@ -1,3 +1,6 @@
+// side-effect import, and deliberately first: it installs the `window.desktop`
+// fallback before any other module can read it (see host-install.ts)
+import './host-install'
 import { createRoot } from 'react-dom/client'
 import { htmlDir, htmlLang, type Lang } from '@genoffice/i18n'
 import { App } from './App'
@@ -18,9 +21,13 @@ import '@genoffice/ui/ai-panel-prefs.css'
 import '@genoffice/ui/ai-scope-quote.css'
 import '@genoffice/ui/image-viewer.css'
 import './styles.css'
+// after the app's own stylesheet: these rules intentionally override desktop
+// base rules such as `body { min-width: 720px }` at narrow widths
+import '@genoffice/ui/mobile.css'
 import './fonts/fonts.css'
 import { applyAiPanelPrefs, installScreenTips } from '@genoffice/ui'
 import { setAltChunkHtmlConverter } from '@genoffice/docx-engine'
+import { getHost } from '@genoffice/host'
 
 installScreenTips()
 if (window.desktop?.convertAltChunkHtml) {
@@ -42,16 +49,21 @@ async function bootstrap(): Promise<void> {
   let lang: Lang = 'zh'
   let theme: UiTheme = 'system'
   let docTheme: DocTheme = 'follow'
+  // read settings through the host facade, not `window.desktop`: on a browser
+  // or WebView host there is no preload, and the facade answers from its own
+  // store instead of throwing (see docs/mobile/decisions.md, ADR 2)
+  const host = getHost()
   try {
-    // per-promise catch: standalone runs have no app:get-theme handler, and
-    // that rejection must not drop a resolved language
-    ;[lang, theme, docTheme] = await Promise.all([
-      window.desktop.getLanguage().catch(() => 'zh' as const),
-      window.desktop.getTheme().catch(() => 'system' as const),
-      window.desktop.getDocumentTheme?.().catch(() => 'follow' as const),
+    const [nextLang, nextTheme, nextDocTheme] = await Promise.all([
+      host.language().catch(() => 'zh'),
+      host.theme().catch(() => 'system' as const),
+      host.documentTheme().catch(() => 'follow' as const),
     ])
+    lang = nextLang as Lang
+    theme = nextTheme
+    docTheme = nextDocTheme
   } catch {
-    /* dev renderer without the preload bridge */
+    /* fall back to the defaults above */
   }
   setModuleLang(lang)
   document.documentElement.lang = htmlLang(lang)

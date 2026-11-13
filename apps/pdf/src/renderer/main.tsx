@@ -1,3 +1,6 @@
+// side-effect import, and deliberately first: installs the `window.desktop`
+// fallback before any other module can read it (see host-install.ts)
+import './host-install'
 import { createRoot } from 'react-dom/client'
 import { htmlDir, htmlLang, type Lang } from '@genoffice/i18n'
 import App from './App'
@@ -16,6 +19,9 @@ import '@genoffice/ui/markdown.css'
 import '@genoffice/ui/ai-panel-prefs.css'
 import '@genoffice/ui/ai-scope-quote.css'
 import './styles.css'
+// after the app's own stylesheet: these rules intentionally override desktop
+// base rules such as `body { min-width: 720px }` at narrow widths
+import '@genoffice/ui/mobile.css'
 import { applyAiPanelPrefs, installScreenTips } from '@genoffice/ui'
 
 installScreenTips()

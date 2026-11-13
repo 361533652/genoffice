@@ -1,5 +1,6 @@
 import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { getHost } from '@genoffice/host'
 import type { Lang } from '@genoffice/i18n'
 
 export type ConvertFormat = 'pdf' | 'html' | 'md' | 'images'
@@ -539,6 +540,14 @@ export function applyPainterFormat(
 // Word for Mac has no File ribbon tab: file actions live in the native menu
 // bar (which we provide). Windows Word does have one, so keep it there.
 const IS_MAC = navigator.platform.toLowerCase().includes('mac')
+/**
+ * The Electron window is frameless and paints its caption buttons over the
+ * top-right corner of our own chrome, so the tab row reserves room for them.
+ * A browser tab or a WebView has no such overlay — reserving 150px there just
+ * pushes the ribbon tabs off a phone screen (measured: 660px of scroll width
+ * in a 390px viewport).
+ */
+const HAS_CAPTION_OVERLAY = getHost().kind === 'electron'
 // Word offers Half-width / Full-width under Change Case only on CJK UIs
 const WIDTH_CASE_LANGS = new Set<Lang>(['zh', 'zh-TW', 'ja'])
 /** shell tab mode: the tab strip above owns traffic lights / caption buttons */
@@ -2307,7 +2316,7 @@ function RibbonInner({
       onMouseDown={keepDocumentFocus}
     >
       <div
-        className={`ribbon-tabs ${IN_TAB ? '' : IS_MAC ? 'ribbon-tabs-mac' : 'ribbon-tabs-win'}`}
+        className={`ribbon-tabs ${IN_TAB || !HAS_CAPTION_OVERLAY ? '' : IS_MAC ? 'ribbon-tabs-mac' : 'ribbon-tabs-win'}`}
         onDoubleClick={collapse.onTabsDoubleClick}
       >
         {!IS_MAC && (

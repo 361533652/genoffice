@@ -1,0 +1,99 @@
+/**
+ * Mobile layout corrections.
+ *
+ * Loaded by every app's renderer. Everything here is gated behind a narrow
+ * media query or a touch-capability query, so the desktop layout is untouched.
+ *
+ * Scope: only layout/overflow/density. Colours come from the design tokens in
+ * `@genoffice/ui/tokens.css` — never a raw value (see CLAUDE.md, theming rules).
+ */
+
+/* ---------------------------------------------------------------------------
+ * Ribbon: the tab row is a fixed set of tabs that cannot shrink below their
+ * label widths. On a phone it must scroll horizontally instead of widening the
+ * layout viewport (measured before this: 660px of scroll width on a 390px
+ * screen, which made the whole document scroll sideways).
+ * ------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .ribbon-tabs {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    /* keep the tab underline on the row edge while scrolling */
+    scrollbar-gutter: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .ribbon-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* a tab label must not wrap into two lines mid-scroll */
+  .ribbon-tab {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  /* the file tab doubles as the filename; cap it so it cannot eat the row */
+  .ribbon-file {
+    max-width: 30vw;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Touch pointers: a finger is ~44px, a mouse ~1px. Hit targets that were sized
+ * for a cursor need the minimum comfortable size before the touch work starts.
+ * ------------------------------------------------------------------------- */
+@media (pointer: coarse) {
+  .ribbon-tab,
+  .ribbon-tabs button,
+  .ribbon-tabs .qa-btn {
+    min-height: 36px;
+  }
+}
+
+/* Windows caption-button inset is a desktop-shell concern; a browser or a
+   WebView has no overlay to dodge (see ADR 2 in docs/mobile/decisions.md). */
+@media (max-width: 720px) {
+  .ribbon-tabs-win {
+    padding-right: 10px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Sheets: the desktop layout pins the body to a 720px minimum so the grid never
+ * collapses under the ribbon. A phone is 390px, so that floor makes the whole
+ * page scroll sideways. Drop the floor and let the grid own its own scrolling.
+ * ------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  body {
+    min-width: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Ribbon groups: a group is a fixed cluster of buttons, and `.ribbon-body`
+ * already scrolls horizontally. Without `flex: 0 0 auto` the group tries to
+ * share the row and then overflows its container instead of scrolling
+ * (measured: html app laid out at 504px in a 390px viewport).
+ * ------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .ribbon-group {
+    flex: 0 0 auto;
+  }
+
+  .ribbon-group-items {
+    flex: 0 0 auto;
+  }
+
+  /* Scroll containers only clip their own content when the ancestor chain
+     establishes a width limit. `.ribbon`/`.app` are `display:block` with no
+     overflow rule, so a wide ribbon body leaks its scroll width up to the
+     document and the layout viewport grows past the device width.
+     (measured: html app reported innerWidth 504 on a 390px device) */
+  .app,
+  .ribbon {
+    max-width: 100vw;
+    overflow-x: clip;
+  }
+}

@@ -1,5 +1,6 @@
 import type { IFunctionInfo } from '@univerjs/engine-formula'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { getHost } from '@genoffice/host'
 import { platformShortcuts } from '@genoffice/i18n'
 import {
   Dropdown,
@@ -204,6 +205,13 @@ const CHART_TEXT_LABELS: Record<ChartTextTarget, { heading: StringKey; command: 
 /// lights / caption buttons — the ribbon must not reserve space for them.
 const IN_TAB = new URLSearchParams(window.location.search).get('mode') === 'tab'
 const IS_MAC = navigator.platform.toLowerCase().includes('mac')
+/**
+ * The Electron window is frameless and paints caption buttons over the
+ * top-right corner, so the tab row reserves room for them. A browser tab or a
+ * WebView has no such overlay — reserving 150px there overflows a phone screen
+ * (measured: 720px of layout width in a 390px viewport).
+ */
+const HAS_CAPTION_OVERLAY = getHost().kind === 'electron'
 
 /// Univer's formula bar keeps its expanded state in React component state
 /// with no command behind it; the fold arrow is the only way in.
@@ -893,7 +901,7 @@ export function ExcelShell({
     <main className="app-shell" inert={openingWorkbook} aria-busy={openingWorkbook}>
       <header className={`excel-header ${collapse.rootClass}`} ref={collapse.rootRef}>
         <nav
-          className={`ribbon-tabs ${IN_TAB ? '' : IS_MAC ? 'ribbon-tabs-mac' : 'ribbon-tabs-win'}`}
+          className={`ribbon-tabs ${IN_TAB || !HAS_CAPTION_OVERLAY ? '' : IS_MAC ? 'ribbon-tabs-mac' : 'ribbon-tabs-win'}`}
           aria-label={t('appScopeWorkbook')}
           onDoubleClick={collapse.onTabsDoubleClick}
         >

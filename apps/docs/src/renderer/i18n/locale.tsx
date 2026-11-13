@@ -80,7 +80,9 @@ export function LocaleProvider({ initial, children }: { initial: Lang; children:
   const [lang, setLang] = useState<Lang>(initial)
   useEffect(
     () =>
-      window.desktop.onLanguageChanged((next) => {
+      // no preload bridge in a browser host: there is nobody to notify us, and
+      // the initial language already came from the host facade
+      window.desktop?.onLanguageChanged?.((next) => {
         setModuleLang(next)
         document.documentElement.lang = htmlLang(next)
         document.documentElement.dir = htmlDir(next)

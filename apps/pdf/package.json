@@ -20,6 +20,7 @@
     "@genoffice/ai-search": "*",
     "@genoffice/electron-utils": "*",
     "@genoffice/font-metrics": "*",
+    "@genoffice/host": "*",
     "@genoffice/i18n": "*",
     "@genoffice/ui": "*",
     "@types/node-forge": "^1.3.14",

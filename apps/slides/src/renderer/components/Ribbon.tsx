@@ -11,6 +11,7 @@ import React, {
   useState,
   type ReactNode,
 } from 'react'
+import { getHost } from '@genoffice/host'
 import type { AnimEffectKind, GradientFillSpec, TransitionKind } from '../../shared/ipc'
 import type { ChartStyleInfo } from '@genoffice/pptx-render'
 import {
@@ -139,6 +140,12 @@ import {
 import { NO_ROTATION } from '@genoffice/pptx-engine/model3d'
 
 const IS_MAC = navigator.platform.toLowerCase().includes('mac')
+/**
+ * The Electron window is frameless and paints caption buttons over the
+ * top-right corner, so the tab row reserves room for them. A browser tab or a
+ * WebView has no such overlay (see docs/mobile/decisions.md, ADR 2).
+ */
+const HAS_CAPTION_OVERLAY = getHost().kind === 'electron'
 /** shell tab mode: the tab strip above owns traffic lights / caption buttons */
 const IN_TAB = new URLSearchParams(window.location.search).get('mode') === 'tab'
 
@@ -1694,7 +1701,7 @@ export function Ribbon({
   return (
     <div className={`ribbon ${collapse.rootClass}`} ref={collapse.rootRef}>
       <div
-        className={`ribbon-tabs ${IN_TAB ? '' : IS_MAC ? 'ribbon-tabs-mac' : 'ribbon-tabs-win'}${
+        className={`ribbon-tabs ${IN_TAB || !HAS_CAPTION_OVERLAY ? '' : IS_MAC ? 'ribbon-tabs-mac' : 'ribbon-tabs-win'}${
           anyPanelOpen ? ' ribbon-tabs-nodrag' : ''
         }`}
         onDoubleClick={collapse.onTabsDoubleClick}

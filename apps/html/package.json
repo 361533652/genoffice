@@ -26,6 +26,7 @@
     "@genoffice/ai-search": "*",
     "@genoffice/electron-utils": "*",
     "@genoffice/file-parse": "*",
+    "@genoffice/host": "*",
     "@genoffice/i18n": "*",
     "@genoffice/project-store": "*",
     "@genoffice/ui": "*",
