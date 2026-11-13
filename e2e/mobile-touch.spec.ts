@@ -87,6 +87,41 @@ test.describe('touch on a mobile host', () => {
     expect(selection).toMatch(/^[A-Z]+\d+:[A-Z]+\d+$/)
   })
 
+  test('sheets: a tap plus typing writes into the cell', async ({ page }) => {
+    await page.goto(SHEETS_URL, { waitUntil: 'load' })
+    await expect(page.locator('.ribbon')).toBeVisible({ timeout: 30_000 })
+    await page.waitForTimeout(3_500)
+
+    // the grid rasterises into a canvas, so neither innerText nor a DOM node
+    // ever shows the cell value: the assertion has to be a pixel diff of the
+    // cell region. Asserting on innerText here produced a false failure that
+    // said touch typing did not work at all.
+    const grid = await page.evaluate(() => {
+      for (const canvas of document.querySelectorAll('canvas')) {
+        const r = canvas.getBoundingClientRect()
+        if (r.width > 300 && r.height > 200) return { x: r.x, y: r.y }
+      }
+      return null
+    })
+    expect(grid, 'worksheet canvas').not.toBeNull()
+    const cell = { x: grid!.x + 89, y: grid!.y + 36 }
+    const clip = { x: cell.x - 40, y: cell.y - 30, width: 200, height: 60 }
+
+    const before = await page.screenshot({ clip })
+    await tap(page, cell.x, cell.y)
+
+    // the name box is DOM, so it is the reliable "a cell is selected" signal
+    await expect(page.locator('[data-u-comp="defined-name"] input')).toHaveValue(/^[A-Z]+\d+$/)
+
+    // type the way a soft keyboard delivers text, then commit the edit
+    await page.keyboard.type('触摸77', { delay: 90 })
+    await page.keyboard.press('Enter')
+    await page.waitForTimeout(1_000)
+
+    const after = await page.screenshot({ clip })
+    expect(Buffer.compare(before, after), 'the cell repainted').not.toBe(0)
+  })
+
   test('docs: a tap places the caret and typing works', async ({ page }) => {
     await page.goto(DOCS_URL, { waitUntil: 'load' })
     await expect(page.locator('.ProseMirror')).toBeVisible({ timeout: 30_000 })
