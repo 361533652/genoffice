@@ -179,13 +179,29 @@ export function installLegacyDesktopBridge(
     consumeAiDocContent: async () => null,
     consumeHeadlessExport: async () => null,
     getPreviewInfo: async () => ({ url: 'about:blank', version: 0 }),
-    readFile: async () => '',
+    // markdown/html read the whole file as text once the host names it
+    readFile: async (path: unknown) => {
+      const file = typeof path === 'string' ? browserFileFor(path) : null
+      return file ? await file.text() : ''
+    },
     updatePreview: async () => undefined,
 
     // ---- recent files / tabs -------------------------------------------
     getRecentFiles: async () => [],
     getRecentProjects: async () => ({ items: [], page: 0 }),
     getUserSettings: async () => ({}),
+
+    // markdown / html: pick a text document and read it whole
+    openMarkdown: async () => {
+      const picked = await openViaPicker('markdown')
+      if (!picked.ok) return null
+      return picked.handle.id
+    },
+    openHtml: async () => {
+      const picked = await openViaPicker('html')
+      if (!picked.ok) return null
+      return picked.handle.id
+    },
 
     // the renderer asks for a path first, then reads it in chunks
     openPdf: async () => {
