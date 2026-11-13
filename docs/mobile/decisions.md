@@ -145,6 +145,9 @@ ADR 4 原本把「触屏交互」列为最可能推翻整个计划的风险，�
 | 文件访问契约（FileAccess） | ✅ 已定义 + 浏览器实现 | e2e：3 用例 + 4 单测 |
 | 文件读写 SAF | ⚠️ 契约已定，Android 侧未接 | — |
 | Rust sidecar 移动版 | ⚠️ 已可绕过（走纯 TS 路径） | — |
+| 文档字节传输 | ✅ blob URL（非 base64） | e2e：20MB → <200 字符 URL |
+| handle 语义 | ✅ 末段为文件名 | 4 个单测 |
+| 完整手机流程 | ✅ 触摸打开-编辑-保存 | e2e：组合流程 |
 
 ### 引擎可移植化：实际改了什么
 
@@ -186,7 +189,7 @@ npx vitest run --root packages/host
 2. FileHost 的 SAF 实现 —— FileHandle 与端口都已就位，缺的是 Android 侧的绑定；
 3. ~~sheets 双击进编辑~~（已证伪：触摸 tap + 键入即可，原判断是探测方法错误）；
 4. Android 宿主工程（需要本机装 Android SDK）；
-5. docs/platforms/chromeos.md:54 的结论改写。
+5. ~~docs/platforms/chromeos.md:54 的结论改写~~（已完成）。
 
 ### 关于 Rust sidecar：可以不交叉编译
 
@@ -194,6 +197,6 @@ npx vitest run --root packages/host
 
 这降低了一个曾经被认为是「三个硬骨头之一」的风险：不是解决了它，而是绕过了它。
 
-## 已知的文档冲突
+## 已解决的文档冲突
 
-`docs/platforms/chromeos.md:54` 写着「Android 不在计划内、架构无法翻译」。该结论已由 ADR 1 取代，需改写并指向本文档。
+`docs/platforms/chromeos.md` 原先写着「Android 不在计划内、架构无法翻译」。该结论已由 ADR 1 取代，页面已改写为「尚未发布，但移植正在进行中」并指向本文档。

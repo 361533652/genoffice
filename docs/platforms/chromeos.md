@@ -51,9 +51,13 @@ desktop, over native Wayland or X11; GenOffice needs no display configuration.
 
 ## What does not work / what does not exist
 
-- **Play Store / Android app**: GenOffice is not an Android application; ARC
-  (the Android runtime) is not a supported install path. The Electron desktop
-  architecture does not translate to Android, and this is not planned.
+- **Play Store / Android app**: not shipped yet. The Electron desktop build is
+  not an Android application and ARC (the Android runtime) is not a supported
+  install path for it, but an Android port is now actively in progress: the
+  renderers already run without Electron, and the file/engine work is done. See
+  [docs/mobile/decisions.md](../mobile/decisions.md) for what is verified and
+  what is still missing. Earlier revisions of this page said Android was "not
+  planned"; that is no longer true and this note supersedes it.
 - **Google Drive sync**: no Drive integration is built in. Documents live in
   the Linux filesystem; ChromeOS can surface Drive files through the Files app,
   but the Linux container does not mount Drive. Export/save manually, or keep
