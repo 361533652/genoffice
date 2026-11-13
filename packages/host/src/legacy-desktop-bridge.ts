@@ -16,7 +16,7 @@
  * has moved to `@genoffice/host`. The `console.debug` trace exists so a test can
  * assert which capabilities a screen actually reached for.
  */
-import { openViaPicker, saveViaPicker, hasFilePicker } from './files.js'
+import { grantFile, openViaPicker, rawFileFor, saveViaPicker, hasFilePicker } from './files.js'
 import { createSettingsStore } from './settings.js'
 
 /** Methods that return an unsubscribe function rather than a value. */
@@ -57,21 +57,21 @@ const OBJECT_LIKE_GETTERS = new Set([
 ])
 
 /**
- * Files the user granted in this session, keyed by the handle the renderer
- * passes around. A browser host holds `File` objects here; SAF will hold a
- * content URI and a file descriptor in the same slot.
+ * Register a file the user picked, returning the handle the renderer stores.
+ *
+ * Delegates to the shared table in ./files.ts so that every file-facing piece
+ * of the host — the legacy shim, FileAccess, the chunked PDF reader — resolves
+ * the same handle. Two tables meant a handle readable through one path and
+ * invisible through another.
  */
-const grantedFiles = new Map<string, File>()
-
-/** Register a file the user picked, returning the handle the renderer stores. */
-export function grantBrowserFile(file: File, handleId = 'browser-' + grantedFiles.size): string {
-  grantedFiles.set(handleId, file)
-  return handleId
+export function grantBrowserFile(file: File, handleId?: string): string {
+  const id = grantFile(file, handleId)
+  return id
 }
 
 /** The file behind a handle, if this session still has it. */
 export function browserFileFor(handleId: string): File | null {
-  return grantedFiles.get(handleId) ?? null
+  return rawFileFor(handleId)
 }
 
 /** The empty value to answer with when an unknown method is called. */

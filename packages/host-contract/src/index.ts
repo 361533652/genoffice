@@ -20,6 +20,14 @@ export {
 export type { FileHandle, DocumentKind, OpenResult } from './handle.js'
 
 export type {
+  FileAccess,
+  FileReader,
+  FileWriter,
+  OpenedFile,
+  SaveOutcome,
+} from './file-access.js'
+
+export type {
   FileHost,
   DialogHost,
   SettingsHost,

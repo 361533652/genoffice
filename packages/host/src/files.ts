@@ -32,6 +32,32 @@ interface BrowserFileHandle extends FileHandle {
 let counter = 0
 const liveHandles = new Map<string, FileSystemFileHandle>()
 
+/**
+ * Files a host handed over without a FileSystemFileHandle.
+ *
+ * A picker-backed host has a real handle; a host that received bytes from
+ * elsewhere (a test, a drag-drop, and later an Android SAF descriptor) only has
+ * the data. Both must answer {@link readFromHandle}, or a caller cannot tell
+ * which kind of host it is on.
+ */
+const rawFiles = new Map<string, File>()
+
+/** Register a plain File under a handle id. */
+export function registerRawFile(id: string, file: File): void {
+  rawFiles.set(id, file)
+}
+
+/** The plain File behind a handle, when the host kept one. */
+export function rawFileFor(id: string): File | null {
+  return rawFiles.get(id) ?? null
+}
+
+/** Register a File and return the handle id callers should store. */
+export function grantFile(file: File, id = 'granted-' + (++counter)): string {
+  rawFiles.set(id, file)
+  return id
+}
+
 export function hasFilePicker(): boolean {
   const w = globalThis as unknown as FsWindow
   return typeof w.showOpenFilePicker === 'function' && typeof w.showSaveFilePicker === 'function'
@@ -94,6 +120,10 @@ export async function saveViaPicker(data: Uint8Array, suggestedName: string, kin
 }
 
 export async function writeToHandle(handle: FileHandle, data: Uint8Array): Promise<{ ok: boolean; error?: string }> {
+  // a plain File is read-only: replacing it needs a destination the user picked
+  if (rawFiles.has(handle.id)) {
+    return { ok: false, error: 'a granted File cannot be rewritten in place; use saveAs' }
+  }
   const native = lookupHandle(handle.id)
   if (!native) return { ok: false, error: 'handle is not writable in this host' }
   try {
@@ -107,6 +137,15 @@ export async function writeToHandle(handle: FileHandle, data: Uint8Array): Promi
 }
 
 export async function readFromHandle(handle: FileHandle): Promise<Uint8Array | null> {
+  // a plain File (no picker handle) answers the same way
+  const raw = rawFiles.get(handle.id)
+  if (raw) {
+    try {
+      return new Uint8Array(await raw.arrayBuffer())
+    } catch {
+      return null
+    }
+  }
   const native = lookupHandle(handle.id)
   if (!native) return null
   try {
