@@ -56,6 +56,24 @@ const OBJECT_LIKE_GETTERS = new Set([
   'getStatus',
 ])
 
+/**
+ * Files the user granted in this session, keyed by the handle the renderer
+ * passes around. A browser host holds `File` objects here; SAF will hold a
+ * content URI and a file descriptor in the same slot.
+ */
+const grantedFiles = new Map<string, File>()
+
+/** Register a file the user picked, returning the handle the renderer stores. */
+export function grantBrowserFile(file: File, handleId = 'browser-' + grantedFiles.size): string {
+  grantedFiles.set(handleId, file)
+  return handleId
+}
+
+/** The file behind a handle, if this session still has it. */
+export function browserFileFor(handleId: string): File | null {
+  return grantedFiles.get(handleId) ?? null
+}
+
 /** The empty value to answer with when an unknown method is called. */
 function fallbackAnswer(name: string): unknown {
   if (OBJECT_LIKE_GETTERS.has(name)) return {}
@@ -168,6 +186,26 @@ export function installLegacyDesktopBridge(
     getRecentFiles: async () => [],
     getRecentProjects: async () => ({ items: [], page: 0 }),
     getUserSettings: async () => ({}),
+
+    // the renderer asks for a path first, then reads it in chunks
+    openPdf: async () => {
+      const picked = await openViaPicker('pdf')
+      if (!picked.ok) return null
+      return { path: picked.handle.id, name: picked.handle.name }
+    },
+
+    // ---- pdf: chunked file reads ----------------------------------------
+    // pdf.js streams through readFileChunk(path, offset, end) rather than
+    // taking a whole buffer, so this returns real bytes when the handle names
+    // a File the user granted, and an empty chunk otherwise.
+    readFileChunk: async (path: unknown, offset: unknown, end: unknown) => {
+      const file = typeof path === 'string' ? browserFileFor(path) : null
+      if (!file) return { data: new Uint8Array(0), fileSize: 0 }
+      const start = typeof offset === 'number' ? offset : 0
+      const stop = typeof end === 'number' ? Math.min(end, file.size) : file.size
+      const slice = file.slice(start, stop)
+      return { data: new Uint8Array(await slice.arrayBuffer()), fileSize: file.size }
+    },
 
     // ---- slides: a blank deck ------------------------------------------
     // slides boots by asking for a fresh deck when nothing is pending, and
