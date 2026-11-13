@@ -22,6 +22,47 @@ import { createSettingsStore } from './settings.js'
 /** Methods that return an unsubscribe function rather than a value. */
 const SUBSCRIPTION_PATTERN = /^(on[A-Z]|arm[A-Z]|install[A-Z])/
 
+/**
+ * Methods whose answer the renderer feeds straight into `.length`.
+ *
+ * A host without an implementation cannot return `undefined` for these: the
+ * renderer reads the result unguarded (`commentCount: comments.length`), so an
+ * undefined answer is a blank screen rather than a missing feature. Name
+ * prefixes are the honest signal we have — every list-shaped call in the six
+ * apps is a `get*`/`list*` returning a collection.
+ */
+const LIST_LIKE_PATTERN = /^(get|list|fetch)[A-Z]/
+
+/**
+ * Names whose `get*` answer is an object, not a list. Derived from the call
+ * sites that read fields off the result instead of iterating it.
+ */
+const OBJECT_LIKE_GETTERS = new Set([
+  'getLayouts',
+  'getPreviewInfo',
+  'getRecentProjects',
+  'getAiSettings',
+  'getAiPanelPrefs',
+  'getAutoSaveDefault',
+  'getDocumentTheme',
+  'getTheme',
+  'getLanguage',
+  'getSystemLocale',
+  'getAuthorName',
+  'getUserSettings',
+  'getUserDisplayName',
+  'getPathForFile',
+  'getSlideSize',
+  'getStatus',
+])
+
+/** The empty value to answer with when an unknown method is called. */
+function fallbackAnswer(name: string): unknown {
+  if (OBJECT_LIKE_GETTERS.has(name)) return {}
+  if (LIST_LIKE_PATTERN.test(name)) return []
+  return undefined
+}
+
 type AnyFn = (...args: unknown[]) => unknown
 
 export interface LegacyBridgeStats {
@@ -127,6 +168,37 @@ export function installLegacyDesktopBridge(
     getRecentFiles: async () => [],
     getRecentProjects: async () => ({ items: [], page: 0 }),
     getUserSettings: async () => ({}),
+
+    // ---- slides: a blank deck ------------------------------------------
+    // slides boots by asking for a fresh deck when nothing is pending, and
+    // `applyOpen(null)` is a no-op — so returning null here left the app stuck
+    // on "Opening…" forever. A 16:9 slide at the requested fit width is what
+    // the main process would have built.
+    newBlank: async (fitWidthPx?: unknown) => ({
+      path: '',
+      slides: [blankRenderSlide(typeof fitWidthPx === 'number' ? fitWidthPx : 0)],
+    }),
+
+    // ---- clipboard / probe answers -------------------------------------
+    clipboardProbe: async () => false,
+    isDirty: async () => false,
+
+    // ---- slides: list-shaped answers ------------------------------------
+    // These feed `.length` straight into render state, so undefined crashes the
+    // app rather than degrading it. Every method here is one the renderer reads
+    // without a guard; add to this list when a crash points at one.
+    getLayouts: async () => ({ layouts: [], themes: [] }),
+    getAnimations: async () => [],
+    getTransitions: async () => [],
+    getInk: async () => [],
+    getInkPresets: async () => [],
+    getNotes: async () => '',
+    getSlideComments: async () => [],
+    getCustomShows: async () => [],
+    getSections: async () => [],
+    getMediaList: async () => [],
+    listFonts: async () => [],
+    getRecentFilesSlides: async () => [],
   }
 
   const bridge = new Proxy(explicit, {
@@ -145,7 +217,10 @@ export function installLegacyDesktopBridge(
           return () => {}
         }
       }
-      return async () => undefined
+      // list-shaped answers come back as [], not undefined: the renderer reads
+      // `.length` off them without a guard
+      const answer = fallbackAnswer(prop)
+      return async () => answer
     },
     has: () => true,
   })
@@ -178,6 +253,25 @@ export function isLegacyDesktopBridge(target: unknown = globalThis): boolean {
 /** Does this host have any way to pick files at all? */
 export function legacyBridgeHasFileAccess(): boolean {
   return hasFilePicker()
+}
+
+/**
+ * A blank 16:9 slide, shaped like `RenderSlide` from @genoffice/pptx-render.
+ *
+ * The desktop main process builds this from a real .pptx template; a host with
+ * no packager can describe the same geometry directly. 960x540 is PowerPoint's
+ * widescreen baseline, which is what the renderer scales against.
+ */
+function blankRenderSlide(fitWidthPx: number): Record<string, unknown> {
+  const baselineWidth = 960
+  const scale = fitWidthPx > 0 ? fitWidthPx / baselineWidth : 1
+  return {
+    widthPx: baselineWidth * scale,
+    heightPx: 540 * scale,
+    scale,
+    background: { kind: 'solid', color: '#ffffff' },
+    nodes: [],
+  }
 }
 
 function toBytes(data: unknown): Uint8Array | null {
