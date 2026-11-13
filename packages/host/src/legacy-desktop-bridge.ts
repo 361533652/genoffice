@@ -111,6 +111,21 @@ const REQUIRES_DESKTOP = new Set([
   'convertOffice',
   'compareReadPdf',
   'compareReadOpen',
+  // sheets: the workbook is written by the main process against a real file
+  'saveWorkbookEdits',
+  'writeWorkbookRecovery',
+  'openWorkbooksForMerge',
+  'exportImages',
+  'saveMergedPdf',
+  'saveImageAs',
+  'writeExportImage',
+  'saveRecording',
+  'savePicture',
+  'saveStyleSidecar',
+  'saveStyleTemplate',
+  // slides/pdf: the deck file is rewritten in the main process
+  'slideSaveAs',
+  'saveAs',
   // printing and native integrations
   'print',
   'printFile',

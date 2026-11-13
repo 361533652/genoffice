@@ -144,6 +144,7 @@ ADR 4 原本把「触屏交互」列为最可能推翻整个计划的风险，�
 | Android 宿主 | ❌ 未建（本机无 Android SDK） | — |
 | 文件访问契约（FileAccess） | ✅ 已定义 + 浏览器实现 | e2e：3 用例 + 4 单测 |
 | 文件读写 SAF | ⚠️ 契约已定，Android 侧未接 | — |
+| sheets 保存回文件 | ❌ 缺宿主 workbook session | 见 limitations.ts |
 | Rust sidecar 移动版 | ⚠️ 已可绕过（走纯 TS 路径） | — |
 | 文档字节传输 | ✅ blob URL（非 base64） | e2e：20MB → <200 字符 URL |
 | handle 语义 | ✅ 末段为文件名 | 4 个单测 |
@@ -191,6 +192,15 @@ npx vitest run --root packages/host
 4. Android 宿主工程（需要本机装 Android SDK）；
 5. ~~docs/platforms/chromeos.md:54 的结论改写~~（已完成）。
 
+### 一个修正：sheets 目前还不能保存
+
+前一轮我说「六个应用都能打开真实文件并编辑」，对 sheets 这句话只对一半。
+
+它能打开 .xlsx、能改单元格（触摸 tap + 键入都验证过），但**写不回文件**：`saveWorkbookEdits` 需要主进程持有的 `sessionId`，主进程负责把 patch 应用到包上再落盘。浏览器/WebView 宿主没有这层 session，所以保存会失败。
+
+这不是 bug，是**尚未实现的结构**。已把它连同其余五项一起写进 `packages/host/src/limitations.ts` 的 `BROWSER_HOST_LIMITATIONS`，每条都写明「用户不能做什么」和「需要什么才能做」。
+
+同时改了垫片的失败语义：`splitPdf()`、`saveWorkbookEdits()` 这类**动作**，以前返回 `undefined` 让界面以为成功，现在明确 reject 并说明只在桌面版可用；而 `getRecentFiles()` 这类**探测**仍返回空值。把动作和探测混为一谈，会让用户以为自己完成了一个其实没发生的文件操作。
 ### 关于 Rust sidecar：可以不交叉编译
 
 原计划是给 `xlsx-sidecar` 做 `aarch64-linux-android` 交叉编译。现在**不必要了**：纯 TS 的 `xlsx-gateway` 路径已经在浏览器里跑通了完整的编辑-保存-回读闭环（见上文验证）。sidecar 只是大文件的流式优化路径，移动端先走纯 TS 路径即可，交叉编译可以推迟到确实遇到大文件性能瓶颈时再评估。

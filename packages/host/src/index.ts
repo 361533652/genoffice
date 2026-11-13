@@ -25,6 +25,7 @@ export * from './legacy-desktop-bridge.js'
 export * from './node-globals.js'
 export * from './deflate.js'
 export * from './file-access.js'
+export * from './limitations.js'
 
 /** The subset of `window.desktop` this facade adapts (see apps/docs/src/shared/ipc.ts). */
 interface ElectronPreload {
