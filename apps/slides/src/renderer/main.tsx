@@ -1,6 +1,7 @@
 // side-effect import, and deliberately first: installs the `window.desktop`
 // fallback before any other module can read it (see host-install.ts)
 import './host-install'
+import { getHost } from '@genoffice/host'
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { htmlDir, htmlLang, type Lang } from '@genoffice/i18n'
@@ -54,9 +55,11 @@ async function bootstrap(): Promise<void> {
   try {
     // per-promise catch: standalone runs have no app:get-theme handler, and
     // that rejection must not drop a resolved language
+    // through the host facade, not a global: a browser or WebView host has no
+    // preload, and the facade answers from its own store instead of throwing
     ;[lang, theme] = await Promise.all([
-      window.slidesApi.getLanguage().catch(() => 'zh' as const),
-      window.slidesApi.getTheme().catch(() => 'system' as const),
+      getHost().language().catch(() => 'zh' as const),
+      getHost().theme().catch(() => 'system' as const),
     ])
   } catch {
     /* dev renderer without the preload bridge */

@@ -42,6 +42,11 @@ interface ElectronPreload {
   [key: string]: unknown
 }
 
+/** UI languages the shell persists and the renderers render. */
+export type HostLanguage =
+  | 'zh' | 'en' | 'ja' | 'ko' | 'fr' | 'de' | 'es' | 'th'
+  | 'id' | 'ru' | 'ar' | 'pt' | 'it' | 'pl' | 'cs' | 'nl'
+
 export type HostKind = 'electron' | 'browser' | 'injected'
 
 /** The resolved host, in the shape renderers consume. */
@@ -50,7 +55,14 @@ export interface Host {
   readonly capabilities: HostCapabilities
   /** the raw Electron preload when present — migration-in-progress escape hatch */
   readonly electron: ElectronPreload | null
-  language(): Promise<string>
+  /**
+   * The UI language.
+   *
+   * Typed as the closed set rather than `string` because every caller hands the
+   * answer straight to `htmlLang()` / `LocaleProvider`, which take a `Lang`. A
+   * `string` here forced a cast at each of the five call sites.
+   */
+  language(): Promise<HostLanguage>
   theme(): Promise<'light' | 'dark' | 'system'>
   documentTheme(): Promise<'light' | 'dark' | 'follow'>
   authorName(): Promise<string>
@@ -60,6 +72,12 @@ export interface Host {
 }
 
 let cached: Host | null = null
+
+/** Narrow an arbitrary stored/answered language onto the supported set. */
+function asHostLanguage(value: string): HostLanguage {
+  const known: readonly string[] = ['zh', 'en', 'ja', 'ko', 'fr', 'de', 'es', 'th', 'id', 'ru', 'ar', 'pt', 'it', 'pl', 'cs', 'nl']
+  return (known.includes(value) ? value : 'zh') as HostLanguage
+}
 
 /** Reset the cached host — tests and host hot-swap only. */
 export function resetHost(): void {
@@ -96,7 +114,7 @@ export function resolveHost(): Host {
       kind: 'electron',
       capabilities: DESKTOP_CAPABILITIES,
       electron: preload,
-      language: () => preload.getLanguage?.() ?? Promise.resolve('zh'),
+      language: async () => asHostLanguage(await (preload.getLanguage?.() ?? 'zh')),
       theme: () => preload.getTheme?.() ?? Promise.resolve('system'),
       documentTheme: () => preload.getDocumentTheme?.() ?? Promise.resolve('follow'),
       authorName: () => preload.getAuthorName?.() ?? Promise.resolve(''),
@@ -116,7 +134,7 @@ export function resolveHost(): Host {
     kind: 'browser',
     capabilities: { ...BROWSER_CAPABILITIES, openFile: hasFilePicker(), saveFile: hasFilePicker() },
     electron: null,
-    language: async () => store.read().language,
+    language: async () => asHostLanguage(store.read().language),
     theme: async () => store.read().theme,
     documentTheme: async () => store.read().documentTheme,
     authorName: async () => store.read().authorName,

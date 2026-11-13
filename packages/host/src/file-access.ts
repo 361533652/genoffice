@@ -65,7 +65,10 @@ export function createBrowserFileAccess(): FileAccess {
       const result = await writeToHandle(handle, data)
       // createWritable() + close() commits, but there is no rename: a tab that
       // dies mid-write leaves a truncated file. ADR 3 carries this.
-      return result.ok ? { ok: true, atomic: false } : { ok: false, reason: 'error', error: result.error }
+      // exactOptionalPropertyTypes: omit `error` rather than set it to undefined
+      return result.ok
+        ? { ok: true, atomic: false }
+        : { ok: false, reason: 'error', ...(result.error ? { error: result.error } : {}) }
     },
 
     async saveAs(data, suggestedName, kind): Promise<OpenedFile | null> {

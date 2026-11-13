@@ -1,6 +1,7 @@
 // side-effect import, and deliberately first: installs the `window.desktop`
 // fallback before any other module can read it (see host-install.ts)
 import './host-install'
+import { getHost } from '@genoffice/host'
 import { createRoot } from 'react-dom/client'
 import { htmlDir, htmlLang, type Lang } from '@genoffice/i18n'
 import App from './App'
@@ -32,9 +33,10 @@ function applyTheme(theme: UiTheme): void {
 }
 
 void (async () => {
+  // through the host facade: a browser or WebView host has no preload
   const [lang, theme] = await Promise.all([
-    window.pdfApi.getLanguage().catch(() => 'zh' as const),
-    window.pdfApi.getTheme().catch(() => 'system' as const),
+    getHost().language().catch(() => 'zh' as const),
+    getHost().theme().catch(() => 'system' as const),
   ])
   document.documentElement.lang = htmlLang(lang as Lang)
   document.documentElement.dir = htmlDir(lang)

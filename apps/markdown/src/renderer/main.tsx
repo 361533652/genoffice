@@ -1,6 +1,7 @@
 // side-effect import, and deliberately first: installs the `window.desktop`
 // fallback before any other module can read it (see host-install.ts)
 import './host-install'
+import { getHost } from '@genoffice/host'
 import { createRoot } from 'react-dom/client'
 import { htmlDir, htmlLang, type Lang } from '@genoffice/i18n'
 import App from './App'
@@ -48,10 +49,13 @@ function applyDocumentTheme(theme: DocTheme): void {
 }
 
 void (async () => {
+  // through the host facade: a browser or WebView host has no preload. The
+  // markdown paper theme has no place on the facade yet, so it keeps reading the
+  // bridge until that group moves over.
   const [lang, theme, docTheme, mdTheme] = await Promise.all([
-    window.markdownApi.getLanguage().catch(() => 'zh' as const),
-    window.markdownApi.getTheme().catch(() => 'system' as const),
-    window.markdownApi.getDocumentTheme?.().catch(() => 'follow' as const),
+    getHost().language().catch(() => 'zh' as const),
+    getHost().theme().catch(() => 'system' as const),
+    getHost().documentTheme().catch(() => 'follow' as const),
     window.markdownApi.getMarkdownTheme?.().catch(() => 'default' as const),
   ])
   document.documentElement.lang = htmlLang(lang as Lang)
