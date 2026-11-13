@@ -100,18 +100,40 @@ docs 的 `DesktopApi` 一个接口就有 **109 个方法**；渲染层里 `fileP
 
 | 层 | 状态 | 验证方式 |
 |---|---|---|
-| 解析引擎（docx/pptx/xlsx） | ✅ 纯 TS，可直接复用 | 全量 grep，零 `node:` 引用 |
-| 渲染层启动（无 Electron） | ✅ 已跑通 | e2e：零 pageerror |
-| 宿主抽象（contract + facade） | ✅ 已建 | 17 个单测通过 |
-| 旧桥过渡垫片 | ✅ 已生效 | e2e：无桥可启动 |
-| 移动视口版式 | ✅ 已修（390 ↔ 390） | e2e：三项宽度断言 |
+| 渲染层启动（无 Electron），六个应用 | ✅ 已跑通 | e2e：零 pageerror × 6 |
+| 宿主抽象（contract + facade） | ✅ 已建 | 23 个单测通过 |
+| 旧桥过渡垫片（8 个全局名） | ✅ 已生效 | e2e：无桥可启动 |
+| 移动视口版式 | ✅ 已修（390 ↔ 390 × 6） | e2e：宽度断言 |
+| docx 引擎可移植 | ✅ 字节级往返一致 | e2e：SHA-256 相等 |
+| pptx 引擎可移植 | ✅ 语义往返一致 | e2e：页数/形状数相等 |
+| xlsx 引擎可移植 | ✅ 编辑-保存-回读闭环 | e2e：A1 值回读成功 |
 | CJK IME（合成事件） | ✅ 已通过 | e2e：4 场景 |
 | 触屏交互 | ❌ 0 处触屏代码 | 全量 grep |
 | CJK IME（真机输入法） | ❌ 未执行 | 需真机 |
 | 键盘遮挡 | ❌ 未执行 | 需真机 |
 | Android 宿主 | ❌ 未建（本机无 Android SDK） | — |
-| 文件读写 SAF | ❌ 未实现 | — |
-| Rust sidecar 交叉编译 | ❌ 未开始 | — |
+| 文件读写 SAF | ⚠️ 端口已定，实现未接 | — |
+| Rust sidecar 移动版 | ⚠️ 已可绕过（走纯 TS 路径） | — |
+
+### 引擎可移植化：实际改了什么
+
+三个引擎都声称「纯 TS」，但真正搬进 WebView 时各自卡在不同的地方。记录在此，避免下次重复踩。
+
+**docx**：只依赖 `Buffer` 这一个全局。装了 `buffer` 包即解决。往返验证是**字节级**的——未修改的文档保存回来 SHA-256 完全相同。
+
+**pptx**：卡在 `node:crypto`（`createHash`、`randomUUID`）和 `node:zlib`（`deflateSync`）。
+- 哈希改 WebCrypto（`open` 本来就是 async，零成本）；
+- UUID 改全局 `crypto.randomUUID`（Node 19+ 与所有浏览器都有）；
+- `deflateSync` 只用来生成占位 PNG 的 IDAT 块，而 `solidPng` 是同步导出的。用 zlib **stored block**（不压缩的合法 deflate）重写，保持同步、零依赖，并用 `node:zlib` 解压双向验证过（7 字节和 200 KB 都通过）。
+- 注意：pptx 是**重建**式保存，字节必然变化（32 KB → 45 KB），所以验证的是语义等价（5 页、每页形状数一致），不是字节相等。
+
+**xlsx**：最难。它通过临时目录 + 原子 rename 落盘，这在 WebView 里根本不存在。
+- 抽出 `FileSystemPort`，Node 实现保留原语义（真临时目录、原子 rename、fsync）；
+- 内存实现（`fs-memory.ts`）用 Map 承载，`replaceFile` 诚实报告 `atomic: false`；
+- Node 实现改为**动态导入**——静态导入会把 `node:fs` 拖进依赖图，使整个包在浏览器里无法导入，即使一行文件系统代码都不执行；
+- `sha256` 改成同步纯 JS 实现（调用方在规划阶段行内比较哈希，改成异步会把整条规划链路 async 化）；
+- JSZip 的 `nodebuffer` 全部换 `uint8array`（浏览器不支持前者，四处）。
+- 验证到闭环：打开 blank.xlsx → 改 A1 → 保存 → 重新读出来得到 `genoffice-mobile`，`touchedEntries` 正好是 `['xl/worksheets/sheet1.xml']`。
 
 ## 怎么跑这些验收
 
@@ -130,9 +152,15 @@ npx vitest run --root packages/host
 ## 下一步（按依赖顺序）
 
 1. 真机验证 IME 与键盘几何（阻塞项：没有通过就不该动触屏代码）；
-2. `FileHost` 的 SAF 实现 —— 先把 `saveDocx` 一族的签名从 path 改成 handle；
-3. `xlsx-sidecar` 交叉编译 `aarch64-linux-android`，或退回纯 TS `xlsx-gateway`；
-4. 触屏交互层（从 sheets 的拖选与 slides 的手柄开始，它们退化最严重）。
+2. `FileHost` 的 SAF 实现 —— 把 `saveDocx` 一族的签名从 path 改成 handle；
+3. 触屏交互层（从 sheets 的拖选与 slides 的手柄开始，它们退化最严重）；
+4. Android 宿主工程（需要本机装 Android SDK）。
+
+### 关于 Rust sidecar：可以不交叉编译
+
+原计划是给 `xlsx-sidecar` 做 `aarch64-linux-android` 交叉编译。现在**不必要了**：纯 TS 的 `xlsx-gateway` 路径已经在浏览器里跑通了完整的编辑-保存-回读闭环（见上文验证）。sidecar 只是大文件的流式优化路径，移动端先走纯 TS 路径即可，交叉编译可以推迟到确实遇到大文件性能瓶颈时再评估。
+
+这降低了一个曾经被认为是「三个硬骨头之一」的风险：不是解决了它，而是绕过了它。
 
 ## 已知的文档冲突
 
