@@ -10,7 +10,7 @@
  * Decks from before carry a plain picture whose cNvPr descr names the model part
  * (`aislides-3d:{partPath}`, model3dPartOf).
  */
-import { deflateSync } from 'node:zlib'
+import { zlibStoredSync } from './zlib-stored'
 import { crc32 } from './crc32'
 import { glbBounds } from './glb-bounds'
 import {
@@ -79,7 +79,9 @@ export function solidPng(w: number, h: number, rgb: [number, number, number]): B
   return Buffer.concat([
     Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
     pngChunk('IHDR', ihdr),
-    pngChunk('IDAT', deflateSync(raw)),
+    // zlib-stored instead of node:zlib: `solidPng` is synchronous and must run
+    // in a WebView too (see zlib-stored.ts for why stored blocks are enough)
+    pngChunk('IDAT', zlibStoredSync(raw)),
     pngChunk('IEND', Buffer.alloc(0)),
   ])
 }

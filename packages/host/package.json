@@ -14,7 +14,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@genoffice/host-contract": "*"
+    "@genoffice/host-contract": "*",
+    "buffer": "^6.0.3"
   },
   "devDependencies": {
     "typescript": "^5.9.3",

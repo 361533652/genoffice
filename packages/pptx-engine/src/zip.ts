@@ -8,10 +8,24 @@
  */
 import JSZip from 'jszip'
 import { assertZipInflatesWithinLimits } from '@genoffice/zip-gate'
-import { createHash } from 'node:crypto'
 import { XMLParser } from 'fast-xml-parser'
 import type { SlideSize } from './types'
 import { asXmlNode, xmlArray } from './xml-utils'
+
+/**
+ * SHA-256 as lowercase hex.
+ *
+ * Was `createHash('sha256')` from node:crypto, which a WebView cannot load —
+ * the import alone broke the whole engine off Electron.
+ */
+async function sha256Hex(bytes: Uint8Array): Promise<string> {
+  const copy = new ArrayBuffer(bytes.byteLength)
+  new Uint8Array(copy).set(bytes)
+  const digest = await globalThis.crypto.subtle.digest('SHA-256', copy)
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+}
 
 const relsParser = new XMLParser({
   ignoreAttributes: false,
@@ -69,7 +83,9 @@ export class PackageArchive {
   ) {}
 
   static async open(bytes: Uint8Array): Promise<PackageArchive> {
-    const originalHash = createHash('sha256').update(bytes).digest('hex')
+    // WebCrypto instead of node:crypto: the engine also runs in a browser,
+    // and `open` is already async so the digest costs nothing extra
+    const originalHash = await sha256Hex(bytes)
     // The declared-size pass below is advisory; this metered gate is the one
     // that holds when a part lies about its size (GH #759, measured at
     // 1.2 GB of RSS from a 1.1 MB deck).

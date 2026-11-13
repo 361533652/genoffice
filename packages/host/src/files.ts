@@ -1,4 +1,5 @@
 import type { DocumentKind, FileHandle, OpenResult } from '@genoffice/host-contract'
+import { sha256Hex } from './node-globals.js'
 
 /**
  * Browser file access through the File System Access API.
@@ -129,10 +130,5 @@ export function toArrayBuffer(data: Uint8Array): ArrayBuffer {
   return copy
 }
 
-/** SHA-256 of the bytes as lowercase hex; used to compare round-trips. */
-export async function sha256Hex(data: Uint8Array): Promise<string> {
-  const digest = await globalThis.crypto.subtle.digest('SHA-256', toArrayBuffer(data))
-  return Array.from(new Uint8Array(digest))
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('')
-}
+// sha256Hex lives in ./node-globals.ts — it is the same helper the engine
+// shims need, so there is exactly one implementation

@@ -6,8 +6,14 @@
  * from `main.tsx`'s body would still be too late for any imported module that
  * touches `window.desktop` at module scope.
  *
- * See docs/mobile/decisions.md, ADR 2.
+ * It also installs the Node globals the engine packages assume (`Buffer`), which
+ * a WebView does not provide. See docs/mobile/decisions.md, ADR 2 and ADR 5.
  */
-import { installLegacyDesktopBridge } from '@genoffice/host'
+import { installLegacyDesktopBridge, installNodeGlobals } from '@genoffice/host'
 
 export const legacyBridgeStats = installLegacyDesktopBridge()
+
+// `Buffer` is a global, not an import, so this must finish before any engine
+// module reads it at call time. Buffering the promise is enough: the engines
+// only touch Buffer inside async entry points that run after boot.
+export const nodeGlobalsReady = installNodeGlobals()

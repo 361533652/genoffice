@@ -19,7 +19,6 @@
  * unsectioned — an intuitive rule that naturally self-heals stale
  * references.
  */
-import { randomUUID } from 'node:crypto'
 import { resolveTarget } from './zip'
 import { escapeXmlAttr } from './xml-utils'
 import { unescapeXml } from './notes'
@@ -40,7 +39,9 @@ const P14_NS = 'http://schemas.microsoft.com/office/powerpoint/2010/main'
 
 /** New section GUID: uppercase with braces (the format found in pptx files). */
 function newSectionId(): string {
-  return `{${randomUUID().toUpperCase()}}`
+  // crypto.randomUUID is a global in Node >=19 and in every browser/WebView;
+  // importing it from node:crypto made the whole engine unusable off Electron
+  return `{${globalThis.crypto.randomUUID().toUpperCase()}}`
 }
 
 /** Index array for [start, end). */
