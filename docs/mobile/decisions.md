@@ -107,8 +107,14 @@ docs 的 `DesktopApi` 一个接口就有 **109 个方法**；渲染层里 `fileP
 | docx 引擎可移植 | ✅ 字节级往返一致 | e2e：SHA-256 相等 |
 | pptx 引擎可移植 | ✅ 语义往返一致 | e2e：页数/形状数相等 |
 | xlsx 引擎可移植 | ✅ 编辑-保存-回读闭环 | e2e：A1 值回读成功 |
+| pdf.js 渲染 | ✅ 真实输出可见文字 | e2e：暗像素计数 |
+| 打开真实文档（File > Open） | ✅ 正文进入编辑器 | e2e：内容断言 |
+| 编辑后保存 | ✅ 输出合法 ZIP 包 | e2e：魔数 + 字节数 |
 | CJK IME（合成事件） | ✅ 已通过 | e2e：4 场景 |
-| 触屏交互 | ❌ 0 处触屏代码 | 全量 grep |
+| 触屏：sheets 点击/拖选 | ✅ 实测可用 | e2e：真实 touch 事件 |
+| 触屏：docs 光标/输入 | ✅ 实测可用 | e2e：真实 touch 事件 |
+| 触屏：slides 画布 | ✅ 已渲染 | e2e：Konva 舞台数 |
+| 触屏：sheets 双击进编辑 | ❌ 未通过（无 textarea） | 探测记录 |
 | CJK IME（真机输入法） | ❌ 未执行 | 需真机 |
 | 键盘遮挡 | ❌ 未执行 | 需真机 |
 | Android 宿主 | ❌ 未建（本机无 Android SDK） | — |
@@ -151,10 +157,11 @@ npx vitest run --root packages/host
 
 ## 下一步（按依赖顺序）
 
-1. 真机验证 IME 与键盘几何（阻塞项：没有通过就不该动触屏代码）；
-2. `FileHost` 的 SAF 实现 —— 把 `saveDocx` 一族的签名从 path 改成 handle；
-3. 触屏交互层（从 sheets 的拖选与 slides 的手柄开始，它们退化最严重）；
-4. Android 宿主工程（需要本机装 Android SDK）。
+1. **真机验证 IME 与软键盘几何** —— 唯一还没做的阻塞项，headless 测不出来；
+2. FileHost 的 SAF 实现 —— FileHandle 与端口都已就位，缺的是 Android 侧的绑定；
+3. sheets 的双击进编辑（桌面靠 dblclick，触屏要单独实现）；
+4. Android 宿主工程（需要本机装 Android SDK）；
+5. docs/platforms/chromeos.md:54 的结论改写。
 
 ### 关于 Rust sidecar：可以不交叉编译
 
