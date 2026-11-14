@@ -224,16 +224,20 @@ adb install -r apps/mobile/app/build/outputs/apk/debug/app-debug.apk
 已在 Android 15 模拟器验证：
 - sheets：SAF 选文件 → wasm 打开 → 画布键入 → 保存（SAF 另存）→ 回读编辑值
 - slides：启动空白稿 → 加文本框 → 编辑 → 保存（SAF）→ **二次保存原地写入（无选择器）**
+- **从其他应用打开（v0.1.1）**：ACTION_VIEW intent filters（PDF/Office/文本），文件管理器「用 GenOffice 打开」→ 自动打开（PDF/xlsx 实测）
+- **主页（v0.1.1）**：最近文件（持久化、点按重开、每次打开/保存自动记录）+ 应用网格 + 打开文件按钮
+- **深色防护（v0.1.1）**：六应用声明 color-scheme light dark，防 HyperOS/WebView 算法变暗把菜单变成暗底暗字
 - 宿主注入：Host 门面、sheets wasm URL、slides 会话开关、长按 contextmenu 合成、
-  原生文件钩子（open/saveAs/saveInPlace/read，可写句柄、可等待）、原生确认框。
-详见 apps/mobile/README.md。
+  原生文件钩子（open/saveAs/saveInPlace/read，可写句柄、可等待）、原生确认框、一次性 pending-open。
+详见 apps/mobile/README.md。已发布 Release v0.1.0-android / v0.1.1-android（gh release create）。
 
 ## 建议的下一步
 
 按投入产出排序：
 
-1. **真机装 APK**（你的 PGEM10 已 adb 连接，说一声就装）→ 真机性能/IME/长按验证
-2. **手机打开 5391 打几个字**（两分钟）→ 确认中文输入法真机行为（`npm run serve:mobile-checks`）
-3. **定 A4 缩放**（你自己想清楚就行）→ 影响所有文档的默认观感
-4. slides 字体精度（canvas 测量 provider）与 master view 移植
-5. 纯浏览器部署的首屏代码分割（APK 路线已解此问题）
+1. **确认「文件」菜单真机问题**：用户在 Redmi K80（HyperOS）反馈点「文件」无反应；模拟器正常，已补 color-scheme 防强制变暗。等用户截图/装 v0.1.1 复测确认是否仍现
+2. **真机验证**（用户自装 v0.1.1 APK）：性能/IME/长按/打开方式
+3. **手机打开 5391 打几个字**（两分钟）→ 确认中文输入法真机行为（`npm run serve:mobile-checks`）
+4. **定 A4 缩放**（你自己想清楚就行）→ 影响所有文档的默认观感
+5. slides 字体精度（canvas 测量 provider）与 master view 移植
+6. 纯浏览器部署的首屏代码分割（APK 路线已解此问题）
