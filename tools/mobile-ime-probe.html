@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" />
+    <title>GenOffice 移动端诊断</title>
+    <style>
+      :root {
+        --bg: #f7f8fa;
+        --surface: #fff;
+        --text: #1a1d21;
+        --dim: #5c6370;
+        --ok: #16803c;
+        --bad: #b42318;
+        --warn: #b54708;
+        --line: #e3e6ea;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #14161a;
+          --surface: #1c1f24;
+          --text: #e8eaed;
+          --dim: #9aa1ac;
+          --ok: #3fb950;
+          --bad: #f85149;
+          --warn: #d29922;
+          --line: #2a2f36;
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 16px;
+        background: var(--bg);
+        color: var(--text);
+        font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+      h1 { font-size: 19px; margin: 0 0 4px; }
+      .sub { color: var(--dim); font-size: 13px; margin-bottom: 16px; }
+      section {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 14px;
+        margin-bottom: 12px;
+      }
+      h2 { font-size: 15px; margin: 0 0 8px; }
+      .hint { color: var(--dim); font-size: 13px; margin-bottom: 10px; }
+      #probe {
+        width: 100%;
+        min-height: 120px;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--bg);
+        color: var(--text);
+        font: inherit;
+        font-size: 17px;
+        resize: vertical;
+      }
+      button {
+        margin-top: 10px;
+        padding: 10px 16px;
+        min-height: 44px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        color: var(--text);
+        font: inherit;
+        cursor: pointer;
+      }
+      button:active { background: var(--line); }
+      ul { list-style: none; margin: 0; padding: 0; }
+      li {
+        display: flex;
+        gap: 8px;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--line);
+        font-size: 14px;
+      }
+      li:last-child { border-bottom: 0; }
+      .name { color: var(--dim); flex: 0 0 44%; }
+      .val { color: var(--text); word-break: break-all; }
+      .ok { color: var(--ok); }
+      .bad { color: var(--bad); }
+      .warn { color: var(--warn); }
+      #log {
+        font: 12px/1.6 ui-monospace, monospace;
+        color: var(--dim);
+        white-space: pre-wrap;
+        max-height: 260px;
+        overflow: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>GenOffice 移动端诊断</h1>
+    <div class="sub">在手机上打开这一页，按提示操作一次，看结果是否全部通过。</div>
+
+    <section>
+      <h2>1. 中文输入测试</h2>
+      <div class="hint">
+        点进下面的框，用你平时的输入法输入：<b>你好世界</b>（不要复制粘贴）<br />
+        然后看下面的「字符校验」是否为通过。
+      </div>
+      <textarea id="probe" placeholder="在这里输入中文…" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea>
+      <button id="clear">重新输入</button>
+      <ul id="ime"></ul>
+    </section>
+
+    <section>
+      <h2>2. 软键盘几何</h2>
+      <div class="hint">
+        上面的输入框获得焦点、键盘弹出后，这里会显示键盘占了多少高度，
+        以及输入框是否被键盘遮住。
+      </div>
+      <ul id="kb"></ul>
+    </section>
+
+    <section>
+      <h2>3. 环境信息</h2>
+      <ul id="env"></ul>
+    </section>
+
+    <section>
+      <h2>事件日志</h2>
+      <div id="log"></div>
+    </section>
+
+    <script>
+      const $ = (id) => document.getElementById(id)
+      const rows = (host, pairs) => {
+        host.innerHTML = pairs
+          .map(
+            ([k, v, cls]) =>
+              '<li><span class="name">' + k + '</span><span class="val ' + (cls || '') + '">' + v + '</span></li>',
+          )
+          .join('')
+      }
+
+      // ---- 环境 -------------------------------------------------------------
+      const env = [
+        ['屏幕', window.screen.width + ' × ' + window.screen.height],
+        ['视口', window.innerWidth + ' × ' + window.innerHeight],
+        ['设备像素比', String(window.devicePixelRatio)],
+        ['UA', navigator.userAgent.slice(0, 90)],
+        ['触屏点数', String(navigator.maxTouchPoints)],
+        ['语言', navigator.language],
+      ]
+      rows($('env'), env)
+
+      // ---- 输入法 -----------------------------------------------------------
+      const logLines = []
+      const log = (line) => {
+        logLines.push(new Date().toISOString().slice(11, 23) + '  ' + line)
+        $('log').textContent = logLines.slice(-40).join('\n')
+      }
+
+      let composing = false
+      let composeStart = 0
+      const probe = $('probe')
+
+      probe.addEventListener('compositionstart', () => {
+        composing = true
+        composeStart = performance.now()
+        log('compositionstart')
+        render()
+      })
+      probe.addEventListener('compositionend', (e) => {
+        composing = false
+        log('compositionend "' + (e.data || '') + '" (组合耗时 ' + Math.round(performance.now() - composeStart) + 'ms)')
+        render()
+      })
+      probe.addEventListener('input', (e) => {
+        log('input "' + (e.data || '') + '" composing=' + e.isComposing)
+        render()
+      })
+
+      function render() {
+        const raw = probe.value
+        const expected = '你好世界'
+        // 只比较非空白字符
+        const norm = (s) => s.replace(/\s+/g, '')
+        const got = norm(raw)
+        let state = ['等待输入…', 'warn']
+        if (got.length > 0) {
+          if (got === expected) state = ['✔ 通过：字符完全正确', 'ok']
+          else if (got.length > expected.length) state = ['✘ 多出字符（' + got.length + ' 个，期望 4）', 'bad']
+          else if (got.length < expected.length) state = ['✘ 少了字符（' + got.length + ' 个，期望 4）', 'bad']
+          else state = ['✘ 字符不符：' + got, 'bad']
+        }
+        // 常见故障：上屏重复、乱序、夹杂拼音
+        const notes = []
+        if (got.includes('nihao') || got.includes('shijie')) notes.push('拼音未转换')
+        if (/(.)\1/.test(got) && got.length > expected.length) notes.push('疑似重复上屏')
+        rows($('ime'), [
+          ['字符校验', state[0], state[1]],
+          ['收到内容', got.length ? got : '（空）'],
+          ['长度', got.length + ' / 期望 4', got.length === 4 ? 'ok' : ''],
+          ['组合事件', composing ? '进行中' : '已结束'],
+          ...(notes.length ? [['注意', notes.join('、'), 'warn']] : []),
+        ])
+        renderKb()
+      }
+
+      $('clear').addEventListener('click', () => {
+        probe.value = ''
+        logLines.length = 0
+        $('log').textContent = ''
+        probe.focus()
+        render()
+      })
+
+      // ---- 键盘几何 ---------------------------------------------------------
+      function renderKb() {
+        const vv = window.visualViewport
+        if (!vv) {
+          rows($('kb'), [['状态', '此浏览器不支持 visualViewport', 'bad']])
+          return
+        }
+        // 键盘高度：布局视口高度与实际可见高度之差
+        const keyboard = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop))
+        const focused = document.activeElement === probe
+        const rect = probe.getBoundingClientRect()
+        // 输入框底边是否落在键盘上方
+        const visibleBottom = vv.height + vv.offsetTop
+        const covered = focused && keyboard > 0 && rect.bottom > visibleBottom
+        rows($('kb'), [
+          ['visualViewport', Math.round(vv.width) + ' × ' + Math.round(vv.height)],
+          ['键盘高度', keyboard + 'px', keyboard > 100 ? 'ok' : ''],
+          ['输入框聚焦', focused ? '是' : '否'],
+          ['输入框底边', Math.round(rect.bottom) + 'px'],
+          ['可见区底边', Math.round(visibleBottom) + 'px'],
+          [
+            '是否被遮挡',
+            keyboard === 0 ? '（键盘未弹出）' : covered ? '✘ 被遮挡' : '✔ 未被遮挡',
+            keyboard === 0 ? '' : covered ? 'bad' : 'ok',
+          ],
+        ])
+      }
+      const vv = window.visualViewport
+      if (vv) {
+        vv.addEventListener('resize', () => {
+          log('viewport 变化 ' + Math.round(vv.width) + '×' + Math.round(vv.height))
+          renderKb()
+        })
+        vv.addEventListener('scroll', renderKb)
+      }
+      probe.addEventListener('focus', () => setTimeout(renderKb, 300))
+      probe.addEventListener('blur', () => setTimeout(renderKb, 300))
+      window.addEventListener('resize', renderKb)
+
+      render()
+    </script>
+  </body>
+</html>
