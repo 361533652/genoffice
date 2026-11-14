@@ -145,6 +145,37 @@ const REQUIRES_DESKTOP = new Set([
   // document open. A neutral answer is correct for those.
   'focusDocsTab',
   'takeExportPdf',
+  // slides: every edit goes through the main process, which owns the deck.
+  // Resolving these to undefined made the editor look like it accepted an edit
+  // (the command "succeeded") while nothing changed — measured: addSlide()
+  // resolved, the deck stayed 1/1.
+  'addElement', 'deleteElement', 'deleteElements',
+  'addSlide', 'addBlankSlide', 'addSlideWithLayout',
+  'copySlides', 'pasteSlide', 'deleteSlide', 'deleteSlides',
+  'moveSlide', 'moveSlides', 'copyElements', 'copyElementsImage', 'pasteElements',
+  'setSlideLayout', 'setSlideSize', 'setSlideHidden', 'setSlidesHidden',
+  'setElementFont', 'setElementParagraphFormat', 'setShapeAdjust', 'setShapeGeometry',
+  'setTextAnchor', 'setEffects', 'setTextBodyProps',
+  'setTableColWidth', 'setTableRowHeight', 'setTableCellAnchor',
+  'insertImage', 'insertImageUrl', 'insertMedia',
+  'addImageBytes', 'addMediaBytes', 'addModel3d', 'setModel3dView',
+  'replacePictureBytes', 'replacePictureUrl',
+  'addTable', 'addInk', 'addChart', 'addSmartArt',
+  'setLink', 'applyHeaderFooter', 'applyTheme',
+  'setTransition', 'setAdvanceTimes', 'setAnimations', 'clearNarration',
+  'setSections', 'addSection', 'renameSection', 'removeSection',
+  'removeSectionSlides', 'moveSection',
+  'setNotes', 'addComment', 'deleteComment',
+  'applyEditScript', 'applyTxn', 'undo', 'redo',
+  'printSlides', 'printerOptions',
+  // sheets: the remaining write path
+  'updateWorkbookPassword', 'updateExternalLinks', 'autoRenameWorkbook',
+  'printWorkbook', 'exportCsv',
+  // pdf
+  'insertPdf', 'insertBlankPage', 'splitPages',
+  // markdown / html
+  'createWikiNote', 'exportDocx', 'printHtml', 'setPresentFullScreen',
+
   // AI: every one of these proxies a request through the main process, which
   // holds the provider keys and does the streaming. Returning undefined made the
   // panel show "thinking" and then nothing, forever.
@@ -355,6 +386,25 @@ export function installLegacyDesktopBridge(
     reportCloseCheck: async () => ({ ok: false }),
     reportCloseSaveResult: async () => ({ ok: false }),
     reportViewMenuState: async () => ({ ok: false }),
+    // ---- state flag echoes --------------------------------------------------
+    // `save`/`setDirty` look like writes but are the app telling the host "this
+    // document is now dirty / please save". The renderer fires them without
+    // awaiting and reads nothing back, so a neutral ack is the correct answer —
+    // rejecting them (as the slide-edit entries above do) would turn every
+    // keystroke into an unhandled rejection.
+    save: async () => ({ ok: false }),
+    setDirty: async () => ({ ok: false }),
+    updatePreview: async () => ({ ok: false }),
+    setProvisionalTitle: async () => ({ ok: false }),
+    takeWikiFragment: async () => null,
+    setShowFullScreen: async () => ({ ok: false }),
+    saveImage: async () => ({ ok: false }),
+    setMarkdownTheme: async () => ({ ok: false }),
+    setImageHost: async () => ({ ok: false }),
+    // a preference echo fired during mount, not awaited: a rejection here is an
+    // unhandled error on every boot
+    setAutoSavePref: async () => ({ ok: false }),
+
     // spelling diagnostics: fire-and-forget by the app, so they answer instead
     // of rejecting (a rejection here becomes an unhandled page error)
     respellKick: async () => ({ ok: false }),
@@ -382,8 +432,6 @@ export function installLegacyDesktopBridge(
       const file = typeof path === 'string' ? browserFileFor(path) : null
       return file ? await file.text() : ''
     },
-    updatePreview: async () => undefined,
-
     // ---- recent files / tabs -------------------------------------------
     getRecentFiles: async () => [],
     getRecentProjects: async () => ({ items: [], page: 0 }),
