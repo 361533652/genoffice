@@ -130,7 +130,8 @@ const REQUIRES_DESKTOP = new Set([
   'print',
   'printFile',
   'printPdfBuffer',
-  'exportPdf',
+  // exportPdf is implemented above as a structured { ok: false } — callers read
+  // result.ok, so a rejection there would lose the reason
   'runCli',
   'zoteroCommand',
   'openSourcePath',
@@ -138,6 +139,12 @@ const REQUIRES_DESKTOP = new Set([
   'spellReplace',
   'spellAddWord',
   'spellIgnoreWord',
+  // NB: respellKick / spellDiag / spellLanguages / spellSetLanguages are NOT
+  // here. They are diagnostics and preference echoes the app fires without
+  // awaiting, so rejecting them turned into unhandled rejections on every
+  // document open. A neutral answer is correct for those.
+  'focusDocsTab',
+  'takeExportPdf',
   // AI: every one of these proxies a request through the main process, which
   // holds the provider keys and does the streaming. Returning undefined made the
   // panel show "thinking" and then nothing, forever.
@@ -255,6 +262,48 @@ export function installLegacyDesktopBridge(
         hash: picked.hash ?? '',
       }
     },
+    /**
+     * Save the open document back to where it came from.
+     *
+     * The desktop answer is `{ ok, path }` and every caller reads `result.ok`
+     * first; returning undefined made them throw a TypeError whose message
+     * ("Cannot read properties of undefined") then reached the user as a save
+     * error. A structured failure says what actually happened.
+     *
+     * A real host supplies this through FileAccess.save(); the browser shim has
+     * no writable destination for a document it only read, so it refuses.
+     */
+    saveDocx: async () => ({
+      ok: false,
+      reason: 'readonly',
+      error: 'This host cannot save back to the original file. Use Save As.',
+    }),
+    saveDocxNew: async () => ({
+      ok: false,
+      reason: 'readonly',
+      error: 'This host cannot create files without a picker. Use Save As.',
+    }),
+    saveDocxTo: async () => ({
+      ok: false,
+      reason: 'readonly',
+      error: 'This host cannot write to a path. Use Save As.',
+    }),
+    exportHtml: async () => ({
+      ok: false,
+      error: 'HTML export needs the desktop app.',
+    }),
+    exportMarkdown: async () => ({
+      ok: false,
+      error: 'Markdown export needs the desktop app.',
+    }),
+    exportPdf: async () => ({
+      ok: false,
+      error: 'PDF export needs the desktop app.',
+    }),
+    setDocPassword: async () => ({
+      ok: false,
+      error: 'Document passwords need the desktop app.',
+    }),
     saveDocxAs: async (_path: unknown, data: unknown) => {
       const bytes = toBytes(data)
       if (!bytes) return null
@@ -293,6 +342,28 @@ export function installLegacyDesktopBridge(
     claimContextMenu: () => undefined,
     listPrinters: async () => [],
     listDocsTabs: async () => [],
+
+    // ---- write-shaped answers the app reads ---------------------------------
+    // These all claim to write something. Resolving to undefined made callers
+    // either throw on `result.ok` or silently believe the write happened.
+    discardDocPasswordIntents: async () => ({ ok: false }),
+    convertAltChunkHtml: async () => null,
+    writeMergeOutput: async () => ({ ok: false, canceled: true }),
+    respondToZotero: async () => ({ ok: false, error: 'Zotero needs the desktop app.' }),
+    reportMcpResult: async () => ({ ok: false }),
+    signalMcpReady: async () => ({ ok: false }),
+    reportCloseCheck: async () => ({ ok: false }),
+    reportCloseSaveResult: async () => ({ ok: false }),
+    reportViewMenuState: async () => ({ ok: false }),
+    // spelling diagnostics: fire-and-forget by the app, so they answer instead
+    // of rejecting (a rejection here becomes an unhandled page error)
+    respellKick: async () => ({ ok: false }),
+    spellDiag: async () => ({ ok: false }),
+    spellLanguages: async () => [],
+    spellSetLanguages: async () => ({ ok: false }),
+    // recovery copies are best-effort by design (the caller already catches),
+    // but it must still answer so a future caller can tell
+    writeRecoveryCopy: async () => ({ ok: false }),
 
     // ---- startup probes -------------------------------------------------
     // Every app asks "is there a document waiting to be opened?" on mount and
