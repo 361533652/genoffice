@@ -45,7 +45,8 @@
     "dist:win": "npm run notices && npm run build:all && npm run dist:win -w @genoffice/shell",
     "dist:linux": "npm run notices && npm run build:all && npm run dist:linux -w @genoffice/shell",
     "test:mobile": "playwright test --config e2e/playwright.mobile.config.ts",
-    "dev:mobile": "npm run dev:renderer -w @genoffice/docs"
+    "dev:mobile": "npm run dev:renderer -w @genoffice/docs",
+    "verify:mobile-builds": "node tools/verify-mobile-builds.mjs"
   },
   "dependencies": {
     "ws": "^8.21.1"
