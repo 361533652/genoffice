@@ -298,6 +298,21 @@ npm run serve:mobile-checks -- --build   # 先重新构建
 
 已固化为 `e2e/mobile-rapid-open.spec.ts` + `e2e/mobile-rapid-open-guard.spec.ts`。
 
+#### 中文输入法：组合期间不污染文档，撤销粒度正确
+
+之前只验证了「字符能进文档」，没验证**组合期间**的行为——而这正是中文输入特有的问题。用 CDP 的 `Input.imeSetComposition` 模拟真实输入法：
+
+| 阶段 | 文档内容 | 判断 |
+|---|---|---|
+| 组合中（拼音 nihao） | `nihao` | 正常，候选状态本就该显示拼音 |
+| 提交后 | `你好世界` | ✅ 无拼音残留 |
+
+撤销粒度另测：`AAABBBCCC` → `AAABBB` → `AAA` → 空，每次撤销一步，正确。
+
+**我在这里又写错了一次断言。** 第一版在空文档里输入两个词，然后期望「撤销一次后第一个词还在」——这在空文档上做不到，也不应该做到：撤销回到空文档是正确行为，不是 bug。加上基准内容后测试才有意义。
+
+已固化为 `e2e/mobile-ime-composition.spec.ts` + `e2e/mobile-ime-guard.spec.ts`（后者验证「拼音断言能抓到拼音」「拉丁字母不会冒充中文」）。
+
 ## 怎么跑这些验收
 
 **一条命令，零手工准备**：
