@@ -1,3 +1,4 @@
+import { getHost } from '@genoffice/host'
 import { focusWorksheet } from './sheet-focus'
 import {
   activateFormulaClosure,
@@ -5899,6 +5900,7 @@ export function App({
         statusMessage={openingWorkbook ? t('appOpeningWorkbook') : message}
         emptyCsvNotice={emptyCsvNotice}
         onOpenWorkbook={() => void handleInspectWorkbook()}
+        showOpenInToolbar={getHost().kind !== 'electron'}
         onDismissEmptyCsvNotice={() => setEmptyCsvNotice(false)}
         aiBusy={aiBusy}
         {...(sessionUsage !== undefined ? { sessionUsage } : {})}

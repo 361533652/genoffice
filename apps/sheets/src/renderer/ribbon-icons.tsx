@@ -171,6 +171,16 @@ export function SaveIcon(): ReactElement {
   )
 }
 
+/// Quick-access open. Hosts without an app menu (browser, Android WebView)
+/// have no other route to selectWorkbook — the desktop keeps its File menu.
+export function OpenIcon(): ReactElement {
+  return (
+    <Icon>
+      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+    </Icon>
+  )
+}
+
 /// Save As keeps the floppy silhouette and adds the familiar pencil overlay.
 export function SaveAsIcon(): ReactElement {
   return (

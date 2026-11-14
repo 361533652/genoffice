@@ -47,7 +47,9 @@
     "test:mobile": "playwright test --config e2e/playwright.mobile.config.ts",
     "dev:mobile": "npm run dev:renderer -w @genoffice/docs",
     "verify:mobile-builds": "node tools/verify-mobile-builds.mjs",
-    "serve:mobile-checks": "node tools/serve-mobile-checks.mjs"
+    "serve:mobile-checks": "node tools/serve-mobile-checks.mjs",
+    "build:mobile-assets": "node apps/mobile/scripts/copy-web-assets.mjs",
+    "build:apk": "node apps/mobile/scripts/copy-web-assets.mjs && gradle -p apps/mobile assembleDebug"
   },
   "dependencies": {
     "ws": "^8.21.1"

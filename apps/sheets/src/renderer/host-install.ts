@@ -10,6 +10,7 @@
  * a WebView does not provide. See docs/mobile/decisions.md, ADR 2 and ADR 5.
  */
 import { installLegacyDesktopBridge, installNodeGlobals, installStorageFallback } from '@genoffice/host'
+import { installSheetsSessionHost } from '@genoffice/host/sheets/install'
 
 export const legacyBridgeStats = installLegacyDesktopBridge()
 
@@ -22,3 +23,16 @@ export const storageOk = installStorageFallback()
 // module reads it at call time. Buffering the promise is enough: the engines
 // only touch Buffer inside async entry points that run after boot.
 export const nodeGlobalsReady = installNodeGlobals()
+
+// The wasm workbook session: when the host serves the engine asset, sheets
+// gets real open/edit/save (the same Rust sidecar the desktop spawns, compiled
+// to wasm32-wasip1). The Android WebView injection and the e2e harness set the
+// URL; a host that never sets it keeps the honest desktop-only refusals, and
+// the desktop build is untouched. Installation is async but completes long
+// before a user can pick a file; a failure leaves the refusals in place.
+const sheetsWasmUrl = (globalThis as { __genofficeSheetsWasmUrl?: string }).__genofficeSheetsWasmUrl
+if (typeof sheetsWasmUrl === 'string' && sheetsWasmUrl !== '') {
+  void installSheetsSessionHost({ wasm: sheetsWasmUrl }).catch((error: unknown) => {
+    console.warn('[sheets] wasm session host unavailable:', error)
+  })
+}

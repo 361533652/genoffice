@@ -25,6 +25,7 @@ import {
   BorderTopIcon,
   CaretIcon,
   GensparkMark,
+  OpenIcon,
   RIBBON_GLYPH_ICONS,
   RedoIcon,
   SaveAsIcon,
@@ -306,6 +307,9 @@ interface ExcelShellProps {
   readonly statusMessage: string
   readonly emptyCsvNotice: boolean
   readonly onOpenWorkbook: () => void
+  /// Hosts without an app menu (browser, Android WebView) get a quick-access
+  /// Open button; the desktop keeps Open in its File menu only.
+  readonly showOpenInToolbar: boolean
   readonly onDismissEmptyCsvNotice: () => void
   /// Zoom of the active sheet in percent, echoed by the status-bar slider.
   readonly zoomPercent: number
@@ -565,6 +569,7 @@ export function ExcelShell({
   statusMessage,
   emptyCsvNotice,
   onOpenWorkbook,
+  showOpenInToolbar,
   onDismissEmptyCsvNotice,
   zoomPercent,
   statusBarFuncs,
@@ -905,6 +910,17 @@ export function ExcelShell({
           aria-label={t('appScopeWorkbook')}
           onDoubleClick={collapse.onTabsDoubleClick}
         >
+          {showOpenInToolbar && (
+            <button
+              type="button"
+              className="qa-btn"
+              data-tip={t('appOpenWorkbookTitle')}
+              aria-label={t('appOpenWorkbookTitle')}
+              onClick={onOpenWorkbook}
+            >
+              <OpenIcon />
+            </button>
+          )}
           <button
             type="button"
             className="qa-btn"
