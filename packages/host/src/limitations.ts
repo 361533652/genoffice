@@ -19,10 +19,16 @@ export interface HostLimitation {
 /** Known gaps on a browser/WebView host, as of the Android port. */
 export const BROWSER_HOST_LIMITATIONS: readonly HostLimitation[] = [
   {
+    capability: 'selectWorkbook',
+    missing: 'opening a spreadsheet at all',
+    needs:
+      'a host-side workbook session. The sheets app does not read bytes and parse them itself: it asks the main process to open a file, and gets back a WorkbookFile whose sessionId addresses every later read, edit and save. Without that session there is no workbook to show — so this gap sits *before* the save one.',
+  },
+  {
     capability: 'saveWorkbookEdits',
     missing: 'saving a spreadsheet back to its file',
     needs:
-      'a host-side workbook session: the sheets app opens through the main process, which owns a sessionId and writes the patched package. A mobile host must provide the same session + FileAccess save path.',
+      'the same host-side session as selectWorkbook, plus a FileAccess save path. Both fall out of one piece of work.',
   },
   {
     capability: 'splitPdf',

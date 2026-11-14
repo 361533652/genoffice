@@ -168,6 +168,13 @@ const REQUIRES_DESKTOP = new Set([
   'setNotes', 'addComment', 'deleteComment',
   'applyEditScript', 'applyTxn', 'undo', 'redo',
   'printSlides', 'printerOptions',
+  // sheets: the open path itself needs the main process — selectWorkbook()
+  // returns a WorkbookFile carrying a sessionId the host creates. Without it the
+  // app cannot open a workbook at all, and returning undefined left the open
+  // button doing nothing with no message.
+  'selectWorkbook',
+  'openEncryptedWorkbook',
+  'openWorkbookAtPath',
   // sheets: the remaining write path
   'updateWorkbookPassword', 'updateExternalLinks', 'autoRenameWorkbook',
   'printWorkbook', 'exportCsv',

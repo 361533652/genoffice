@@ -27,11 +27,17 @@ describe('browser host limitations', () => {
     }
   })
 
-  it('calls out the one gap that blocks the sheets editor', () => {
-    // saving a workbook needs a host-side session; without it the sheets app can
-    // open and edit but cannot write the result back
+  it('calls out the gaps that block the sheets editor, in the order they bite', () => {
+    // opening comes first: without a session there is no workbook to show, so
+    // saying "it can open but not save" was too generous
+    const open = BROWSER_HOST_LIMITATIONS.find((l) => l.capability === 'selectWorkbook')
     const save = BROWSER_HOST_LIMITATIONS.find((l) => l.capability === 'saveWorkbookEdits')
-    expect(save).toBeDefined()
+    expect(open, 'opening a workbook').toBeDefined()
+    expect(save, 'saving a workbook').toBeDefined()
+    expect(open!.needs).toMatch(/session/)
     expect(save!.needs).toMatch(/session/)
+    // and the list is ordered so the first blocker is the one a reader hits first
+    const order = BROWSER_HOST_LIMITATIONS.map((l) => l.capability)
+    expect(order.indexOf('selectWorkbook')).toBeLessThan(order.indexOf('saveWorkbookEdits'))
   })
 })

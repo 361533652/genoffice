@@ -144,7 +144,8 @@ ADR 4 原本把「触屏交互」列为最可能推翻整个计划的风险，�
 | Android 宿主 | ❌ 未建（本机无 Android SDK） | — |
 | 文件访问契约（FileAccess） | ✅ 已定义 + 浏览器实现 | e2e：3 用例 + 4 单测 |
 | 文件读写 SAF | ⚠️ 契约已定，Android 侧未接 | — |
-| sheets 保存回文件 | ❌ 缺宿主 workbook session | 见 limitations.ts |
+| sheets 打开文件 | ❌ 缺宿主 workbook session（打开即失败） | 见 limitations.ts |
+| sheets 保存回文件 | ❌ 同一缺口的下游 | 见 limitations.ts |
 | Rust sidecar 移动版 | ⚠️ 已可绕过（走纯 TS 路径） | — |
 | 文档字节传输 | ✅ blob URL（非 base64） | e2e：20MB → <200 字符 URL |
 | handle 语义 | ✅ 末段为文件名 | 4 个单测 |
@@ -255,6 +256,16 @@ npx vitest run --root packages/host
 390px 视口下打开一份 A4 文档，应用给出 43% 缩放——页面宽度 341px 恰好填满可视区（实测可见率 1.0）。**这是正确的「适配宽度」，不是缺陷**。
 
 代价是 A4 页面压到手机宽度后文字偏小。桌面 Word 手机版的做法是默认放大到可读字号，让用户横向滚动或双击缩放。要不要改成那样是**产品取舍**，取决于你更看重「一眼看全版式」还是「先看清楚字」。已记在这里，等你决定，我没有擅改。
+### 一处需要下调的说法：sheets 在移动端打不开文件
+
+之前我写「sheets 能打开、能改单元格，但存不回」。**前半句是错的。**
+
+sheets 不自己读字节解析，它向主进程要 `selectWorkbook()`，拿回一个带 `sessionId` 的 `WorkbookFile`；后续的单元格读、公式、编辑、保存全部按这个 session 寻址。移动端宿主没有 session，所以**连打开这一步都过不去**——点「打开」按钮什么也不会发生，界面没有任何变化。
+
+这个缺口在保存缺口**之前**。能力缺口清单已按「用户会先撞到哪个」排序：`selectWorkbook` 在前，`saveWorkbookEdits` 在后，两者其实由同一件工作解决（宿主侧 workbook session + FileAccess 保存路径）。
+
+顺带把 `selectWorkbook` 加进了桌面专属动作清单：它以前返回 `undefined`，点按钮静默无反应；现在会明确报错说明需要桌面版。
+
 ### 关于 Rust sidecar：可以不交叉编译
 
 原计划是给 `xlsx-sidecar` 做 `aarch64-linux-android` 交叉编译。现在**不必要了**：纯 TS 的 `xlsx-gateway` 路径已经在浏览器里跑通了完整的编辑-保存-回读闭环（见上文验证）。sidecar 只是大文件的流式优化路径，移动端先走纯 TS 路径即可，交叉编译可以推迟到确实遇到大文件性能瓶颈时再评估。
