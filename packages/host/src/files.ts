@@ -79,6 +79,62 @@ export function hasFilePicker(): boolean {
   return typeof w.showOpenFilePicker === 'function' && typeof w.showSaveFilePicker === 'function'
 }
 
+/**
+ * A file the native host is holding for the app to open — e.g. the user picked
+ * "Open with GenOffice" on a PDF in another app (Android ACTION_VIEW). The host
+ * exposes a one-shot provider; whichever app entry point consumes it first wins
+ * (only one app runs per WebView, so there is no contention).
+ */
+export interface PendingOpenFile {
+  name: string
+  data: Uint8Array
+  /** a SAF content:// uri (writable) or a synthetic handle id */
+  handleId: string
+  writable: boolean
+}
+
+type PendingOpenProvider = () => Promise<PendingOpenFile | null>
+
+/** Consume the host's pending file once, or null when there is none. */
+export async function consumePendingOpenFile(): Promise<PendingOpenFile | null> {
+  const provider = (globalThis as { __genofficeConsumePendingOpen?: PendingOpenProvider })
+    .__genofficeConsumePendingOpen
+  if (typeof provider !== 'function') return null
+  try {
+    return (await provider()) ?? null
+  } catch {
+    return null
+  }
+}
+
+/** Whether the host holds a pending file, without consuming it (sheets' boot
+ * probe asks before deciding to auto-open). */
+export async function hasPendingOpenFile(): Promise<boolean> {
+  const peek = (globalThis as { __genofficeHasPendingOpen?: () => Promise<boolean> })
+    .__genofficeHasPendingOpen
+  if (typeof peek !== 'function') return false
+  try {
+    return !!(await peek())
+  } catch {
+    return false
+  }
+}
+
+/** Turn a pending file into an OpenResult, registering reads for it. */
+export function openResultFromPending(pending: PendingOpenFile): OpenResult {
+  const handle: FileHandle = {
+    id: pending.handleId,
+    name: pending.name,
+    writable: pending.writable,
+  }
+  // a non-writable snapshot needs a raw File so readFromHandle can answer; a
+  // writable SAF handle is read/written through the native hooks instead
+  if (!pending.writable) {
+    registerRawFile(pending.handleId, new File([pending.data.slice()], pending.name))
+  }
+  return { ok: true, handle, data: pending.data }
+}
+
 export function rememberHandle(handle: FileSystemFileHandle, kind?: DocumentKind): BrowserFileHandle {
   // same shape as grantFile: the last segment is the display name, because
   // callers split the string rather than reading handle.name
@@ -356,6 +412,9 @@ export function openViaInput(kind?: DocumentKind): Promise<OpenResult> {
  * when present (it yields a writable handle), otherwise an <input type=file>.
  */
 export async function openAnywhere(kind?: DocumentKind): Promise<OpenResult> {
+  // a file the host is holding (ACTION_VIEW "open with") wins over any picker
+  const pending = await consumePendingOpenFile()
+  if (pending) return openResultFromPending(pending)
   // A native host (Android SAF) supplies an awaitable open with a writable
   // handle — preferred over <input type=file>, whose File snapshot cannot be
   // written back in place.

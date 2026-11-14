@@ -16,7 +16,7 @@
  * has moved to `@genoffice/host`. The `console.debug` trace exists so a test can
  * assert which capabilities a screen actually reached for.
  */
-import { grantFile, openAnywhere, rawFileFor, saveAnywhere, hasFilePicker } from './files.js'
+import { grantFile, openAnywhere, rawFileFor, saveAnywhere, hasFilePicker, consumePendingOpenFile, registerRawFile, hasPendingOpenFile } from './files.js'
 import { createSettingsStore } from './settings.js'
 
 /** Methods that return an unsubscribe function rather than a value. */
@@ -498,10 +498,44 @@ export function installLegacyDesktopBridge(
     // Every app asks "is there a document waiting to be opened?" on mount and
     // treats a thrown error as "this file is broken". On a host with no shell
     // the honest answer is "nothing pending", never undefined-for-a-value.
-    consumePending: async () => null,
-    consumePendingOpenDocx: async () => null,
+    // A native host may hold a file from "Open with GenOffice" (ACTION_VIEW);
+    // the one-shot provider hands it to whichever app consumes it first.
+    consumePending: async () => {
+      const pending = await consumePendingOpenFile()
+      if (!pending) return null
+      // markdown/html/pdf read through readFile/readFileChunk (browserFileFor),
+      // so register a readable snapshot even for a writable SAF handle; the
+      // native read/write hooks still take precedence in readFromHandle/writeToHandle
+      registerRawFile(pending.handleId, new File([pending.data.slice()], pending.name))
+      return pending.handleId
+    },
+    consumePendingOpenDocx: async () => {
+      const pending = await consumePendingOpenFile()
+      if (!pending) return null
+      registerRawFile(pending.handleId, new File([pending.data.slice()], pending.name))
+      // blob URL, not a base64 data URL: a 20MB docx as data URL is a 27MB string
+      const dataUrl = URL.createObjectURL(new Blob([pending.data.slice()]))
+      return { path: pending.handleId, name: pending.name, dataUrl, hash: '' }
+    },
     consumePendingOpen: async () => null,
-    consumePendingOpenSheet: async () => null,
+    // sheets' boot probe: auto-open when the host holds a file ("open with").
+    // The wasm session installs asynchronously, so wait for it before reporting
+    // the queue — otherwise the probe fires selectWorkbook before the override
+    // exists and the file is silently never opened.
+    hasQueuedWorkbook: async () => {
+      if (!(await hasPendingOpenFile())) return false
+      const g = globalThis as { __genofficeSheetsSessionReady?: boolean }
+      for (let i = 0; i < 200 && !g.__genofficeSheetsSessionReady; i++) {
+        await new Promise((r) => setTimeout(r, 50))
+      }
+      return !!g.__genofficeSheetsSessionReady
+    },
+    consumePendingOpenSheet: async () => {
+      const pending = await consumePendingOpenFile()
+      if (!pending) return null
+      registerRawFile(pending.handleId, new File([pending.data.slice()], pending.name))
+      return pending.handleId
+    },
     consumeNewBlankDoc: async () => null,
     consumeAiDocContent: async () => null,
     consumeHeadlessExport: async () => null,

@@ -37,6 +37,7 @@ import {
 import { mapScriptOps, runTxn, type Op } from '@genoffice/pptx-ops'
 import { imageDpiFromBytes, imageSizeFromBytes, EMU_PER_PX_96 } from '@genoffice/pptx-render'
 import { createSettingsStore } from '../settings.js'
+import { consumePendingOpenFile } from '../files.js'
 import type { DeckSessionHost } from './deck-session.js'
 
 // ── small ports from the desktop surface ─────────────────────────────────
@@ -141,18 +142,26 @@ const IMAGE_EXTS = ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'tif', 'tiff']
 export function createDeckMethods(
   host: DeckSessionHost,
   files: FileHost,
-): Record<string, (...args: never[]) => unknown> {
+): Record<string, (...args: any[]) => unknown> {
   const settings = createSettingsStore()
   // single-tab in-memory clipboards (the desktop shares these via the OS)
   let slideClipboard: { bundles: SlideBundle[]; pngs?: string[] } | null = null
   let elementClipboard: { items: ElementClipboardItem[]; lastPage: string; pastes: number } | null = null
 
-  const methods: Record<string, (...args: never[]) => unknown> = {
+  const methods: Record<string, (...args: any[]) => unknown> = {
     // ---- open / save / lifecycle -------------------------------------------
     newBlank: (fitWidthPx: number, size?: { cx?: number; cy?: number }) => host.newBlank(fitWidthPx, size),
     openPptx: (fitWidthPx: number) => host.open(fitWidthPx),
     open: (fitWidthPx: number) => host.open(fitWidthPx),
-    consumePendingOpen: () => null,
+    consumePendingOpen: async (fitWidthPx: number) => {
+      const pending = await consumePendingOpenFile()
+      if (!pending) return null
+      return host.openBytes(
+        pending.data,
+        { id: pending.handleId, name: pending.name, writable: pending.writable },
+        fitWidthPx,
+      )
+    },
     consumePending: () => null,
     save: () => host.save(),
     saveAs: (defaultName?: string) => host.saveAs(defaultName),

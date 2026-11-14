@@ -7,6 +7,9 @@
       content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: genoffice-docx-media:; font-src 'self' data: blob:; worker-src 'self' blob:; connect-src 'self' blob: data: ws://localhost:* genoffice-docx-media:"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Declare theme support so WebView/HyperOS algorithmic darkening stays off:
+         the app themes itself via data-theme; forced darkening breaks menus. -->
+    <meta name="color-scheme" content="light dark" />
     <title>GenOffice Docs</title>
   </head>
   <body>

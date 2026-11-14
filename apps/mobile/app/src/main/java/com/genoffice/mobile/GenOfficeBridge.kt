@@ -57,6 +57,8 @@ class GenOfficeBridge(
             }
             "confirm" -> confirm(id, params.optString("message"))
             "alert" -> alert(id, params.optString("message"))
+            "getPendingOpen" -> getPendingOpen(id)
+            "hasPendingOpen" -> resolve(id, JSONObject().put("ok", true).put("result", PendingOpen.has()))
             "openDocument" -> activity.launchNativeOpen(id)
             "saveDocumentAs" -> saveDocumentAs(id, params)
             "saveInPlace" -> saveInPlace(id, params)
@@ -100,6 +102,21 @@ class GenOfficeBridge(
 
     // ---- SAF file access ---------------------------------------------------
 
+    /** Hand the staged "open with" / recent file to the web app (one-shot). */
+    private fun getPendingOpen(id: String) {
+        val p = PendingOpen.consume()
+        if (p == null) {
+            resolve(id, JSONObject().put("ok", true).put("result", null as Any?))
+            return
+        }
+        val result = JSONObject()
+            .put("name", p.name)
+            .put("handleId", p.handleId)
+            .put("writable", p.writable)
+            .put("data", Base64.encodeToString(p.bytes, Base64.NO_WRAP))
+        resolve(id, JSONObject().put("ok", true).put("result", result))
+    }
+
     /** called by the activity when the native open picker answers */
     fun onNativeOpenResult(id: String, uri: Uri?) {
         if (uri == null) {
@@ -118,9 +135,11 @@ class GenOfficeBridge(
                 }
                 val bytes = activity.contentResolver.openInputStream(uri)?.use { it.readBytes() }
                     ?: throw IllegalStateException("cannot open $uri")
+                val name = displayName(uri) ?: "document"
+                Recents.add(activity, appForName(name), name, uri.toString())
                 val handle = JSONObject()
                     .put("id", uri.toString())
-                    .put("name", displayName(uri) ?: "document")
+                    .put("name", name)
                     .put("writable", true)
                 resolve(
                     id,
@@ -165,9 +184,11 @@ class GenOfficeBridge(
                     )
                 } catch (_: SecurityException) {
                 }
+                val name = displayName(uri) ?: save.name
+                Recents.add(activity, appForName(name), name, uri.toString())
                 val handle = JSONObject()
                     .put("id", uri.toString())
-                    .put("name", displayName(uri) ?: save.name)
+                    .put("name", name)
                     .put("writable", true)
                 resolve(save.id, JSONObject().put("ok", true).put("result", JSONObject().put("handle", handle)))
             } catch (e: Exception) {
@@ -220,6 +241,19 @@ class GenOfficeBridge(
             }
         } catch (e: Exception) {
             null
+        }
+    }
+
+    /** Resolve the editor id from a filename (for the recents list). */
+    private fun appForName(name: String): String {
+        return when (name.substringAfterLast('.', "").lowercase()) {
+            "pdf" -> "pdf"
+            "docx", "doc" -> "docs"
+            "xlsx", "xls", "csv" -> "sheets"
+            "pptx", "ppt" -> "slides"
+            "html", "htm" -> "html"
+            "md", "markdown", "txt", "log" -> "markdown"
+            else -> "docs"
         }
     }
 

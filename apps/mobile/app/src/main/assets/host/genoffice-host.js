@@ -165,6 +165,26 @@
     }).catch(function () { return null; });
   };
 
+  // ---- 3c. "Open with GenOffice" / recents: the staged file -----------------
+  // The host holds a file (ACTION_VIEW, a recent tap, the home open button).
+  // The app consumes it once at boot; sheets peeks first to decide to auto-open.
+  window.__genofficeConsumePendingOpen = function () {
+    return nativeCall('getPendingOpen', {}).then(function (r) {
+      if (!r || !r.data) return null;
+      return {
+        name: r.name,
+        data: b64ToBytes(r.data),
+        handleId: r.handleId,
+        writable: !!r.writable
+      };
+    }).catch(function () { return null; });
+  };
+  window.__genofficeHasPendingOpen = function () {
+    return nativeCall('hasPendingOpen', {}).then(function (r) {
+      return !!r;
+    }).catch(function () { return false; });
+  };
+
   // ---- 4. long-press → contextmenu ------------------------------------------
   var pressTimer = null;
   var pressOrigin = null;
