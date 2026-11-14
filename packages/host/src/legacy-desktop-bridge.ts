@@ -261,7 +261,24 @@ export function installLegacyDesktopBridge(
       const saved = await saveViaPicker(bytes, 'document.docx', 'docx')
       return saved.ok ? { path: saved.handle.id, name: saved.handle.name } : null
     },
-    confirmDocumentReplace: async () => true,
+    /**
+     * "May I replace the open document?" — asked before an open discards the
+     * current one.
+     *
+     * This cannot be a silent `true`. On the desktop the answer comes from a
+     * dialog that also offers Save; answering true here means an open file would
+     * throw away unsaved edits with no prompt and no chance to save, which is the
+     * one outcome a confirmation must never produce. A host with no dialog
+     * answers with the platform's own confirm when it has one, and refuses
+     * otherwise.
+     */
+    confirmDocumentReplace: async () => {
+      const ask = (globalThis as { confirm?: (message: string) => boolean }).confirm
+      // a WebView always has one; a bare JS environment (tests) may not, and
+      // then refusing is the safe answer rather than discarding silently
+      if (typeof ask !== 'function') return false
+      return ask('Open another document? Unsaved changes in this one will be lost.')
+    },
     onLanguageChanged: noop,
     onThemeChanged: noop,
     onDocumentThemeChanged: noop,
