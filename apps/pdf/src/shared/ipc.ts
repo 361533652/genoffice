@@ -1049,6 +1049,14 @@ export interface ImageSearchResponse {
 export interface PdfApi {
   /** Take the pdf path pending for this view (queued at tab creation); null if none */
   consumePending(): Promise<string | null>
+  /**
+   * Ask the host for a pdf and return its handle.
+   *
+   * The desktop shell puts Open in its own menu, so the renderer never needed this.
+   * A browser has no shell menu: without it an empty PDF window is a sentence with
+   * nothing to press. Optional because a host may not implement it.
+   */
+  openPdf?(): Promise<{ path: string; name: string } | null>
   /** open any shell-routed document path (an AI answer's filenav citation) */
   openSourcePath(path: string): Promise<void>
   /** Read pdf bytes. Only paths granted to this view are allowed */

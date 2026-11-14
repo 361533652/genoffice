@@ -7670,6 +7670,12 @@ export default function App() {
   }
 
   if (status !== 'ready' || !doc) {
+    // An empty PDF window used to be a single sentence with no control at all: on the
+    // desktop the Open command lives in the shell's menu, and a browser has no such
+    // menu, so a first-time user saw "没有要打开的文件" and had nothing to press.
+    // Measured on the production build: 0 visible buttons here versus 19-89 in the
+    // other five apps.
+    const canOpen = status === 'empty' || status === 'error'
     return (
       <div className="app">
         <div className="pdf-placeholder">
@@ -7680,6 +7686,21 @@ export default function App() {
                 ? `${t('loadError')}: ${openError}`
                 : t('loadError')
               : t('noFile')}
+          {canOpen && (
+            <button
+              type="button"
+              className="pdf-placeholder-open"
+              onClick={() => {
+                void (async () => {
+                  const picked = await window.pdfApi.openPdf?.()
+                  if (!picked) return
+                  await openPath(picked.path)
+                })()
+              }}
+            >
+              {t('pwOpen')}
+            </button>
+          )}
         </div>
       </div>
     )
