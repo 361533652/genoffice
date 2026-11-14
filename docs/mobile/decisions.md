@@ -379,6 +379,25 @@ npm run serve:mobile-checks -- --build   # 先重新构建
 
 **测试环境的一个陷阱**：无头 Edge 其实**有** `showSaveFilePicker`，所以第一次验证时走了 picker 路径、被当成用户取消。必须显式移除这两个 API 才能模拟安卓。这与前面「测试环境默认条件掩盖真机行为」是同一类问题。
 
+#### 打开也有同样的问题：安卓上打不开文件
+
+修完保存后，我用同样的判断检查了打开路径——**同样的缺口**：
+
+`openViaPicker()` 在没有 `showOpenFilePicker` 时直接返回 `unsupported`，页面里也没有 `<input type=file>` 兜底。安卓浏览器打开文件按钮**产不出任何文件**。
+
+编辑器打不开文件，就等于一个带工具栏的空白页。
+
+**修复**：新增 `openViaInput()` / `openAnywhere()`，与保存侧对称：
+
+| 侧 | 有 API | 无 API |
+|---|---|---|
+| 保存 | 用 picker（可写 handle） | `<a download>` 下载 |
+| 打开 | 用 picker（可写 handle） | `<input type=file>` |
+
+代价同样明确：`<input type=file>` 返回的 `File` 没有可写 handle，后续原地保存不可用，应用需按「只能另存为」处理。但**打不开**比这严重得多。
+
+已验证：移除两个 picker API 后，`openDocx()` 真实弹出文件选择器、接收文件后返回正确的文件名——不是「函数被调用了」，而是字节真的到了。
+
 ## 怎么跑这些验收
 
 **一条命令，零手工准备**：

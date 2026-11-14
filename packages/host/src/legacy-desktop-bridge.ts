@@ -16,7 +16,7 @@
  * has moved to `@genoffice/host`. The `console.debug` trace exists so a test can
  * assert which capabilities a screen actually reached for.
  */
-import { grantFile, openViaPicker, rawFileFor, saveAnywhere, hasFilePicker } from './files.js'
+import { grantFile, openAnywhere, rawFileFor, saveAnywhere, hasFilePicker } from './files.js'
 import { createSettingsStore } from './settings.js'
 
 /** Methods that return an unsubscribe function rather than a value. */
@@ -314,7 +314,10 @@ export function installLegacyDesktopBridge(
       return next
     },
     openDocx: async () => {
-      const picked = await openViaPicker('docx')
+      // the picker when the host has one, <input type=file> when it does not: an
+      // Android browser has no showOpenFilePicker, and without a fallback the Open
+      // button could not produce a file at all
+      const picked = await openAnywhere('docx')
       if (!picked.ok) return null
       // prefer a blob over the bytes we already hold: no re-encode, no copy
       const granted = browserFileFor(picked.handle.id)
@@ -497,19 +500,19 @@ export function installLegacyDesktopBridge(
 
     // markdown / html: pick a text document and read it whole
     openMarkdown: async () => {
-      const picked = await openViaPicker('markdown')
+      const picked = await openAnywhere('markdown')
       if (!picked.ok) return null
       return picked.handle.id
     },
     openHtml: async () => {
-      const picked = await openViaPicker('html')
+      const picked = await openAnywhere('html')
       if (!picked.ok) return null
       return picked.handle.id
     },
 
     // the renderer asks for a path first, then reads it in chunks
     openPdf: async () => {
-      const picked = await openViaPicker('pdf')
+      const picked = await openAnywhere('pdf')
       if (!picked.ok) return null
       return { path: picked.handle.id, name: picked.handle.name }
     },

@@ -67,7 +67,9 @@ export function rawFileFor(id: string): File | null {
  * real Android host will put a SAF document name there for the same reason.
  */
 export function grantFile(file: File, id?: string): string {
-  const handleId = id ?? `host/granted-${++counter}/${file.name}`
+  // the id carries the display name in its last segment: callers split it, and a
+  // bare token showed up as a filename in the title bar
+  const handleId = id ?? `host/browser-${++counter}/${file.name}`
   rawFiles.set(handleId, file)
   return handleId
 }
@@ -257,4 +259,83 @@ export async function saveAnywhere(
     return saveViaPicker(data, suggestedName, kind)
   }
   return saveViaDownload(data, suggestedName)
+}
+/**
+ * Open a file through <input type="file">.
+ *
+ * The twin of saveViaDownload, and needed for the same reason: showOpenFilePicker
+ * is desktop Chromium, so on an Android browser or WebView openViaPicker() answers
+ * 'unsupported' and the Open button cannot produce a file at all. An editor that
+ * cannot open a document is a blank page with a toolbar.
+ *
+ * The trade-off matches the save side: an <input type=file> hands back a File with
+ * no writable handle, so later in-place saves are impossible and the app must treat
+ * the document as save-as-only. That is still strictly better than not opening.
+ */
+export function openViaInput(kind?: DocumentKind): Promise<OpenResult> {
+  return new Promise((resolve) => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    if (kind) {
+      const ext = EXT_BY_KIND[kind]
+      input.accept = ext.startsWith('.') ? ext : '.' + ext
+    }
+    input.style.display = 'none'
+
+    let settled = false
+    const finish = (result: OpenResult): void => {
+      if (settled) return
+      settled = true
+      input.remove()
+      resolve(result)
+    }
+
+    input.addEventListener('change', () => {
+      const file = input.files?.[0]
+      if (!file) {
+        finish({ ok: false, reason: 'canceled' })
+        return
+      }
+      void (async () => {
+        try {
+          const data = new Uint8Array(await file.arrayBuffer())
+          const hash = await sha256Hex(data)
+          // a plain File has no writable handle: grantFile records it as a raw file,
+          // which is what makes an in-place save fail with a reason instead of
+          // silently dropping the write
+          const id = grantFile(file)
+          finish({ ok: true, handle: { id, name: file.name, writable: false }, data, hash })
+        } catch (error) {
+          finish({ ok: false, reason: 'error', error: String(error) })
+        }
+      })()
+    })
+
+    // A cancelled <input type=file> fires no event in most browsers; if the user
+    // never picks anything the promise would hang. There is no reliable cancel
+    // signal, so the caller is left to time out or ignore it — but when the window
+    // regains focus with no files chosen, treat that as a cancel.
+    window.addEventListener(
+      'focus',
+      () => {
+        setTimeout(() => {
+          if (!input.files || input.files.length === 0) finish({ ok: false, reason: 'canceled' })
+        }, 500)
+      },
+      { once: true },
+    )
+
+    document.body.appendChild(input)
+    input.click()
+  })
+}
+
+/**
+ * Open through whichever mechanism this host has: the File System Access picker
+ * when present (it yields a writable handle), otherwise an <input type=file>.
+ */
+export async function openAnywhere(kind?: DocumentKind): Promise<OpenResult> {
+  const w = globalThis as unknown as FsWindow
+  if (typeof w.showOpenFilePicker === 'function') return openViaPicker(kind)
+  return openViaInput(kind)
 }
