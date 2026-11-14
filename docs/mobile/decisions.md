@@ -211,16 +211,26 @@ npm run serve:mobile-checks -- --build   # 先重新构建
 开发服务器（5199-5205）只绑 `127.0.0.1`，手机访问不到——这是为什么另起这两个服务。
 ## 怎么跑这些验收
 
+**一条命令，零手工准备**：
+
 ```bash
-# 1. 起渲染层（模拟移动宿主：无 preload）
-cd apps/docs && npx vite --config vite.renderer.config.ts --host 127.0.0.1 --port 5199
+npm run test:mobile        # 58 个移动端 e2e
+```
 
-# 2. 跑移动端验收
-npm run test:mobile
+六个开发服务器由 Playwright 的 `webServer` 自动拉起（配置在 `e2e/playwright.mobile.config.ts`），测试结束自动关闭。以前这些服务要手工起，忘了一个就会在某个测试里报 `connection refused`，看起来像测试坏了而不是环境没准备好。
 
-# 3. 单测
+声称“请求消费方成功”的部分（`vite preview`、构建验证）自带启动逻辑，也不依赖外部进程。
+
+```bash
+# 单测
 npx vitest run --root packages/host-contract
 npx vitest run --root packages/host
+
+# 生产构建能否运行（六个应用，逐个 build + preview）
+npm run verify:mobile-builds
+
+# 真机自检：把两个页面开在局域网上
+npm run serve:mobile-checks
 ```
 
 ## 下一步（按依赖顺序）
