@@ -425,12 +425,32 @@ export function installLegacyDesktopBridge(
     reportCloseSaveResult: async () => ({ ok: false }),
     reportViewMenuState: async () => ({ ok: false }),
     // ---- state flag echoes --------------------------------------------------
-    // `save`/`setDirty` look like writes but are the app telling the host "this
-    // document is now dirty / please save". The renderer fires them without
-    // awaiting and reads nothing back, so a neutral ack is the correct answer —
-    // rejecting them (as the slide-edit entries above do) would turn every
-    // keystroke into an unhandled rejection.
-    save: async () => ({ ok: false }),
+    /**
+     * The text editors' save (markdown, html).
+     *
+     * This was answered with { ok: false } on the reading that it is a fire-and-forget
+     * "document is dirty" notification. It is not: no `desktop.save()` call exists in
+     * any renderer, while markdown and html both `await save({ text, mode })` and read
+     * `ok`/`path` from the answer. Measured before: editing a markdown file on a phone
+     * and pressing Save produced { ok: false } with no message, and no way to keep the
+     * work.
+     *
+     * The picker is absent on Android, so this writes through a download and returns a
+     * synthetic path the caller can show. setDirty below really is a notification and
+     * keeps its neutral ack.
+     */
+    save: async (request: unknown) => {
+      const req = (request ?? {}) as { text?: unknown; suggestedName?: unknown }
+      const text = typeof req.text === 'string' ? req.text : ''
+      const suggested =
+        typeof req.suggestedName === 'string' && req.suggestedName.trim()
+          ? req.suggestedName.trim()
+          : 'document.txt'
+      const saved = await saveAnywhere(new TextEncoder().encode(text), suggested)
+      return saved.ok
+        ? { ok: true, path: saved.handle.id }
+        : { ok: false, error: saved.error ?? 'Could not save this file.' }
+    },
     setDirty: async () => ({ ok: false }),
     updatePreview: async () => ({ ok: false }),
     setProvisionalTitle: async () => ({ ok: false }),

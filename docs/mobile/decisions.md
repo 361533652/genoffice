@@ -363,6 +363,22 @@ npm run serve:mobile-checks -- --build   # 先重新构建
 
 已验证：移除两个 picker API 后，`saveDocxAs` 真实触发下载且文件名为 `.docx`；picker 存在时仍然优先走 picker（降级不能遮蔽正经路径）。
 
+#### 同一类缺陷的另外两个实例：markdown / html 也存不了
+
+上一轮修好 docs 的保存出口后，我检查了「这是孤例还是一类」。答案是**一类**：
+
+| 应用 | 修复前 | 修复后 |
+|---|---|---|
+| docs | `saveDocxAs` 返回 null | 走下载，可用 |
+| markdown | `save()` 返回 `{ok:false}`，无任何说明 | 走下载，可用 |
+| html | 同上 | 走下载，可用 |
+
+**根因是一个误判**：垫片里把 `save` 当成「文档变脏了」的通知，用一个中性 ack 应答。但全仓库**没有任何代码调用 `desktop.save()`**，而 markdown/html 都会 `await save({text, mode})` 并读取 `ok`/`path`。
+
+改成真正的保存实现后，两个应用都能在无 picker 的安卓形态下保存。
+
+**测试环境的一个陷阱**：无头 Edge 其实**有** `showSaveFilePicker`，所以第一次验证时走了 picker 路径、被当成用户取消。必须显式移除这两个 API 才能模拟安卓。这与前面「测试环境默认条件掩盖真机行为」是同一类问题。
+
 ## 怎么跑这些验收
 
 **一条命令，零手工准备**：
