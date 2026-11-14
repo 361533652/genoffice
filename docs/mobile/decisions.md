@@ -146,7 +146,7 @@ ADR 4 原本把「触屏交互」列为最可能推翻整个计划的风险，�
 | 文件读写 SAF | ⚠️ 契约已定，Android 侧未接 | — |
 | sheets 打开文件 | ❌ 缺宿主 workbook session（打开即失败） | 见 limitations.ts |
 | sheets 保存回文件 | ❌ 同一缺口的下游 | 见 limitations.ts |
-| Rust sidecar 移动版 | ⚠️ 已可绕过（走纯 TS 路径） | — |
+| Rust sidecar 移动版 | ❌ 打开工作簿仍然依赖它 | 见下方更正 |
 | 文档字节传输 | ✅ blob URL（非 base64） | e2e：20MB → <200 字符 URL |
 | handle 语义 | ✅ 末段为文件名 | 4 个单测 |
 | 完整手机流程 | ✅ 触摸打开-编辑-保存 | e2e：组合流程 |
@@ -266,11 +266,35 @@ sheets 不自己读字节解析，它向主进程要 `selectWorkbook()`，拿回
 
 顺带把 `selectWorkbook` 加进了桌面专属动作清单：它以前返回 `undefined`，点按钮静默无反应；现在会明确报错说明需要桌面版。
 
-### 关于 Rust sidecar：可以不交叉编译
+### 评估过并暂缓：用渲染层映射兜住 sheets 的打开
 
-原计划是给 `xlsx-sidecar` 做 `aarch64-linux-android` 交叉编译。现在**不必要了**：纯 TS 的 `xlsx-gateway` 路径已经在浏览器里跑通了完整的编辑-保存-回读闭环（见上文验证）。sidecar 只是大文件的流式优化路径，移动端先走纯 TS 路径即可，交叉编译可以推迟到确实遇到大文件性能瓶颈时再评估。
+想过在渲染层用 `xlsx-gateway` 的解析结果构造 `WorkbookFile`，让表格在没有主进程 session 时也能打开。**评估后暂缓**，原因是两套模型不对等：
 
-这降低了一个曾经被认为是「三个硬骨头之一」的风险：不是解决了它，而是绕过了它。
+| 侧 | 提供/需要的字段 |
+|---|---|
+| xlsx-gateway 的 `readBasicWorkbook` | 仅 `{ revision, sheets: [{ id, name, cells }] }` |
+| 应用需要的 `WorkbookFile` | **26 个字段** |
+
+缺的 20 多个不是可有可无的装饰：`styles`/`dxfStyles`（单元格样式与条件格式）、`themeColors`/`themeFonts`（主题配色与字体）、`date1904`/`shortDateFormat`（日期系统）、`workbookProtection`、`definedNames`、`visuals`、`sheets[].columnWidths`/`rowCount`……这些直接决定表格**显示成什么样**。
+
+硬凑的后果不是打不开，而是**打得开但显示错误**——单元格没有格式、日期差 4 年、列宽全是一律默认值。这种错比打不开更难被发现，也更难被信任。
+
+正确做法仍是宿主侧实现 `selectWorkbook()`：复用主进程已有的解析（那里已经有完整的 `WorkbookFile` 构造逻辑），而不是在渲染层重写一遍。这也是为什么它和 SAF 一起做更合理——两者都是"宿主替渲染层做它做不到的事"。
+### 更正：「sidecar 可以绕过」只对保存成立，打开不行
+
+前面写过「纯 TS 的 xlsx-gateway 路径已在浏览器跑通闭环，Rust sidecar 交叉编译不需要」。**这句话要收窄。**
+
+重新查了主进程的打开路径 `openWorkbookSession()`：它第一件事就是 `client.open(snapshotPath, lang, shortDate)`，而 `XlsxSidecarClient` 就是那个 Rust 可执行文件。所以：
+
+| 操作 | 是否依赖 sidecar |
+|---|---|
+| 渲染层内解析单元格（`readBasicWorkbook` / `applyPlanToXlsx`） | 否，纯 TS，已验证 |
+| **应用真正打开工作簿（`selectWorkbook`）** | **是** |
+| 渲染层内保存补丁 | 否，纯 TS，已验证 |
+
+我把「xlsx-gateway 能在浏览器解析并写出」当成了「表格应用不需要 sidecar」，这是把**库的能力**当成了**应用的能力**。应用要的 `WorkbookFile` 那 26 个字段（样式、主题、日期系统、保护、定义名、可视化对象）是 sidecar 的 `open()` 一次吐出来的；网关的 `readBasicWorkbook` 只给 `{ revision, sheets: [{id,name,cells}] }`。
+
+**影响**：Android 端要么交叉编译 sidecar（`aarch64-linux-android`），要么在宿主侧用纯 TS 重建那 26 个字段的提取逻辑。两条都不轻，之前划进「已排除」过于乐观。
 
 ## 已解决的文档冲突
 
