@@ -10,11 +10,15 @@ import { expect, test, type Page } from '@playwright/test'
  * Counting dark pixels is the cheap proof that a render happened, as opposed to
  * a blank canvas being reported as success.
  *
- * The render runs in the docs renderer rather than the PDF app: both load pdf.js
- * from the same checkout, and the PDF app navigates during its no-file boot,
- * which destroys the execution context mid-evaluate. The docs page is stable and
- * has no preload either — the property under test is pdf.js in a WebView, not
- * which window hosts it.
+ * The render runs in the docs renderer rather than the PDF app, for a mundane
+ * reason: when this was written I could not get a fixture into the PDF app before
+ * its mount effect ran, and concluded the app "navigates during its no-file
+ * boot". That diagnosis was wrong — a setInterval poller simply loses the race
+ * against mount. e2e/mobile-pdf-app.spec.ts now opens a real file through the
+ * PDF app's own load path with a defineProperty intercept.
+ *
+ * This spec keeps a narrower question: can pdf.js rasterise a page in a WebView
+ * at all, independent of any app's loading sequence.
  */
 
 const DOCS_URL = process.env.MOBILE_DOCS_URL ?? 'http://127.0.0.1:5199'
