@@ -8765,6 +8765,9 @@ export function App() {
               </button>
               <input
                 className="zoom-slider"
+                // a range input with no name is announced as "slider" and
+                // nothing else; the value alone does not say what it changes
+                aria-label={t('ribbonGroupZoom')}
                 type="range"
                 min={DOCS_ZOOM_MIN}
                 max={DOCS_ZOOM_MAX}

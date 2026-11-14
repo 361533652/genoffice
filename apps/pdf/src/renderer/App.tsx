@@ -11803,6 +11803,8 @@ export default function App() {
               </button>
               <input
                 className="zoom-slider"
+                // without a name the control is announced as "slider" only
+                aria-label={t('zoomIn')}
                 type="range"
                 min={MIN_SCALE * 100}
                 max={MAX_SCALE * 100}

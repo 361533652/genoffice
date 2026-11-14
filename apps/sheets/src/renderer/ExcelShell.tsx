@@ -1090,6 +1090,8 @@ export function ExcelShell({
               </button>
               <input
                 className="zoom-slider"
+                // a range input with no name is announced as "slider" alone
+                aria-label={t('appZoomLabel')}
                 type="range"
                 min={SHEET_ZOOM_MIN}
                 max={SHEET_ZOOM_MAX}

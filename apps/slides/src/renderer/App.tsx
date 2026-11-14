@@ -4079,6 +4079,10 @@ export function App() {
                       />
                       <textarea
                         value={notesText}
+                        // a placeholder is not an accessible name: it disappears
+                        // once there is text, and a screen reader announces the
+                        // field as "edit text" without saying what it edits
+                        aria-label={t('appNotesClickToAdd')}
                         placeholder={
                           notesHeight < 60 ? t('appNotesClickToAdd') : t('appNotesPlaceholder')
                         }
@@ -4436,6 +4440,8 @@ function ZoomControls({
       </button>
       <input
         className="zoom-slider"
+        // unnamed, a screen reader announces only "slider" and a percentage
+        aria-label={t('ribbonTransZoom')}
         type="range"
         min={ZOOM_MIN * 100}
         max={ZOOM_MAX * 100}

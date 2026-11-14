@@ -3822,6 +3822,11 @@ function RibbonInner({
                     <button
                       className={`rb-caret rb-color-caret${dropdown === 'highlight' ? ' active' : ''}`}
                       disabled={!canEdit}
+                      // icon-only: without a name a screen reader announces only
+                      // "button", and this one opens a palette rather than
+                      // applying a colour
+                      aria-label={t('editorRevHighlight')}
+                      aria-expanded={dropdown === 'highlight'}
                       onClick={() => setDropdown((v) => (v === 'highlight' ? null : 'highlight'))}
                     >
                       <IconCaret />
@@ -3876,6 +3881,8 @@ function RibbonInner({
                     </button>
                     <button
                       className={`rb-caret rb-color-caret${dropdown === 'color' ? ' active' : ''}`}
+                      aria-label={t('editorRevFontColor')}
+                      aria-expanded={dropdown === 'color'}
                       disabled={!canEdit}
                       onClick={() => setDropdown((v) => (v === 'color' ? null : 'color'))}
                     >
