@@ -37,6 +37,8 @@ mod table_styles;
 #[cfg(test)]
 mod tests;
 mod types;
+#[cfg(target_family = "wasm")]
+pub mod wasm;
 mod workbook;
 mod worksheet;
 mod xls_biff;

@@ -5,6 +5,11 @@ edition = "2024"
 license = "Apache-2.0"
 publish = false
 
+[lib]
+# cdylib: the wasm build exports sidecar_handle_line & co for a JS host
+# (src/wasm.rs). rlib keeps the native bin and `cargo test` working unchanged.
+crate-type = ["cdylib", "rlib"]
+
 [features]
 # Run indexing and recalc inline instead of on threads, as WebAssembly builds
 # without threads must; lets that path be tested on any machine.
