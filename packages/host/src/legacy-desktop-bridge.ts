@@ -54,6 +54,13 @@ const OBJECT_LIKE_GETTERS = new Set([
   'getPathForFile',
   'getSlideSize',
   'getStatus',
+  // font metrics and the "which faces are missing" report are read as objects by
+  // the slides text layout path; undefined makes the caller guard for nothing
+  'fontMetrics',
+  'fontMissing',
+  // the document's password-prompt intent: read as an object, and drawing a
+  // revision number out of undefined is how the guard in the caller got added
+  'docPasswordIntentRevision',
 ])
 
 /**
@@ -225,10 +232,30 @@ function desktopOnly(name: string): Promise<never> {
   )
 }
 
+/**
+ * Names that ask a yes/no or "is there anything queued" question.
+ *
+ * Their honest answer on a host with no queue is `false`, and callers branch on
+ * the value directly (`if (await hasQueuedWorkbook())`). Returning undefined also
+ * takes the false branch, so this is not a bug fix — it makes the contract say
+ * what it means instead of relying on every caller treating undefined as false.
+ */
+const BOOLEAN_PROBES = new Set([
+  'hasQueuedWorkbook',
+  'hasUnsavedChanges',
+  'notifyPendingEdits',
+  'consumeNewBlankWorkbook',
+])
+
+/** Names that return a collection without the usual get/list prefix. */
+const EXTRA_LIST_ANSWERS = new Set(['privateFontFaces', 'listEditFonts', 'getComments'])
+
 /** The empty value to answer with when an unknown method is called. */
 function fallbackAnswer(name: string): unknown {
+  if (EXTRA_LIST_ANSWERS.has(name)) return []
   if (OBJECT_LIKE_GETTERS.has(name)) return {}
   if (LIST_LIKE_PATTERN.test(name)) return []
+  if (BOOLEAN_PROBES.has(name)) return false
   return undefined
 }
 
@@ -516,7 +543,17 @@ export function installLegacyDesktopBridge(
       }
       if (typeof prop !== 'string') return undefined
       stats.called.add(prop)
-      stats.unmapped.add(prop)
+      // Only report calls that resolve to `undefined`. A subscription is fully
+      // answered by an unsubscribe function, an object-shaped getter by {}, a
+      // list-shaped one by [], and a desktop-only action by a refusal — none of
+      // those are gaps. Counting them made the audit read as 10-13 missing
+      // capabilities when most were events that cannot fire on this host.
+      const answered =
+        SUBSCRIPTION_PATTERN.test(prop) ||
+        OBJECT_LIKE_GETTERS.has(prop) ||
+        REQUIRES_DESKTOP.has(prop) ||
+        fallbackAnswer(prop) !== undefined
+      if (!answered) stats.unmapped.add(prop)
       if (SUBSCRIPTION_PATTERN.test(prop)) {
         return (...args: unknown[]) => {
           const handler = args.find((a) => typeof a === 'function')
@@ -540,6 +577,20 @@ export function installLegacyDesktopBridge(
   for (const name of names) {
     if (!target[name]) target[name] = bridge
   }
+
+  // Expose what fell through, so a real device session can be audited afterwards.
+  //
+  // The fallback itself is deliberate: returning undefined lets an app boot on a
+  // host that lacks a capability, which is why ~950 call sites keep working on a
+  // phone. The cost is that a caller cannot tell "this host has no answer" from
+  // "the answer is empty", and for a save-shaped method that difference is lost
+  // user work. Recording the names does not change the behaviour; it makes the
+  // gap observable — open the app, use it, then read this set.
+  ;(target as Record<string, unknown>).__genofficeBridgeAudit = {
+    called: () => [...stats.called],
+    unmapped: () => [...stats.unmapped],
+  }
+
   return stats
 }
 

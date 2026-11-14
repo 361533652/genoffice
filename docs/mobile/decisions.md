@@ -313,6 +313,20 @@ npm run serve:mobile-checks -- --build   # 先重新构建
 
 已固化为 `e2e/mobile-ime-composition.spec.ts` + `e2e/mobile-ime-guard.spec.ts`（后者验证「拼音断言能抓到拼音」「拉丁字母不会冒充中文」）。
 
+#### host 契约收敛：启动时零个未应答调用
+
+渲染层仍有约 950 处 `window.desktop.*` 调用，它们靠垫片（legacy bridge）应答。**这在移动端不是缺陷**——正是它让应用能启动。真正的风险是：调用方分不清「宿主没实现」和「答案就是空的」。
+
+垫片本来就有 `unmapped` 记录，但没暴露。这轮做了三件事：
+
+1. **暴露审计接口** `__genofficeBridgeAudit`，任何一次真机session 都能查出漏了哪些方法；
+2. **精确定义「未应答」**：只有 resolve 成 `undefined` 才算。订阅（`on*`）、对象型 getter、列表型、桌面专属动作都算已应答——最初版本把这些全算成缺口，报告成 10–13 个，实际远没有那么多；
+3. **补上空答案**：`fontMetrics`/`fontMissing`/`docPasswordIntentRevision` 给 `{}`，`privateFontFaces` 等给 `[]`，`hasQueuedWorkbook` 一类探针给 `false`。
+
+结果：**六个应用启动时的未应答调用从 2–3 个降到 0**（sheets 本就接近零，slides 修了字体相关两个）。已固化断言，再有新增未应答方法会让测试失败。
+
+**注意**：这只覆盖「启动路径」，不等于用户完整操作路径。用那个审计接口在真机上走一遍，能查出更全的清单。
+
 ## 怎么跑这些验收
 
 **一条命令，零手工准备**：
