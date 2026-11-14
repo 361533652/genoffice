@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark home chrome (design review P1-1). The dark AppCompat parent also
+         makes host-owned AlertDialogs (JS confirm/alert) render dark at night.
+         MainActivity.applySystemBars re-applies HomeTheme values at runtime. -->
+    <style name="Theme.GenOffice" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:statusBarColor">#1A1A1A</item>
+        <item name="android:navigationBarColor">#1A1A1A</item>
+        <item name="android:windowBackground">#1A1A1A</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

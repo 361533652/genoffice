@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Folder glyph from the desktop Home.tsx FolderIcon (viewBox 16, stroke 1.2).
+     White stroke; tinted at runtime (accent for the open-file action, iconMuted
+     for the empty state). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.2"
+        android:strokeLineJoin="round"
+        android:pathData="M1.5,4 A1.5,1.5 0 0 1 3,2.5 L6.1,2.5 C6.54,2.5 6.95,2.69 7.23,3.02 L8.4,4.4 L13,4.4 A1.5,1.5 0 0 1 14.5,5.9 L14.5,11.5 A1.5,1.5 0 0 1 13,13 L3,13 A1.5,1.5 0 0 1 1.5,11.5 Z" />
+</vector>

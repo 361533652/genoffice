@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Converted 1:1 from apps/shell/src/renderer/src/assets/file-docx.svg.
+     The SVG viewBox is "24 24 240 240"; the group translate normalizes it to 0..240.
+     Badge identity color (#3276CD) is theme-independent (design review P0-4). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="240"
+    android:viewportHeight="240">
+    <group
+        android:translateX="-24"
+        android:translateY="-24">
+        <path
+            android:fillColor="#3276CD"
+            android:pathData="M72,24 L216,24 A48,48 0 0 1 264,72 L264,216 A48,48 0 0 1 216,264 L72,264 A48,48 0 0 1 24,216 L24,72 A48,48 0 0 1 72,24 Z" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M207.373,96 H196.927 C192.749,96 189.267,98.4 188.57,102 C173.946,160.8 174.642,159 173.946,163.8 C173.946,163.2 173.946,162.6 173.249,161.4 C172.553,158.4 173.946,161.4 157.232,102 C155.839,98.4 153.053,96 148.875,96 H139.822 C135.643,96 132.161,98.4 131.465,102 C114.751,161.4 114.751,159.6 114.054,163.8 V161.4 C113.358,158.4 104.305,117.6 100.823,102 C99.4299,98.4 96.6442,96 92.4658,96 H80.6268 C75.0556,96 70.8771,100.8 72.2699,105 C77.8412,124.8 91.073,171 95.2514,186.6 C96.6442,190.2 100.126,192 103.608,192 H121.019 C125.197,192 128.679,190.2 129.375,186.6 L141.911,144 L144,138 L146.089,144 C146.089,144 154.446,174 158.625,186.6 C159.321,189.6 162.803,192 166.285,192 H183.695 C187.177,192 190.659,190.2 192.052,186.6 C205.98,137.4 212.944,115.2 215.73,105 C217.123,100.8 212.944,96 207.373,96 Z" />
+    </group>
+</vector>

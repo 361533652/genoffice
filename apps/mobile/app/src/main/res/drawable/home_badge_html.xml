@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Converted 1:1 from apps/shell/src/renderer/src/assets/file-html.svg.
+     The glyph is a stroke path (width 20, round caps/joins), kept as a stroke.
+     Badge identity color (#0FA3A3) is theme-independent (design review P0-4). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="240"
+    android:viewportHeight="240">
+    <path
+        android:fillColor="#0FA3A3"
+        android:pathData="M48,0 L192,0 A48,48 0 0 1 240,48 L240,192 A48,48 0 0 1 192,240 L48,240 A48,48 0 0 1 0,192 L0,48 A48,48 0 0 1 48,0 Z" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="20"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M92,72 L44,120 L92,168 M148,72 L196,120 L148,168" />
+</vector>

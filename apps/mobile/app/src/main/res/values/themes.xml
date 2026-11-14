@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Light home chrome. Runtime (MainActivity.applySystemBars) re-applies the
+         HomeTheme values on top of these static defaults; keep them in sync so
+         the launch window never flashes a mismatched bar color. -->
     <style name="Theme.GenOffice" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:statusBarColor">#FFFFFF</item>
-        <item name="android:navigationBarColor">#FFFFFF</item>
+        <item name="android:statusBarColor">#FAFAFA</item>
+        <item name="android:navigationBarColor">#FAFAFA</item>
+        <item name="android:windowBackground">#FAFAFA</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 </resources>

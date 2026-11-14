@@ -1,12 +1,16 @@
 package com.genoffice.mobile
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.RippleDrawable
+import android.graphics.drawable.StateListDrawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.Gravity
@@ -14,15 +18,16 @@ import android.view.View
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
-import android.widget.Button
 import android.widget.FrameLayout
-import android.widget.HorizontalScrollView
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.webkit.WebViewAssetLoader
 import androidx.webkit.WebViewClientCompat
 import androidx.webkit.WebViewCompat
@@ -30,8 +35,9 @@ import androidx.webkit.WebViewCompat
 /**
  * The GenOffice Android host.
  *
- * A home screen (recent files + the six editors + an open-file button) and a
- * WebView. The editors are the SAME production bundles the browser host runs
+ * A home screen (title → "新建" app grid → "最近使用" list with an open-file
+ * text action, themed light/dark by the system uiMode) and a WebView. The
+ * editors are the SAME production bundles the browser host runs
  * (assets/web/<app>/), served over https via WebViewAssetLoader.
  *
  * Files reach an editor three ways, all funnelling through [PendingOpen] which
@@ -48,18 +54,26 @@ class MainActivity : ComponentActivity() {
     private lateinit var webView: WebView
     private lateinit var assetLoader: WebViewAssetLoader
     private lateinit var bridge: GenOfficeBridge
+    private lateinit var homeTheme: HomeTheme
     private var fileChooserCallback: ValueCallback<Array<Uri>>? = null
     private var currentApp: String? = null
 
-    private data class AppDef(val id: String, val label: String, val glyph: String, val color: Int)
+    /** grid column count of the currently built home (3 portrait / 6 wide) */
+    private var homeCols = 0
+
+    /** "查看全部" expands the recent list in place; reset only by process death */
+    private var recentsExpanded = false
+
+    /** badge drawables are the desktop FileBadge SVGs converted to vectors (P0-4) */
+    private data class AppDef(val id: String, val label: String, val badgeRes: Int)
 
     private val apps = listOf(
-        AppDef("docs", "文档", "W", 0xFF2B579A.toInt()),
-        AppDef("sheets", "表格", "X", 0xFF217346.toInt()),
-        AppDef("slides", "幻灯片", "P", 0xFFB7472A.toInt()),
-        AppDef("pdf", "PDF", "PDF", 0xFFC62828.toInt()),
-        AppDef("markdown", "Markdown", "M", 0xFF455A64.toInt()),
-        AppDef("html", "HTML", "H", 0xFFE34F26.toInt()),
+        AppDef("docs", "文档", R.drawable.home_badge_docs),
+        AppDef("sheets", "表格", R.drawable.home_badge_sheets),
+        AppDef("slides", "幻灯片", R.drawable.home_badge_slides),
+        AppDef("pdf", "PDF", R.drawable.home_badge_pdf),
+        AppDef("markdown", "Markdown", R.drawable.home_badge_markdown),
+        AppDef("html", "HTML", R.drawable.home_badge_html),
     )
 
     private val openDocument =
@@ -113,13 +127,51 @@ class MainActivity : ComponentActivity() {
             v.setPadding(bars.left, bars.top, bars.right, bars.bottom)
             insets
         }
+        // the inset padding strips show the root background — keep it on-theme
+        // so status/navigation bars meet the page without a seam (P1-5)
+        root.setBackgroundColor(homeTheme.bg)
         setContentView(root)
+        applySystemBars()
         handleViewIntent(intent)
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handleViewIntent(intent)
+    }
+
+    /**
+     * Rotation is handled here (configChanges), not by recreation. Only the
+     * home subtree is rebuilt when the column bucket changes; the WebView and
+     * its editor state are never touched. Night-mode switches are NOT in
+     * configChanges, so they recreate the activity and re-resolve HomeTheme.
+     */
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (!::home.isInitialized) return
+        val cols = if (newConfig.screenWidthDp >= 600) 6 else 3
+        if (cols != homeCols) rebuildHome()
+    }
+
+    private fun rebuildHome() {
+        val visible = home.visibility
+        val scroll = home.scrollY
+        root.removeView(home)
+        buildHome()
+        home.visibility = visible
+        root.addView(home, 0, FrameLayout.LayoutParams(-1, -1))
+        home.post { home.scrollY = scroll }
+        applySystemBars()
+    }
+
+    /** status/navigation bars match the page background; icons follow the theme */
+    private fun applySystemBars() {
+        window.statusBarColor = homeTheme.bg
+        window.navigationBarColor = homeTheme.bg
+        if (Build.VERSION.SDK_INT >= 28) window.navigationBarDividerColor = Color.TRANSPARENT
+        val controller = WindowInsetsControllerCompat(window, root)
+        controller.isAppearanceLightStatusBars = !homeTheme.night
+        controller.isAppearanceLightNavigationBars = !homeTheme.night
     }
 
     // ---- incoming "Open with" intents ----------------------------------------
@@ -164,153 +216,300 @@ class MainActivity : ComponentActivity() {
 
     // ---- home screen -----------------------------------------------------------
 
+    /**
+     * Home layout per the design review (§7): title → "新建" app grid →
+     * "最近使用" single-container list. Content is capped at 640dp and centered;
+     * the grid is 6 columns on ≥600dp screens, 3 otherwise, so all six apps
+     * stay above the fold in landscape (P0-1 / P0-2).
+     */
     private fun buildHome() {
-        val container = LinearLayout(this).apply {
+        homeTheme = HomeTheme.from(this)
+        val wide = resources.configuration.screenWidthDp >= 600
+        homeCols = if (wide) 6 else 3
+        val pageMargin = dp(if (wide) 24 else 16)
+
+        val content = ContentColumn(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(20), dp(24), dp(20), dp(32))
-            setBackgroundColor(0xFFF5F6F8.toInt())
+            setPadding(0, dp(12), 0, dp(24))
         }
 
-        container.addView(TextView(this).apply {
+        content.addView(TextView(this).apply {
             text = "GenOffice"
-            textSize = 30f
-            setTypeface(typeface, Typeface.BOLD)
-            setTextColor(0xFF1A1A1A.toInt())
-        })
-        container.addView(TextView(this).apply {
-            text = "文档 · 表格 · 幻灯片 · PDF"
-            textSize = 14f
-            setTextColor(0xFF7A7A7A.toInt())
-            setPadding(0, dp(2), 0, dp(20))
-        })
+            textSize = 22f
+            typeface = font(700)
+            letterSpacing = -0.01f
+            setTextColor(homeTheme.text)
+        }, LinearLayout.LayoutParams(-1, -2).also { it.bottomMargin = dp(20) })
 
-        val openBtn = Button(this).apply {
-            text = "打开文件"
-            setOnClickListener { homeOpenPicker.launch(arrayOf("*/*")) }
-        }
-        container.addView(openBtn, LinearLayout.LayoutParams(-1, dp(48)).also { it.bottomMargin = dp(24) })
+        content.addView(sectionLabel("新建"), LinearLayout.LayoutParams(-1, -2).also { it.bottomMargin = dp(8) })
 
-        container.addView(sectionLabel("最近使用"))
-        recentsBox = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        container.addView(recentsBox, LinearLayout.LayoutParams(-1, -2).also { it.bottomMargin = dp(24) })
-
-        container.addView(sectionLabel("应用"))
         val grid = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        for (row in apps.chunked(3)) {
+        val rows = apps.chunked(homeCols)
+        for ((ri, row) in rows.withIndex()) {
             val rowLayout = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
-                weightSum = 3f
+                weightSum = homeCols.toFloat()
             }
-            for (app in row) {
-                rowLayout.addView(appCard(app), LinearLayout.LayoutParams(0, -2, 1f).also {
-                    it.marginEnd = dp(10)
+            for ((ci, app) in row.withIndex()) {
+                rowLayout.addView(appCard(app), LinearLayout.LayoutParams(0, dp(92), 1f).also {
+                    if (ci < row.size - 1) it.marginEnd = dp(8)
                 })
             }
-            grid.addView(rowLayout, LinearLayout.LayoutParams(-1, -2).also { it.bottomMargin = dp(10) })
+            grid.addView(rowLayout, LinearLayout.LayoutParams(-1, -2).also {
+                if (ri < rows.size - 1) it.bottomMargin = dp(8)
+            })
         }
-        container.addView(grid)
+        content.addView(grid, LinearLayout.LayoutParams(-1, -2).also { it.bottomMargin = dp(24) })
 
+        content.addView(recentsHeader(), LinearLayout.LayoutParams(-1, dp(48)).also { it.bottomMargin = dp(8) })
+        recentsBox = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            background = rounded(homeTheme.surface, dp(12), homeTheme.border)
+        }
+        content.addView(recentsBox, LinearLayout.LayoutParams(-1, -2))
+
+        val wrapper = FrameLayout(this).apply {
+            setPadding(pageMargin, 0, pageMargin, 0)
+            addView(content, FrameLayout.LayoutParams(-1, -2, Gravity.CENTER_HORIZONTAL))
+        }
         home = ScrollView(this).apply {
-            addView(container, FrameLayout.LayoutParams(-1, -2))
+            setBackgroundColor(homeTheme.bg)
             isFillViewport = true
+            addView(wrapper, FrameLayout.LayoutParams(-1, -2))
         }
         refreshRecents()
     }
 
-    private fun sectionLabel(text: String): TextView = TextView(this).apply {
-        this.text = text
-        textSize = 13f
-        setTypeface(typeface, Typeface.BOLD)
-        setTextColor(0xFF9A9A9A.toInt())
-        setPadding(0, 0, 0, dp(10))
+    /** caps the content column at 640dp; the FrameLayout parent centers it */
+    private inner class ContentColumn(context: android.content.Context) : LinearLayout(context) {
+        override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+            val w = minOf(MeasureSpec.getSize(widthMeasureSpec), dp(640))
+            super.onMeasure(MeasureSpec.makeMeasureSpec(w, MeasureSpec.EXACTLY), heightMeasureSpec)
+        }
     }
 
-    private fun appCard(app: AppDef): LinearLayout {
-        val card = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER
-            setPadding(dp(8), dp(18), dp(8), dp(18))
-            background = rounded(0xFFFFFFFF.toInt(), dp(14))
-            setOnClickListener { openApp(app.id) }
-        }
-        card.addView(TextView(this).apply {
-            text = app.glyph
-            textSize = if (app.glyph.length > 1) 16f else 24f
-            setTypeface(typeface, Typeface.BOLD)
-            setTextColor(Color.WHITE)
-            gravity = Gravity.CENTER
-            background = rounded(app.color, dp(12))
-            val size = dp(52)
-            layoutParams = LinearLayout.LayoutParams(size, size).also { it.bottomMargin = dp(10) }
+    private fun sectionLabel(text: String): TextView = TextView(this).apply {
+        this.text = text
+        textSize = 14f
+        typeface = font(600)
+        letterSpacing = 0.02f
+        setTextColor(homeTheme.secondary)
+        ViewCompat.setAccessibilityHeading(this, true)
+    }
+
+    /** "最近使用" label + the demoted open-file text button on the right (P0-1) */
+    private fun recentsHeader(): LinearLayout = LinearLayout(this).apply {
+        orientation = LinearLayout.HORIZONTAL
+        gravity = Gravity.CENTER_VERTICAL
+        addView(sectionLabel("最近使用"), LinearLayout.LayoutParams(0, -2, 1f))
+        addView(openFileButton(), LinearLayout.LayoutParams(-2, dp(48)))
+    }
+
+    private fun openFileButton(): LinearLayout = LinearLayout(this).apply {
+        orientation = LinearLayout.HORIZONTAL
+        gravity = Gravity.CENTER_VERTICAL
+        setPadding(dp(12), 0, dp(12), 0)
+        background = textButtonBg()
+        contentDescription = "打开文件"
+        setOnClickListener { homeOpenPicker.launch(arrayOf("*/*")) }
+        addView(ImageView(this@MainActivity).apply {
+            setImageResource(R.drawable.home_ic_folder)
+            setColorFilter(homeTheme.accent)
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }, LinearLayout.LayoutParams(dp(16), dp(16)).also { it.marginEnd = dp(4) })
+        addView(TextView(this@MainActivity).apply {
+            text = "打开文件"
+            textSize = 14f
+            typeface = font(500)
+            setTextColor(homeTheme.accent)
         })
-        card.addView(TextView(this).apply {
+    }
+
+    private fun appCard(app: AppDef): LinearLayout = LinearLayout(this).apply {
+        orientation = LinearLayout.VERTICAL
+        gravity = Gravity.CENTER
+        setPadding(dp(4), dp(12), dp(4), dp(12))
+        background = cardBg(homeTheme.surface, 12, homeTheme.border)
+        contentDescription = "新建${app.label}"
+        setOnClickListener { openApp(app.id) }
+        addView(ImageView(this@MainActivity).apply {
+            setImageResource(app.badgeRes)
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }, LinearLayout.LayoutParams(dp(44), dp(44)).also { it.bottomMargin = dp(8) })
+        addView(TextView(this@MainActivity).apply {
             text = app.label
-            textSize = 13f
-            setTextColor(0xFF333333.toInt())
+            textSize = 12f
+            typeface = font(500)
+            setTextColor(homeTheme.text)
             gravity = Gravity.CENTER
+            includeFontPadding = false
+            maxLines = 1
         })
-        return card
     }
 
     private fun refreshRecents() {
         recentsBox.removeAllViews()
         val entries = Recents.list(this)
         if (entries.isEmpty()) {
-            recentsBox.addView(TextView(this).apply {
-                text = "暂无最近文件 — 打开或新建一个文件开始使用。"
-                textSize = 13f
-                setTextColor(0xFF9A9A9A.toInt())
-                setPadding(dp(4), dp(8), dp(4), dp(8))
-            })
+            recentsBox.addView(emptyState())
             return
         }
-        for (entry in entries.take(12)) {
-            recentsBox.addView(recentRow(entry))
+        val hasFooter = entries.size > 5
+        val shown = if (recentsExpanded) entries else entries.take(5)
+        for ((i, entry) in shown.withIndex()) {
+            if (i > 0) recentsBox.addView(divider(indent = true))
+            recentsBox.addView(recentRow(entry, first = i == 0, last = !hasFooter && i == shown.size - 1))
+        }
+        if (hasFooter) {
+            recentsBox.addView(divider(indent = false))
+            recentsBox.addView(showAllFooter())
         }
     }
 
-    private fun recentRow(entry: Recents.Entry): LinearLayout {
+    /** hairline between rows, indented to the text start (12 + 36 + 12) */
+    private fun divider(indent: Boolean): View = View(this).apply {
+        setBackgroundColor(homeTheme.divider)
+        layoutParams = LinearLayout.LayoutParams(-1, dp(1)).also {
+            if (indent) it.marginStart = dp(60)
+        }
+    }
+
+    private fun recentRow(entry: Recents.Entry, first: Boolean, last: Boolean): LinearLayout {
         val app = apps.find { it.id == entry.app } ?: apps[0]
-        val row = LinearLayout(this).apply {
+        val rel = DateUtils.getRelativeTimeSpanString(entry.ts)
+        return LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            setPadding(dp(12), dp(12), dp(12), dp(12))
-            background = rounded(0xFFFFFFFF.toInt(), dp(12))
+            setPadding(dp(12), dp(10), dp(12), dp(10))
+            background = rowRipple(first, last)
+            contentDescription = "${entry.name}，${app.label}，$rel"
             setOnClickListener { openRecent(entry) }
+            addView(ImageView(this@MainActivity).apply {
+                setImageResource(app.badgeRes)
+                importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+            }, LinearLayout.LayoutParams(dp(36), dp(36)).also { it.marginEnd = dp(12) })
+            val textCol = LinearLayout(this@MainActivity).apply {
+                orientation = LinearLayout.VERTICAL
+                layoutParams = LinearLayout.LayoutParams(0, -2, 1f)
+            }
+            textCol.addView(TextView(this@MainActivity).apply {
+                text = entry.name
+                textSize = 15f
+                typeface = font(500)
+                setTextColor(homeTheme.text)
+                includeFontPadding = false
+                maxLines = 1
+                ellipsize = android.text.TextUtils.TruncateAt.END
+            })
+            textCol.addView(TextView(this@MainActivity).apply {
+                text = "${app.label} · $rel"
+                textSize = 12f
+                setTextColor(homeTheme.secondary)
+                includeFontPadding = false
+                setPadding(0, dp(2), 0, 0)
+            })
+            addView(textCol)
+            addView(ImageView(this@MainActivity).apply {
+                setImageResource(R.drawable.home_ic_chevron_right)
+                setColorFilter(homeTheme.iconMuted)
+                importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+            }, LinearLayout.LayoutParams(dp(16), dp(16)).also { it.marginStart = dp(8) })
+            layoutParams = LinearLayout.LayoutParams(-1, dp(56))
         }
-        row.addView(TextView(this).apply {
-            text = app.glyph
-            textSize = if (app.glyph.length > 1) 12f else 18f
-            setTypeface(typeface, Typeface.BOLD)
-            setTextColor(Color.WHITE)
-            gravity = Gravity.CENTER
-            background = rounded(app.color, dp(9))
-            val size = dp(40)
-            layoutParams = LinearLayout.LayoutParams(size, size).also { it.marginEnd = dp(12) }
-        })
-        val textCol = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            layoutParams = LinearLayout.LayoutParams(0, -2, 1f)
-        }
-        textCol.addView(TextView(this).apply {
-            text = entry.name
-            textSize = 15f
-            setTextColor(0xFF222222.toInt())
-            maxLines = 1
-            ellipsize = android.text.TextUtils.TruncateAt.END
-        })
-        textCol.addView(TextView(this).apply {
-            text = "${app.label} · ${DateUtils.getRelativeTimeSpanString(entry.ts)}"
-            textSize = 12f
-            setTextColor(0xFF9A9A9A.toInt())
-            setPadding(0, dp(2), 0, 0)
-        })
-        row.addView(textCol)
-        val lp = LinearLayout.LayoutParams(-1, -2)
-        lp.bottomMargin = dp(8)
-        row.layoutParams = lp
-        return row
     }
+
+    /** expands/collapses the full recent list in place (full page: later iteration) */
+    private fun showAllFooter(): LinearLayout = LinearLayout(this).apply {
+        orientation = LinearLayout.HORIZONTAL
+        gravity = Gravity.CENTER
+        background = rowRipple(first = false, last = true)
+        contentDescription = if (recentsExpanded) "收起最近文件" else "查看全部最近文件"
+        setOnClickListener {
+            recentsExpanded = !recentsExpanded
+            refreshRecents()
+        }
+        addView(TextView(this@MainActivity).apply {
+            text = if (recentsExpanded) "收起" else "查看全部"
+            textSize = 14f
+            typeface = font(500)
+            setTextColor(homeTheme.accent)
+        })
+        layoutParams = LinearLayout.LayoutParams(-1, dp(48))
+    }
+
+    /** empty state: icon → title → hint → open-file action (P1-6) */
+    private fun emptyState(): LinearLayout = LinearLayout(this).apply {
+        orientation = LinearLayout.VERTICAL
+        gravity = Gravity.CENTER_HORIZONTAL
+        setPadding(dp(16), dp(32), dp(16), dp(32))
+        addView(ImageView(this@MainActivity).apply {
+            setImageResource(R.drawable.home_ic_folder)
+            setColorFilter(homeTheme.iconMuted)
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }, LinearLayout.LayoutParams(dp(48), dp(48)).also { it.bottomMargin = dp(16) })
+        addView(TextView(this@MainActivity).apply {
+            text = "暂无最近文件"
+            textSize = 14f
+            typeface = font(500)
+            setTextColor(homeTheme.text)
+        }, LinearLayout.LayoutParams(-2, -2).also { it.bottomMargin = dp(4) })
+        addView(TextView(this@MainActivity).apply {
+            text = "打开或新建一个文件开始使用"
+            textSize = 12f
+            setTextColor(homeTheme.secondary)
+        }, LinearLayout.LayoutParams(-2, -2).also { it.bottomMargin = dp(16) })
+        addView(openFileButton(), LinearLayout.LayoutParams(-2, dp(48)))
+    }
+
+    // ---- home drawing helpers ---------------------------------------------------
+
+    /** surface card with 1dp border, 12dp corners and a bounded ripple (P0-5) */
+    private fun cardBg(fill: Int, radiusDp: Int, stroke: Int? = null): RippleDrawable {
+        val r = dp(radiusDp).toFloat()
+        val content = GradientDrawable().apply {
+            setColor(fill)
+            cornerRadius = r
+            if (stroke != null) setStroke(dp(1), stroke)
+        }
+        val mask = GradientDrawable().apply { setColor(Color.WHITE); cornerRadius = r }
+        return RippleDrawable(ColorStateList.valueOf(homeTheme.ripple), content, mask)
+    }
+
+    /**
+     * Row ripple inside the shared recent container: only the container's outer
+     * corners are rounded, so the mask rounds just the first/last row corners.
+     */
+    private fun rowRipple(first: Boolean, last: Boolean): RippleDrawable {
+        val r = dp(12).toFloat()
+        val radii = floatArrayOf(
+            if (first) r else 0f, if (first) r else 0f,
+            if (last) r else 0f, if (last) r else 0f,
+            if (last) r else 0f, if (last) r else 0f,
+            if (first) r else 0f, if (first) r else 0f,
+        )
+        val mask = GradientDrawable().apply { setColor(Color.WHITE); cornerRadii = radii }
+        return RippleDrawable(ColorStateList.valueOf(homeTheme.ripple), null, mask)
+    }
+
+    /** text button: accentSoft pressed fill + ripple, 8dp corners (P0-5) */
+    private fun textButtonBg(): RippleDrawable {
+        val pressed = GradientDrawable().apply {
+            setColor(homeTheme.accentSoft)
+            cornerRadius = dp(8).toFloat()
+        }
+        val content = StateListDrawable().apply {
+            addState(intArrayOf(android.R.attr.state_pressed), pressed)
+            addState(intArrayOf(), GradientDrawable().apply { setColor(Color.TRANSPARENT) })
+        }
+        val mask = GradientDrawable().apply { setColor(Color.WHITE); cornerRadius = dp(8).toFloat() }
+        return RippleDrawable(ColorStateList.valueOf(homeTheme.ripple), content, mask)
+    }
+
+    /** variable font weight on API 28+; graceful normal/bold fallback below */
+    private fun font(weight: Int): Typeface =
+        if (Build.VERSION.SDK_INT >= 28) Typeface.create(Typeface.DEFAULT, weight, false)
+        else if (weight >= 600) Typeface.DEFAULT_BOLD
+        else Typeface.DEFAULT
 
     private fun openRecent(entry: Recents.Entry) {
         val uri = Uri.parse(entry.uri)
@@ -468,8 +667,9 @@ class MainActivity : ComponentActivity() {
 
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 
-    private fun rounded(color: Int, radius: Int): GradientDrawable = GradientDrawable().apply {
+    private fun rounded(color: Int, radius: Int, stroke: Int? = null): GradientDrawable = GradientDrawable().apply {
         setColor(color)
         cornerRadius = radius.toFloat()
+        if (stroke != null) setStroke(dp(1), stroke)
     }
 }
