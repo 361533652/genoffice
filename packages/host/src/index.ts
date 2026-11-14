@@ -27,6 +27,10 @@ export * from './deflate.js'
 export * from './file-access.js'
 export * from './limitations.js'
 export * from './storage-fallback.js'
+// The sheets session host is a SUBPATH import (@genoffice/host/sheets/install):
+// it pulls the xlsx gateway into the module graph, and only the sheets app
+// should carry that. Type-only re-exports are erased, so they are safe here.
+export type { SheetsSessionInstallOptions, SheetsSessionHandle } from './sheets/install.js'
 
 /** The subset of `window.desktop` this facade adapts (see apps/docs/src/shared/ipc.ts). */
 interface ElectronPreload {

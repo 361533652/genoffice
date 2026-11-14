@@ -6,7 +6,8 @@
   "type": "module",
   "description": "Host facade: one entry point the renderer talks to, backed by Electron, a browser, or the Android WebView bridge.",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./sheets/install": "./src/sheets/install.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
@@ -14,7 +15,9 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@bjorn3/browser_wasi_shim": "^0.4.2",
     "@genoffice/host-contract": "*",
+    "@genoffice/xlsx-gateway": "*",
     "buffer": "^6.0.3"
   },
   "devDependencies": {

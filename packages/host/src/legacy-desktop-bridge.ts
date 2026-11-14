@@ -261,6 +261,24 @@ function fallbackAnswer(name: string): unknown {
 
 type AnyFn = (...args: unknown[]) => unknown
 
+/**
+ * Host-provided implementations that take precedence over the shim.
+ *
+ * The sheets session host registers its workbook methods here: on a host that
+ * runs the wasm sidecar, `selectWorkbook` & co. are REAL capabilities, not
+ * desktop-only refusals. The registry keeps the shim's default answers intact
+ * for every host that does not opt in, and the audit still sees the calls.
+ */
+const bridgeOverrides = new Map<string, AnyFn>()
+
+/** Register an implementation; returns an unregister function. */
+export function registerBridgeOverride(name: string, fn: AnyFn): () => void {
+  bridgeOverrides.set(name, fn)
+  return () => {
+    if (bridgeOverrides.get(name) === fn) bridgeOverrides.delete(name)
+  }
+}
+
 export interface LegacyBridgeStats {
   /** number of distinct method names resolved so far */
   called: Set<string>
@@ -564,6 +582,12 @@ export function installLegacyDesktopBridge(
 
   const bridge = new Proxy(explicit, {
     get(known, prop: string) {
+      // a host capability (wasm workbook session) outranks the shim
+      const override = typeof prop === 'string' ? bridgeOverrides.get(prop) : undefined
+      if (override) {
+        stats.called.add(prop)
+        return override
+      }
       if (prop in known) {
         stats.called.add(prop)
         return known[prop]
