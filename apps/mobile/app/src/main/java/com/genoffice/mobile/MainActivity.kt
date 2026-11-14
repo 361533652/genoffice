@@ -346,6 +346,11 @@ class MainActivity : ComponentActivity() {
             useWideViewPort = true
             loadWithOverviewMode = true
         }
+        // The editors theme themselves (data-theme); never let the system/OEM
+        // (e.g. HyperOS) algorithmically darken the WebView — that turns menus
+        // into dark-on-dark "invisible" panels. Belt-and-suspenders with the
+        // color-scheme meta in each app's index.html.
+        androidx.webkit.WebSettingsCompat.setAlgorithmicDarkeningAllowed(webView.settings, false)
         webView.addJavascriptInterface(bridge, "GenOfficeNative")
         webView.webViewClient = object : WebViewClientCompat() {
             override fun shouldInterceptRequest(
