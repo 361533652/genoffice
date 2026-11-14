@@ -191,3 +191,70 @@ export function toArrayBuffer(data: Uint8Array): ArrayBuffer {
 
 // sha256Hex lives in ./node-globals.ts — it is the same helper the engine
 // shims need, so there is exactly one implementation
+/**
+ * Save by handing the bytes to the browser's download machinery.
+ *
+ * saveViaPicker() needs showSaveFilePicker, which is desktop Chromium. Android
+ * Chrome and Android WebViews do not ship it, so on the actual target platform the
+ * picker path returns 'unsupported' and a user who edits a document has nowhere to
+ * put the result. Measured: with both pickers removed, saveDocxAs resolves to null
+ * and nothing is written.
+ *
+ * A download is not as good as a picker — the file lands in the Downloads folder
+ * with a name the browser chose, not where the user pointed — but it is a real save,
+ * and it is the only one available there. The alternative is losing the work.
+ */
+export async function saveViaDownload(
+  data: Uint8Array,
+  suggestedName: string,
+): Promise<OpenResult> {
+  try {
+    const blob = new Blob([toArrayBuffer(data)])
+    const url = URL.createObjectURL(blob)
+    try {
+      const anchor = document.createElement('a')
+      anchor.href = url
+      anchor.download = suggestedName
+      anchor.rel = 'noopener'
+      // Some WebViews ignore click() on a detached node; keep it in the document
+      // for the duration of the click.
+      anchor.style.display = 'none'
+      document.body.appendChild(anchor)
+      anchor.click()
+      anchor.remove()
+    } finally {
+      // revoking immediately can cancel the download in some browsers; give the
+      // click a turn of the event loop first
+      setTimeout(() => URL.revokeObjectURL(url), 10_000)
+    }
+    // There is no handle: the browser owns the file from here. The caller gets a
+    // synthetic name so it can show something honest in the title bar.
+    return {
+      ok: true,
+      handle: { id: 'host/download/' + suggestedName, name: suggestedName, writable: false },
+      data,
+    }
+  } catch (error) {
+    return { ok: false, reason: 'error', error: String(error) }
+  }
+}
+
+/**
+ * Save through whichever mechanism this host actually has.
+ *
+ * A picker is preferred because the user chooses the location and the app keeps a
+ * writable handle for later saves. Where it does not exist, fall back to a download
+ * rather than failing — refusing to save is the one outcome a document editor must
+ * not produce when the user asked to save.
+ */
+export async function saveAnywhere(
+  data: Uint8Array,
+  suggestedName: string,
+  kind?: DocumentKind,
+): Promise<OpenResult> {
+  const w = globalThis as unknown as FsWindow
+  if (typeof w.showSaveFilePicker === 'function') {
+    return saveViaPicker(data, suggestedName, kind)
+  }
+  return saveViaDownload(data, suggestedName)
+}

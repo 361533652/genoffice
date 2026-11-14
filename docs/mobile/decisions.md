@@ -346,6 +346,23 @@ npm run serve:mobile-checks -- --build   # 先重新构建
 
 新测试 `e2e/mobile-save-path.spec.ts` 断言的是「三条路径都必须明确应答，不许假装成功」——这条在真机上仍然成立，而「能不能真的存下来」只能真机验证。
 
+#### 修复：安卓上保存文档根本没有出口
+
+追查「docs 能不能保存」时发现的问题，比错误标注更严重：
+
+`hasFilePicker()` 要求 `showOpenFilePicker` **和** `showSaveFilePicker` 同时存在。这两个是桌面 Chromium 的 File System Access API——**安卓 Chrome 和安卓 WebView 都没有**。
+
+也就是说，在目标平台上：用户编辑完文档，**没有任何方式把内容保存下来**。`saveDocxAs` 返回 `null`，代码库里也没有任何下载式导出。
+
+**修复**：新增 `saveViaDownload()` / `saveAnywhere()`（`packages/host/src/files.ts`）：
+
+- 有 picker → 走 picker（用户选位置、拿到可写 handle，后续可覆盖保存）
+- 没有 picker → 用 `<a download>` 触发浏览器下载
+
+下载是**更差的保存**——文件落在下载目录、文件名由浏览器定、handle 不可写。但它是一次真正的保存，而「拒绝保存」是文档编辑器绝不能给出的结果。
+
+已验证：移除两个 picker API 后，`saveDocxAs` 真实触发下载且文件名为 `.docx`；picker 存在时仍然优先走 picker（降级不能遮蔽正经路径）。
+
 ## 怎么跑这些验收
 
 **一条命令，零手工准备**：

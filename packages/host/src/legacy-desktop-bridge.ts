@@ -16,7 +16,7 @@
  * has moved to `@genoffice/host`. The `console.debug` trace exists so a test can
  * assert which capabilities a screen actually reached for.
  */
-import { grantFile, openViaPicker, rawFileFor, saveViaPicker, hasFilePicker } from './files.js'
+import { grantFile, openViaPicker, rawFileFor, saveAnywhere, hasFilePicker } from './files.js'
 import { createSettingsStore } from './settings.js'
 
 /** Methods that return an unsubscribe function rather than a value. */
@@ -372,7 +372,11 @@ export function installLegacyDesktopBridge(
     saveDocxAs: async (_path: unknown, data: unknown) => {
       const bytes = toBytes(data)
       if (!bytes) return null
-      const saved = await saveViaPicker(bytes, 'document.docx', 'docx')
+      // Preferred: the picker, which gives a writable handle for later saves. On an
+      // Android browser or WebView there is no showSaveFilePicker, and refusing here
+      // meant a user could edit a document and have nowhere to put it. A download is
+      // a worse save (browser-chosen location, non-writable handle) but it is a save.
+      const saved = await saveAnywhere(bytes, 'document.docx', 'docx')
       return saved.ok ? { path: saved.handle.id, name: saved.handle.name } : null
     },
     /**
