@@ -76,6 +76,14 @@ class MainActivity : ComponentActivity() {
         root.addView(chooser, FrameLayout.LayoutParams(-1, -1))
         webView.visibility = View.GONE
         root.addView(webView, FrameLayout.LayoutParams(-1, -1))
+        // Android 15 enforces edge-to-edge: without insets the app's top row
+        // (the quick-access toolbar) sits behind the status bar and its buttons
+        // cannot be tapped.
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(root) { v, insets ->
+            val bars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+            v.setPadding(bars.left, bars.top, bars.right, bars.bottom)
+            insets
+        }
         setContentView(root)
     }
 
@@ -140,10 +148,59 @@ class MainActivity : ComponentActivity() {
             ): Boolean {
                 fileChooserCallback?.onReceiveValue(null)
                 fileChooserCallback = callback
-                val mimeTypes = params.acceptTypes
-                    .filter { it.isNotEmpty() && it != "*/*" }
-                    .toTypedArray()
-                openDocument.launch(if (mimeTypes.isEmpty()) arrayOf("*/*") else mimeTypes)
+                // MIME filtering is unreliable across WebViews and providers:
+                // extension-only accepts map to octet-stream on one side while
+                // the provider resolves the file to the real OOXML type on the
+                // other, graying out the very file the user wants. Show everything
+                // and let the app validate the picked document.
+                openDocument.launch(arrayOf("*/*"))
+                return true
+            }
+
+            // window.confirm / window.alert: the default WebChromeClient answers
+            // confirm with false, which silently cancels every "replace the open
+            // document?" gate. Route them to native dialogs instead.
+            override fun onJsConfirm(
+                view: WebView,
+                url: String,
+                message: String,
+                result: android.webkit.JsResult
+            ): Boolean {
+                android.app.AlertDialog.Builder(this@MainActivity)
+                    .setMessage(message)
+                    .setPositiveButton(android.R.string.ok) { _, _ -> result.confirm() }
+                    .setNegativeButton(android.R.string.cancel) { _, _ -> result.cancel() }
+                    .setOnCancelListener { result.cancel() }
+                    .show()
+                return true
+            }
+
+            override fun onJsAlert(
+                view: WebView,
+                url: String,
+                message: String,
+                result: android.webkit.JsResult
+            ): Boolean {
+                android.app.AlertDialog.Builder(this@MainActivity)
+                    .setMessage(message)
+                    .setPositiveButton(android.R.string.ok) { _, _ -> result.confirm() }
+                    .setOnCancelListener { result.confirm() }
+                    .show()
+                return true
+            }
+
+            override fun onJsBeforeUnload(
+                view: WebView,
+                url: String,
+                message: String,
+                result: android.webkit.JsResult
+            ): Boolean {
+                android.app.AlertDialog.Builder(this@MainActivity)
+                    .setMessage(message)
+                    .setPositiveButton(android.R.string.ok) { _, _ -> result.confirm() }
+                    .setNegativeButton(android.R.string.cancel) { _, _ -> result.cancel() }
+                    .setOnCancelListener { result.cancel() }
+                    .show()
                 return true
             }
         }
