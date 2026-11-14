@@ -2,17 +2,18 @@
 
 > 这份文件写给刚醒来的人。它回答三个问题：现在能做什么、做过什么、卡在哪。
 > 技术细节在 [decisions.md](./decisions.md)，这里有 4 条 ADR 和逐轮记录。
-> 数据截止：64 个本地提交、146 个移动端 e2e、37 个 host 单测，全部通过。
+> 数据截止：66 个本地提交、147 个移动端 e2e、43 个 host 单测，全部通过。
 > **尚未推送到远端**——按你的要求，等你确认后再推。
 
 ---
 
 ## 一句话现状
 
-**六个应用都能在没有 Electron 的手机浏览器里启动；docs / markdown / html / sheets 能打开、编辑、保存。**
-sheets 的工作簿会话跑在 WebView 内的 wasm sidecar 上（与桌面同一个 Rust 引擎）。
-Android 宿主工程已建成并在 Android 15 模拟器上端到端验证（SAF 打开→编辑→保存→回读）。
-slides 的编辑能力仍卡在宿主侧 deck session（纯 TS 可移植，是下一块工作）。
+**六个应用都能在没有 Electron 的手机浏览器里启动；docs / markdown / html / sheets / slides 能打开、编辑、保存。**
+sheets 的工作簿会话跑在 WebView 内的 wasm sidecar 上（与桌面同一个 Rust 引擎）；
+slides 的 deck session 是纯 TS 移植（pptx-engine/pptx-ops/pptx-render）。
+Android 宿主工程已建成并在 Android 15 模拟器上端到端验证（SAF 打开→编辑→保存→原地保存→回读）。
+pdf 能打开查看，页面手术仍需桌面。
 
 ---
 
@@ -24,8 +25,8 @@ slides 的编辑能力仍卡在宿主侧 deck session（纯 TS 可移植，是�
 | **pdf** | ✅ | 部分 | ❌ | 能渲染；新用户可从空状态直接点「打开」；页面手术需桌面 |
 | **markdown** | ✅ | ✅ | ⚠️ | 保存走下载（安卓无 picker） |
 | **html** | ✅ | ✅ | ⚠️ | 同上 |
-| **sheets** | ✅ | ✅ | ⚠️ | wasm sidecar 会话（与桌面同引擎）；保存走下载/SAF 另存 |
-| **slides** | ✅ | ❌ | ❌ | 能开能看，67 个编辑能力全部明确拒绝（deck session 待移植） |
+| **sheets** | ✅ | ✅ | ⚠️ | wasm sidecar 会话（与桌面同引擎）；安卓走 SAF 可原地保存 |
+| **slides** | ✅ | ✅ | ⚠️ | deck session 纯 TS 移植；60+ 编辑方法；master/3D/ink/旁白未移植 |
 
 ---
 
@@ -82,18 +83,16 @@ npm run serve:mobile-checks
 
 ## 卡在哪：剩下的事
 
-### 1. slides 的 deck session（最大的一块）
-
-slides 的 67 个编辑能力需要宿主侧持有 `OpenedPptx` + undo/redo 历史。
-与 sheets 不同，这**不需要 Rust**：pptx-engine / pptx-ops（runTxn 事务执行器）/
-pptx-render 全是纯 TS，可在宿主内照 sheets 会话层的模式移植。
-难点：字体度量（桌面依赖系统字体扫描，WebView 里要用 canvas 测量兜底）
-和 67 个方法的编排面（多数是「会话查找→引擎 op→历史→重建」的薄封装）。
-
-### 2. A4 缩放的取舍（需要你定）
+### 1. A4 缩放的取舍（需要你定）
 
 手机上文档按宽度适配到 43%。好处是五页文档一屏装得下、不会横向溢出；坏处是字小到看不清。
 Word 手机版的选择是放大到可读字号、让用户滚动。**这是产品决策，我不该替你定。**
+
+### 2. slides 的 v1 残留（不阻塞使用）
+
+master view / 3D 模型 / ink / 旁白录制未移植（保持诚实拒绝）；
+字体度量用 pptx-render 的启发式兜底（无系统字体枚举），canvas 测量 provider 是下一步；
+崩溃恢复副本无持久化存储，writeWorkbookRecovery 诚实返回失败。
 
 ### 3. 首屏体积策略（APK 路线已就绪）
 
@@ -101,14 +100,18 @@ Web 路线首次加载 docs 5.7 MB / sheets 14.7 MB（3G 下 114s / 294s）。
 **Android 宿主已把资源打进 APK**（assets 本地化，安装一次付清），这条路线不再等待决策。
 纯浏览器部署仍面临下载成本：代码分割 sheets 单块是剩余选项。
 
-### 已解决（原「卡在哪」三项）
+### 已解决（原「卡在哪」各项）
 
 - ~~Android SDK~~：已装 `E:\Android\Sdk`（platform 35 / build-tools 35.0.0），
   JDK 17 在 `E:\Android\jdk-17`，用户级 ANDROID_HOME/JAVA_HOME/PATH 已设。
 - ~~宿主侧 workbook session~~：wasm 路线落地——xlsx-sidecar 编译到 wasm32-wasip1，
   在 WebView 内跑同一个 Rust 引擎；TS 会话层移植桌面语义（快照打开、守卫读取、
-  完整保存 plan + 流式管线 + 保存后会话交换）。**不再需要原生宿主工程作为前置。**
+  完整保存 plan + 流式管线 + 保存后会话交换）。
+- ~~宿主侧 deck session~~：纯 TS 移植落地——pptx-engine/pptx-ops/pptx-render 无 Node 依赖，
+  快照 undo/redo、60+ op 垫片方法、autofit 后处理、手势事务、blob 媒体 URL。
 - ~~Rust sidecar 交叉编译~~：被 wasm 路线取代，无需 NDK。
+- ~~SAF 文件访问~~：原生钩子（open/saveAs/saveInPlace/read）返回可写句柄，
+  保存可等待——「已保存」意味着真写入，不是「选择器还开着」。
 
 ---
 
@@ -202,9 +205,9 @@ npm run verify:mobile-builds # 六应用生产构建逐个验证
 
 ## 一句话结论
 
-**六个应用都能在无 Electron 的移动宿主里启动；docs / markdown / html / sheets 能完整读写；pdf 能打开和看；Android 宿主已建成并在模拟器上端到端验证。slides 的 deck session 是下一块工作量（纯 TS 可移植）。**
+**六个应用都能在无 Electron 的移动宿主里启动；docs / markdown / html / sheets / slides 能完整读写；pdf 能打开和看；Android 宿主已建成并在模拟器上端到端验证（含 SAF 原地保存）。**
 
-累计 64 个提交、146 个移动端 e2e + 37 个 host 单测，修掉 9+5 个真缺陷（含「用户根本用不了」级：存储不可用白屏、安卓无法保存/打开、sheets 无打开入口、WebView 宿主白屏/状态栏遮挡/确认闸门静默取消）。
+累计 66 个提交、147 个移动端 e2e + 43 个 host 单测，修掉 9+8 个真缺陷（含「用户根本用不了」级：存储不可用白屏、安卓无法保存/打开、sheets 无打开入口、WebView 宿主白屏/状态栏遮挡/确认闸门静默取消、保存假成功）。
 
 ## Android 宿主（apps/mobile）
 
@@ -218,15 +221,19 @@ gradle -p apps/mobile assembleDebug
 adb install -r apps/mobile/app/build/outputs/apk/debug/app-debug.apk
 ```
 
-已在 Android 15 模拟器验证：SAF 打开 → 画布键入 → 保存（blob 拦截 → SAF 另存）→ 回读编辑值。
-宿主注入提供：Host 门面、sheets wasm URL、长按 contextmenu 合成、blob 下载拦截、
-原生确认框、SAF 文件选择。详见 apps/mobile/README.md。
+已在 Android 15 模拟器验证：
+- sheets：SAF 选文件 → wasm 打开 → 画布键入 → 保存（SAF 另存）→ 回读编辑值
+- slides：启动空白稿 → 加文本框 → 编辑 → 保存（SAF）→ **二次保存原地写入（无选择器）**
+- 宿主注入：Host 门面、sheets wasm URL、slides 会话开关、长按 contextmenu 合成、
+  原生文件钩子（open/saveAs/saveInPlace/read，可写句柄、可等待）、原生确认框。
+详见 apps/mobile/README.md。
 
 ## 建议的下一步
 
 按投入产出排序：
 
-1. **slides deck session**（纯 TS 移植，照 sheets 会话层模式）→ 解锁最后一个编辑应用
+1. **真机装 APK**（你的 PGEM10 已 adb 连接，说一声就装）→ 真机性能/IME/长按验证
 2. **手机打开 5391 打几个字**（两分钟）→ 确认中文输入法真机行为（`npm run serve:mobile-checks`）
 3. **定 A4 缩放**（你自己想清楚就行）→ 影响所有文档的默认观感
-4. **真机装 APK**（你的 PGEM10 已 adb 连接，说一声就装）→ 真机性能/IME/长按验证
+4. slides 字体精度（canvas 测量 provider）与 master view 移植
+5. 纯浏览器部署的首屏代码分割（APK 路线已解此问题）
