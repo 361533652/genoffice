@@ -50,13 +50,24 @@ export function aiPanelWidthAtPointer(clientX: number): number {
 export function aiPanelInitiallyOpen(storageKey: string): boolean {
   if (!current.showAiSidebar) return false
   if (!current.openInNewDocs) return false
-  return localStorage.getItem(storageKey) !== '0'
+  // Browsing in private mode, a full quota or a locked-down WebView all make this
+  // read throw. An uncaught throw here escapes during a render and white-screens
+  // the app; "no stored preference" is the honest answer either way.
+  try {
+    return localStorage.getItem(storageKey) !== '0'
+  } catch {
+    return true
+  }
 }
 
 /** Persist the panel state for `aiPanelInitiallyOpen`; a no-op while the setting is off so the memory survives */
 export function rememberAiPanelOpen(storageKey: string, open: boolean): void {
   if (!current.openInNewDocs) return
-  localStorage.setItem(storageKey, open ? '1' : '0')
+  try {
+    localStorage.setItem(storageKey, open ? '1' : '0')
+  } catch {
+    /* not persisted: the panel still behaves correctly for this session */
+  }
 }
 
 export function useAiPanelPrefs(): AiPanelPrefs {

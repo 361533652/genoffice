@@ -248,6 +248,19 @@ npm run serve:mobile-checks -- --build   # 先重新构建
 
 已固化为 `e2e/mobile-rtl.spec.ts`（六应用）+ `e2e/mobile-rtl-guard.spec.ts`（两条守护：中文界面不能被判成 RTL、两个码点区间不重叠）。
 
+#### 修复了一个会让手机白屏的缺陷：存储不可用
+
+**症状**：手机存储不可用时（Safari 隐私模式、配额已满、受限 WebView），六个应用全部白屏——`#root` 是空的，整页什么都没有。
+
+**原因**：某个偏好写入在 React 渲染过程中抛出了未捕获异常。`localStorage` 在可选链上看起来存在，但 `setItem` 会抛 `QuotaExceededError`；沙箱 iframe 里连读属性都抛 `SecurityError`。
+
+**修复**：新增 `packages/host/src/storage-fallback.ts` 的 `installStorageFallback()`，六个入口在最早时机调用。它先用一个临时键试写，失败就把 `localStorage` 换成内存实现——偏好当次会话有效、不持久化。这比给 ~70 个调用点逐个加 try/catch 更可靠，也更难漏。
+
+**顺带修的**：`apps/docs/src/renderer/dark-page-pref.ts` 和 `packages/ui/src/ai-panel-prefs-store.ts` 里原本无保护的存储访问。
+
+**验证**：六应用 × 两种故障模式（写失败 / 全失败）共 12 个用例；另有 `mobile-no-storage-guard.spec.ts` 复现修复前的白屏，证明这个检查确实会失败。
+
+**这是这轮移动端移植里发现的最严重缺陷之一**——不是少个功能，而是整页打不开，而且只在特定设备状态下出现，普通测试永远碰不到。
 ## 怎么跑这些验收
 
 **一条命令，零手工准备**：
