@@ -57,6 +57,7 @@ class GenOfficeBridge(
             }
             "confirm" -> confirm(id, params.optString("message"))
             "alert" -> alert(id, params.optString("message"))
+            "openDocument" -> activity.launchNativeOpen(id)
             "saveDocumentAs" -> saveDocumentAs(id, params)
             "saveInPlace" -> saveInPlace(id, params)
             "readDocument" -> readDocument(id, params.optString("handleId"))
@@ -98,6 +99,43 @@ class GenOfficeBridge(
     }
 
     // ---- SAF file access ---------------------------------------------------
+
+    /** called by the activity when the native open picker answers */
+    fun onNativeOpenResult(id: String, uri: Uri?) {
+        if (uri == null) {
+            resolve(id, JSONObject().put("ok", false).put("reason", "canceled"))
+            return
+        }
+        io.execute {
+            try {
+                try {
+                    activity.contentResolver.takePersistableUriPermission(
+                        uri,
+                        android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                            android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    )
+                } catch (_: SecurityException) {
+                }
+                val bytes = activity.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                    ?: throw IllegalStateException("cannot open $uri")
+                val handle = JSONObject()
+                    .put("id", uri.toString())
+                    .put("name", displayName(uri) ?: "document")
+                    .put("writable", true)
+                resolve(
+                    id,
+                    JSONObject().put("ok", true).put(
+                        "result",
+                        JSONObject()
+                            .put("handle", handle)
+                            .put("data", Base64.encodeToString(bytes, Base64.NO_WRAP))
+                    )
+                )
+            } catch (e: Exception) {
+                fail(id, "open failed: ${e.message}")
+            }
+        }
+    }
 
     private fun saveDocumentAs(id: String, params: JSONObject) {
         val bytes = Base64.decode(params.optString("data"), Base64.DEFAULT)

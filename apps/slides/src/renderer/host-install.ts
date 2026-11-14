@@ -10,6 +10,7 @@
  * a WebView does not provide. See docs/mobile/decisions.md, ADR 2 and ADR 5.
  */
 import { installLegacyDesktopBridge, installNodeGlobals, installStorageFallback } from '@genoffice/host'
+import { installSlidesSessionHost } from '@genoffice/host/slides/install'
 
 export const legacyBridgeStats = installLegacyDesktopBridge()
 
@@ -22,3 +23,14 @@ export const storageOk = installStorageFallback()
 // module reads it at call time. Buffering the promise is enough: the engines
 // only touch Buffer inside async entry points that run after boot.
 export const nodeGlobalsReady = installNodeGlobals()
+
+// The deck session: when the host opts in, slides gets real open/edit/save on
+// the pure-TS pptx engine stack (no Electron main process). The Android WebView
+// injection and the e2e harness set the flag; a host that never sets it keeps
+// the honest desktop-only refusals, and the desktop build is untouched.
+// Synchronous: slides calls newBlank during boot, before any user interaction.
+const slidesSessionEnabled =
+  (globalThis as { __genofficeSlidesSession?: boolean }).__genofficeSlidesSession === true
+if (slidesSessionEnabled) {
+  installSlidesSessionHost()
+}

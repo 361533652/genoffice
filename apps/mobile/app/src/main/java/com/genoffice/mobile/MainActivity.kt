@@ -67,6 +67,20 @@ class MainActivity : ComponentActivity() {
             bridge.onCreateDocumentResult(uri)
         }
 
+    /** the awaitable open the injected host uses (writable SAF handle) */
+    private var nativeOpenPending: String? = null
+    private val openDocumentNative =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            val id = nativeOpenPending ?: return@registerForActivityResult
+            nativeOpenPending = null
+            bridge.onNativeOpenResult(id, uri)
+        }
+
+    fun launchNativeOpen(requestId: String) {
+        nativeOpenPending = requestId
+        openDocumentNative.launch(arrayOf("*/*"))
+    }
+
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

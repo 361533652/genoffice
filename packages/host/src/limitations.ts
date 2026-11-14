@@ -16,19 +16,41 @@ export interface HostLimitation {
   readonly needs: string
 }
 
-/** Known gaps on a browser/WebView host, as of the Android port. */
+/**
+ * Known gaps on a browser/WebView host, as of the Android port.
+ *
+ * The sheets session gaps below apply to hosts that have NOT installed the
+ * session hosts (@genoffice/host/sheets/install, @genoffice/host/slides/install).
+ * With them installed, open/edit/save work; the remaining entries are the
+ * honest v1 residue.
+ */
 export const BROWSER_HOST_LIMITATIONS: readonly HostLimitation[] = [
   {
     capability: 'selectWorkbook',
-    missing: 'opening a spreadsheet at all',
+    missing: 'opening a spreadsheet on a host without the workbook session',
     needs:
-      'a host-side workbook session. The sheets app does not read bytes and parse them itself: it asks the main process to open a file, and gets back a WorkbookFile whose sessionId addresses every later read, edit and save. Without that session there is no workbook to show — so this gap sits *before* the save one.',
+      'a host-side workbook session. The sheets app does not read bytes and parse them itself: it asks the host to open a file, and gets back a WorkbookFile whose sessionId addresses every later read, edit and save. Supplied by the wasm workbook session (the desktop Rust sidecar compiled to wasm32-wasip1) when the host installs it.',
   },
   {
     capability: 'saveWorkbookEdits',
-    missing: 'saving a spreadsheet back to its file',
+    missing: 'saving a spreadsheet back to its file on a host without the workbook session',
     needs:
-      'the same host-side session as selectWorkbook, plus a FileAccess save path. Both fall out of one piece of work.',
+      'the same host-side session as selectWorkbook, plus a FileAccess save path. Both fall out of the wasm workbook session; without it, saving is unavailable.',
+  },
+  {
+    capability: 'slidesMasterEdit',
+    missing: 'editing slide masters and layouts in the dedicated master view',
+    needs: 'a port of the master-view session (part-addressed transactions); the deck session covers normal slide editing',
+  },
+  {
+    capability: 'slidesFontPrecision',
+    missing: 'pixel-exact text layout for fonts the device does not have',
+    needs: 'the deck session uses deterministic heuristic metrics; a canvas-measurement provider and embedded-font loading are the next step',
+  },
+  {
+    capability: 'crashRecovery',
+    missing: 'restoring unsaved edits after a crash',
+    needs: 'a persistent recovery store on the host; writeWorkbookRecovery honestly reports failure until one exists',
   },
   {
     capability: 'splitPdf',

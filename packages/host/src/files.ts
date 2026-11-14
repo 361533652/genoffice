@@ -142,6 +142,14 @@ export async function saveViaPicker(data: Uint8Array, suggestedName: string, kin
 }
 
 export async function writeToHandle(handle: FileHandle, data: Uint8Array): Promise<{ ok: boolean; error?: string }> {
+  // a native host (Android SAF) writes through its own resolver; the browser
+  // FileSystemFileHandle path below cannot see a content:// handle
+  const nativeWrite = (
+    globalThis as {
+      __genofficeSaveInPlaceViaNative?: (handleId: string, data: Uint8Array) => Promise<{ ok: boolean; error?: string }>
+    }
+  ).__genofficeSaveInPlaceViaNative
+  if (typeof nativeWrite === 'function') return nativeWrite(handle.id, data)
   // a plain File is read-only: replacing it needs a destination the user picked
   if (rawFiles.has(handle.id)) {
     return { ok: false, error: 'a granted File cannot be rewritten in place; use saveAs' }
@@ -159,6 +167,11 @@ export async function writeToHandle(handle: FileHandle, data: Uint8Array): Promi
 }
 
 export async function readFromHandle(handle: FileHandle): Promise<Uint8Array | null> {
+  // a native host (Android SAF) reads through its own resolver
+  const nativeRead = (
+    globalThis as { __genofficeReadViaNative?: (handleId: string) => Promise<Uint8Array | null> }
+  ).__genofficeReadViaNative
+  if (typeof nativeRead === 'function') return nativeRead(handle.id)
   // a plain File (no picker handle) answers the same way
   const raw = rawFiles.get(handle.id)
   if (raw) {
@@ -254,6 +267,14 @@ export async function saveAnywhere(
   suggestedName: string,
   kind?: DocumentKind,
 ): Promise<OpenResult> {
+  // A native host (Android SAF) supplies an awaitable save that returns a
+  // writable handle. It must win over the download fallback: a download is
+  // fire-and-forget, so the session would report "saved" while the native
+  // picker is still waiting for the user.
+  const nativeSave = (
+    globalThis as { __genofficeSaveViaNative?: (data: Uint8Array, name: string) => Promise<OpenResult> }
+  ).__genofficeSaveViaNative
+  if (typeof nativeSave === 'function') return nativeSave(data, suggestedName)
   const w = globalThis as unknown as FsWindow
   if (typeof w.showSaveFilePicker === 'function') {
     return saveViaPicker(data, suggestedName, kind)
@@ -335,6 +356,13 @@ export function openViaInput(kind?: DocumentKind): Promise<OpenResult> {
  * when present (it yields a writable handle), otherwise an <input type=file>.
  */
 export async function openAnywhere(kind?: DocumentKind): Promise<OpenResult> {
+  // A native host (Android SAF) supplies an awaitable open with a writable
+  // handle — preferred over <input type=file>, whose File snapshot cannot be
+  // written back in place.
+  const nativeOpen = (
+    globalThis as { __genofficeOpenViaNative?: (kind?: DocumentKind) => Promise<OpenResult> }
+  ).__genofficeOpenViaNative
+  if (typeof nativeOpen === 'function') return nativeOpen(kind)
   const w = globalThis as unknown as FsWindow
   if (typeof w.showOpenFilePicker === 'function') return openViaPicker(kind)
   return openViaInput(kind)

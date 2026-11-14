@@ -132,9 +132,38 @@
     }
   };
 
-  // ---- 3. the sheets wasm engine asset --------------------------------------
+  // ---- 3. the sheets wasm engine asset + the slides deck session ------------
   window.__genofficeSheetsWasmUrl =
     'https://appassets.androidplatform.net/assets/wasm/xlsx_sidecar.wasm';
+  // slides needs no asset: the pptx engine stack is pure TS bundled with the app
+  window.__genofficeSlidesSession = true;
+
+  // ---- 3b. awaitable native file access (SAF) -------------------------------
+  // These win over the picker/download fallbacks in files.ts: they return
+  // writable handles and only resolve once the user actually picked a file,
+  // so "saved" means written, not "a picker is still open".
+  window.__genofficeOpenViaNative = function (kind) {
+    return nativeCall('openDocument', { kind: kind || '' }).then(function (r) {
+      if (!r || !r.handle) return { ok: false, reason: 'canceled' };
+      return { ok: true, handle: r.handle, data: b64ToBytes(r.data) };
+    }).catch(function () { return { ok: false, reason: 'error' }; });
+  };
+  window.__genofficeSaveViaNative = function (data, suggestedName) {
+    return nativeCall('saveDocumentAs', { data: bytesToB64(data), name: suggestedName }).then(function (r) {
+      if (!r || !r.handle) return { ok: false, reason: 'canceled' };
+      return { ok: true, handle: r.handle, data: data };
+    }).catch(function (e) { return { ok: false, reason: 'error', error: String(e && e.message || e) }; });
+  };
+  window.__genofficeSaveInPlaceViaNative = function (handleId, data) {
+    return nativeCall('saveInPlace', { handleId: handleId, data: bytesToB64(data) }).then(function (r) {
+      return r && r.ok ? { ok: true } : { ok: false, error: (r && r.error) || 'write failed' };
+    }).catch(function (e) { return { ok: false, error: String(e && e.message || e) }; });
+  };
+  window.__genofficeReadViaNative = function (handleId) {
+    return nativeCall('readDocument', { handleId: handleId }).then(function (b64) {
+      return b64 ? b64ToBytes(b64) : null;
+    }).catch(function () { return null; });
+  };
 
   // ---- 4. long-press → contextmenu ------------------------------------------
   var pressTimer = null;
