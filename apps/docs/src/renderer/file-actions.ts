@@ -59,7 +59,7 @@ import { hfSaveOptions } from './hf-sections'
 import { fetchDocBytes } from './doc-bytes'
 import { parseDocxOffThread } from './parse-off-thread'
 import { PHASED_APPEND } from './editor/streaming-tail-guard'
-import { docTextLength, docWeight, openTierFor } from './large-document'
+import { docTextLength, docWeight, openTierForDevice } from './large-document'
 import { documentToMarkdown } from './export-markdown'
 import { docStyleCss } from './doc-style-css'
 import { documentTextContext } from './text-layout/document-context'
@@ -483,7 +483,10 @@ export async function loadFile(
       { owned: true },
     )
     if (generation !== openGeneration) return 'superseded'
-    const tier = openTierFor(docWeight(parsed.blocks))
+    // Tiers scale with the device: the desktop constants assume a ~2.2 GB working
+    // set, which a phone does not have. Using them here would let the renderer be
+    // killed mid-pagination instead of refusing the document up front.
+    const tier = openTierForDevice(docWeight(parsed.blocks))
     if (tier === 'refuse') {
       const msg = t('appDocTooLargeBlocks', {
         name: result.name,
