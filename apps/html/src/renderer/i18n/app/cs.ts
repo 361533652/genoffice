@@ -58,6 +58,7 @@ export const cs = {
   saveAs: 'Uložit jako…',
   aiNameFile: 'Pojmenovat pomocí AI…',
   ribbonCollapse: 'Sbalit pás karet',
+  ribbonCompact: 'Kompaktní pás karet (pouze ikony)',
   ribbonExpand: 'Rozbalit pás karet',
   ribbonGroupInsert: 'Vložit',
   editText: 'Upravit text',

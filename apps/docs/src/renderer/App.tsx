@@ -27,6 +27,7 @@ import {
   useAutoSavePref,
   useAiSidebarEnabled,
 } from '@genoffice/ui'
+import { registerDirtyProbe } from '@genoffice/host'
 import { commentAnchors, commentIdsAt, wordRangeAtCaret } from './editor/comments'
 import { setFieldInstr, toggleAllFieldCodes, type FieldRange } from './editor/field-codes'
 import { linkTarget } from './editor/link-actions'
@@ -487,7 +488,7 @@ import {
 import { StylesPane } from './components/StylesPane'
 import { Ruler } from './components/Ruler'
 import { docBodyFont, docHasCjk, docLineFactor, docStyleCss, docThemeCss } from './doc-style-css'
-import { isDocDirty, runGuardedCandidate, runGuardedDocumentAction } from './doc-dirty'
+import { isDocDirty, isDocUserDirty, runGuardedCandidate, runGuardedDocumentAction } from './doc-dirty'
 import {
   EMPTY_HF_VARIANTS,
   restingHfAreaVariant,
@@ -1538,8 +1539,18 @@ export function App() {
     onSelectionUpdate: () => forceRender(),
     // typing in the main document takes ribbon routing back from any textbox
     onFocus: () => setActiveSubEditor(null),
-    onUpdate: () => {
-      dirtyRef.current = true
+    onUpdate: ({ transaction }) => {
+      // A freshly opened document must not report unsaved changes. The phased
+      // mount / streaming tail (`phasedAppend`) and the post-load focus settling
+      // (a selection-only transaction, docChanged=false) dispatch updates that
+      // are not user edits; marking dirty for them made the Android host's
+      // discard gate fire on every file switch with zero edits (interaction-
+      // review R5). Only a real content change marks the document dirty.
+      // `trackIgnore` is deliberately NOT a gate here — checkbox toggles,
+      // comments and table ops set it on genuine user edits.
+      if (transaction.docChanged && transaction.getMeta('phasedAppend') !== true) {
+        dirtyRef.current = true
+      }
       forceRender()
     },
   })
@@ -6058,6 +6069,15 @@ export function App() {
   const anyDirtyRef = useRef(false)
   const hasUnsavedChanges = isDocDirty(fileCtxRef.current)
   anyDirtyRef.current = hasUnsavedChanges
+
+  // P1-6: the Android host's hard-reload gate reads the dirty signal; the ref
+  // keeps it current without re-registering on every edit. R5: use the
+  // user-edit subset — load-time normalization (defaultFonts/numbering/
+  // styleUpserts) made a freshly opened document read dirty and the gate fire
+  // on every file switch.
+  const hostDirtyRef = useRef(false)
+  hostDirtyRef.current = !!doc && isDocUserDirty(fileCtxRef.current)
+  useEffect(() => registerDirtyProbe(() => hostDirtyRef.current), [])
 
   // close guard: the main process queries dirty state before closing a tab/window; choosing "Save" runs a full save and reports back
   useEffect(() => {

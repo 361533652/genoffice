@@ -6,6 +6,7 @@
         android:label="@string/app_name"
         android:theme="@style/Theme.GenOffice"
         android:usesCleartextTraffic="true"
+        android:enableOnBackInvokedCallback="true"
         android:allowBackup="false">
         <activity
             android:name=".MainActivity"

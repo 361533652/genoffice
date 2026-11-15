@@ -87,13 +87,215 @@
   }
 
   /* Scroll containers only clip their own content when the ancestor chain
-     establishes a width limit. `.ribbon`/`.app` are `display:block` with no
+     establishes a width limit. `.app`/`.ribbon` are `display:block` with no
      overflow rule, so a wide ribbon body leaks its scroll width up to the
      document and the layout viewport grows past the device width.
      (measured: html app reported innerWidth 504 on a 390px device) */
-  .app,
-  .ribbon {
+  .app {
     max-width: 100vw;
     overflow-x: clip;
+  }
+
+  /* P0-3: `.ribbon` only gets a width cap, NEVER `overflow-x: clip`. In sheets
+     the `.ribbon` element IS the horizontal scroll container (apps/sheets
+     styles.css `overflow-x: scroll`); clipping it here froze 79% of the tools
+     off-screen with no way to scroll to them (scrollLeft writes read back 0).
+     The other five apps scroll an inner `.ribbon-body`, so a width cap is all
+     the containment they need; `.app { overflow-x: clip }` above plus each
+     scroll container's own overflow keeps the document width at the device. */
+  .ribbon {
+    max-width: 100vw;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * P0-4 — dialogs must fit the viewport. A fixed 440/520/560px card on a 390px
+ * screen clips its edge buttons; a `min-width` floor (sheets format-cells 420)
+ * even overrides its own `max-width`. Clamp every dialog card to the viewport,
+ * release the min-width floor, and let tall cards scroll vertically. `dvh`
+ * tracks the soft keyboard; the `vh` line above it is the pre-108 fallback.
+ * Only the card geometry changes — desktop (>720px) keeps every size.
+ * ------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .modal,
+  .pdf-modal,
+  .format-cells-dialog,
+  .select-data-dialog,
+  .insert-function-dialog,
+  .function-args-dialog,
+  .screenshot-dialog,
+  .icons-dialog,
+  .equation-dialog,
+  .recommended-charts-dialog,
+  .link-dialog,
+  .sort-dialog,
+  .name-manager-dialog,
+  .watch-window,
+  .equation-modal,
+  .modal-chart,
+  .modal-shortcuts,
+  .modal-mailmerge,
+  .protect-dialog,
+  .md-math-pop,
+  .pdf-sig-dialog,
+  .pdf-cert-dialog,
+  .pdf-modal-wide,
+  .pdf-sign-fontgrid,
+  .pdf-sign-imgbox,
+  .pdf-sign-saved {
+    min-width: 0;
+    width: auto;
+    max-width: calc(100vw - 24px);
+    max-height: calc(100vh - 48px);
+    max-height: calc(100dvh - 48px);
+    overflow-y: auto;
+  }
+
+  /* format-cells keeps a comfortable reading width but never the 420 floor */
+  .format-cells-dialog {
+    width: min(420px, calc(100vw - 24px));
+  }
+
+  /* the desktop 96px top margin eats a third of a phone screen */
+  .pdf-modal {
+    margin-top: 24px;
+  }
+
+  /* button rows wrap so the primary action is never the clipped one */
+  .modal-actions,
+  .dialog-actions,
+  .pdf-modal-actions {
+    flex-wrap: wrap;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * P1-1 — anchored panels & galleries. Small menus already flip and fit; the
+ * large fixed-width galleries (cover 462 / style 478 / multi-list 320+) are
+ * wider than the screen and `flip-inline` has no room on either side. Keep the
+ * anchor's vertical position but centre them horizontally as a viewport
+ * overlay, capped to the screen. Every anchored panel first gets a width cap.
+ * ------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  [data-rb-panel],
+  .gs-dd-pop,
+  .menu-select-drop {
+    max-width: calc(100vw - 16px);
+  }
+
+  .cover-gallery,
+  .style-gallery-menu,
+  .list-gallery-multi,
+  .wordart-palette,
+  .symbol-palette,
+  .equation-gallery,
+  .shape-palette {
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(360px, calc(100vw - 16px));
+    max-height: calc(100vh - 140px);
+    max-height: calc(100dvh - 140px);
+    overflow-y: auto;
+    /* the centred overlay always fits horizontally; a flip would fight the
+       transform and is no longer needed */
+    position-try-fallbacks: none;
+  }
+
+  /* find/replace: right-anchored, width-capped, elastic input. The 200px input
+     + option buttons used to push the panel's left edge to -55px. */
+  .find-panel {
+    right: 8px;
+    max-width: calc(100vw - 16px);
+  }
+
+  .find-row {
+    flex-wrap: wrap;
+  }
+
+  .find-input {
+    width: 140px;
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * P1-4 — status bars must stay inside the viewport. The left readout shrinks
+ * and ellipsizes, the right zoom cluster keeps −/%/+ but drops the slider
+ * (110px on markdown, 90px on html) that pushed the row past the screen edge.
+ * ------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .status-bar {
+    max-width: 100vw;
+    overflow: hidden;
+  }
+
+  .status-left {
+    /* yield first: the right cluster keeps its controls at natural width so the
+       rightmost control (zoom value) never paints past the viewport edge */
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .status-left .status-item {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .status-right {
+    flex: 0 0 auto;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  /* R4: in the find-open / ribbon-collapsed states an extra readout joins the
+     right cluster; the cluster itself must not shrink (its children overflowed
+     the viewport when squeezed). Containment comes from the left readout above
+     and a narrower slider — every control stays reachable. */
+  .status-right .zoom-slider {
+    flex: 0 1 auto;
+    width: 60px;
+    min-width: 24px;
+  }
+
+  .status-right .status-item {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* The zoom slider stays visible: it is the canvas apps' only zoom affordance
+     (pinned by mobile-pinch-zoom). Containment comes from the shrinking left
+     readout above, not from removing the slider — width is reclaimed by the
+     ellipsized status-left, so the row still fits the viewport. */
+}
+
+/* ---------------------------------------------------------------------------
+ * P1-2 — the AI dock becomes an overlay on a phone: it never takes flow width
+ * from the document, collapsed (default) or open. It starts collapsed via
+ * aiPanelInitiallyOpen(); an explicit Ask-AI action opens it over the content.
+ * ------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .app-main {
+    position: relative;
+  }
+
+  .ai-dock {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 45;
+  }
+
+  .ai-dock:not(.collapsed) {
+    width: min(92vw, 360px);
+    box-shadow: var(--shadow-menu);
   }
 }

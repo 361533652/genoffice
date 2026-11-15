@@ -73,6 +73,7 @@ export const de = {
   saveAs: 'Speichern unter…',
   aiNameFile: 'Mit KI benennen…',
   ribbonCollapse: 'Menüband reduzieren',
+  ribbonCompact: 'Kompaktes Menüband (nur Symbole)',
   ribbonExpand: 'Menüband erweitern',
   ribbonGroupInsert: 'Einfügen',
   editText: 'Text bearbeiten',

@@ -69,6 +69,7 @@ export const ar = {
   saveAs: 'حفظ باسم…',
   aiNameFile: 'التسمية بالذكاء الاصطناعي…',
   ribbonCollapse: 'طي الشريط',
+  ribbonCompact: 'شريط مضغوط (أيقونات فقط)',
   ribbonExpand: 'توسيع الشريط',
   ribbonGroupInsert: 'إدراج',
   editText: 'تحرير النص',

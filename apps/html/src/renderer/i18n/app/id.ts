@@ -70,6 +70,7 @@ export const id = {
   saveAs: 'Simpan Sebagai…',
   aiNameFile: 'Beri nama dengan AI…',
   ribbonCollapse: 'Ciutkan Pita',
+  ribbonCompact: 'Pita Ringkas (hanya ikon)',
   ribbonExpand: 'Perluas Pita',
   ribbonGroupInsert: 'Sisipkan',
   editText: 'Edit teks',

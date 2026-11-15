@@ -70,6 +70,7 @@ export const tr = {
   saveAs: 'Farklı Kaydet…',
   aiNameFile: 'AI ile adlandır',
   ribbonCollapse: "Şerit'i daralt",
+  ribbonCompact: 'Sıkışık Şerit (yalnızca simgeler)',
   ribbonExpand: "Şerit'i genişlet",
   ribbonGroupInsert: 'Ekle',
   editText: 'Metni düzenle',

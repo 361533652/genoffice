@@ -6,6 +6,7 @@ import {
   sameAiPanelPrefs,
   type AiPanelPrefs,
 } from './ai-panel-prefs'
+import { isNarrowViewport } from './use-narrow-viewport'
 
 let current: AiPanelPrefs = DEFAULT_AI_PANEL_PREFS
 const listeners = new Set<() => void>()
@@ -50,6 +51,10 @@ export function aiPanelWidthAtPointer(clientX: number): number {
 export function aiPanelInitiallyOpen(storageKey: string): boolean {
   if (!current.showAiSidebar) return false
   if (!current.openInNewDocs) return false
+  // Portrait phone: the dock starts collapsed so the document owns the first
+  // screen (interaction-spec P1-2). An explicit Ask-AI action still opens it,
+  // and mobile.css turns the open dock into an overlay that steals no width.
+  if (isNarrowViewport()) return false
   // Browsing in private mode, a full quota or a locked-down WebView all make this
   // read throw. An uncaught throw here escapes during a render and white-screens
   // the app; "no stored preference" is the honest answer either way.

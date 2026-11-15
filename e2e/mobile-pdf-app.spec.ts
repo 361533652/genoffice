@@ -76,6 +76,10 @@ test.describe('pdf app on a mobile host', () => {
     await page.goto(PDF_URL, { waitUntil: 'load' })
     // the app reports the page count once a document is open
     await expect(page.locator('body')).toContainText(/共 \d+ 页/, { timeout: 30_000 })
+    // the page count text lands a frame before pdf.js rasterises the first page
+    // canvas; wait for it so the count below is deterministic (the phone default
+    // opens no thumbnail sidebar, so the page canvas is the first one to appear)
+    await page.waitForSelector('.pdf-page canvas', { timeout: 30_000 })
 
     const state = await page.evaluate(() => ({
       trace: (window as unknown as { __trace: string[] }).__trace,

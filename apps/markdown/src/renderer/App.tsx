@@ -6,6 +6,7 @@ import {
 } from './markdown/roundtripSerializer'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ImageViewer, useAutoSavePref } from '@genoffice/ui'
+import { registerDirtyProbe } from '@genoffice/host'
 import {
   pollUntilReady,
   runHeadlessRendererExport,
@@ -209,6 +210,10 @@ export default function App() {
   const statusRef = useRef<LoadStatus>('loading')
   const dirtyRef = useRef(false)
   const savingRef = useRef(false)
+
+  // P1-6: the Android host's hard-reload gate reads the same dirty signal the
+  // autosave/close paths use (unsaved edits or a save still in flight).
+  useEffect(() => registerDirtyProbe(() => dirtyRef.current || savingRef.current), [])
   const [roundTripEnabled] = useState(roundTripMarkdownEnabled)
   const originalSourceRef = useRef<MarkdownSourceSnapshot | undefined>(undefined)
   const envelopeRef = useRef<DocEnvelope>(EMPTY_ENVELOPE)

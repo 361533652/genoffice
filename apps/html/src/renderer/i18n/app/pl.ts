@@ -69,6 +69,7 @@ export const pl = {
   saveAs: 'Zapisz jako…',
   aiNameFile: 'Nazwij za pomocą AI…',
   ribbonCollapse: 'Zwiń Wstążkę',
+  ribbonCompact: 'Zwinięta Wstążka (tylko ikony)',
   ribbonExpand: 'Rozwiń Wstążkę',
   ribbonGroupInsert: 'Wstaw',
   editText: 'Edytuj tekst',

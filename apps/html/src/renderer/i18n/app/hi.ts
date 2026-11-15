@@ -71,6 +71,7 @@ export const hi = {
   saveAs: 'इस रूप में सहेजें…',
   aiNameFile: 'AI से नाम दें…',
   ribbonCollapse: 'रिबन संक्षिप्त करें',
+  ribbonCompact: 'कॉम्पैक्ट रिबन (केवल आइकन)',
   ribbonExpand: 'रिबन विस्तृत करें',
   ribbonGroupInsert: 'सम्मिलित करें',
   editText: 'टेक्स्ट संपादित करें',

@@ -74,6 +74,7 @@ export const it = {
   saveAs: 'Salva con nome…',
   aiNameFile: 'Assegna un nome con IA…',
   ribbonCollapse: 'Riduci a icona la barra multifunzione',
+  ribbonCompact: 'Barra multifunzione compatta (solo icone)',
   ribbonExpand: 'Espandi la barra multifunzione',
   ribbonGroupInsert: 'Inserisci',
   editText: 'Modifica testo',

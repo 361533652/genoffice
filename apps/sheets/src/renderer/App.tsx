@@ -1,4 +1,4 @@
-import { getHost } from '@genoffice/host'
+import { getHost, registerDirtyProbe } from '@genoffice/host'
 import { focusWorksheet } from './sheet-focus'
 import {
   activateFormulaClosure,
@@ -718,6 +718,12 @@ export function App({
   useEffect(() => {
     workbookFileRef.current = workbookFile
   }, [workbookFile])
+
+  // P1-6: the Android host's hard-reload gate reads the same "can save" signal
+  // the ribbon uses (pending journal edits or a brand-new unsaved workbook).
+  const hostDirtyRef = useRef(false)
+  hostDirtyRef.current = pendingEdits > 0 || workbookFile?.unsavedNew === true
+  useEffect(() => registerDirtyProbe(() => hostDirtyRef.current), [])
   // The card follows the note it belongs to: a file reload that drops the
   // picture (or drops the note) takes the card with it.
   useEffect(() => {
@@ -4677,7 +4683,12 @@ export function App({
     void window.desktopApi
       .listWorkbookConnections({ sessionId })
       .then((result) => {
-        if (!cancelled) setQueryConnections(result.connections)
+        // Normalize the host answer: a host without the capability (or the
+        // legacy bridge's bare-array fallback) can answer a shape whose
+        // `connections` is missing. The Data tab reads `queryConnections.length`
+        // unguarded, so an undefined here white-screens the app on the first
+        // Data-tab click (interaction-review R1). Default to an empty list.
+        if (!cancelled) setQueryConnections(Array.isArray(result?.connections) ? result.connections : [])
       })
       .catch(() => {
         if (!cancelled) setQueryConnections([])

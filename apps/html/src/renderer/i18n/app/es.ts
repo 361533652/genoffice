@@ -72,6 +72,7 @@ export const es = {
   saveAs: 'Guardar como…',
   aiNameFile: 'Nombrar con IA…',
   ribbonCollapse: 'Contraer la cinta de opciones',
+  ribbonCompact: 'Cinta compacta (solo iconos)',
   ribbonExpand: 'Expandir la cinta de opciones',
   ribbonGroupInsert: 'Insertar',
   editText: 'Editar texto',

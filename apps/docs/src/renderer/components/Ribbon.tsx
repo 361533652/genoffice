@@ -49,8 +49,10 @@ import {
   Dropdown,
   isSymbolFontFamily,
   useDismissablePopover,
+  useNarrowViewport,
   useRibbonCollapse,
   useScrollWindow,
+  RibbonTabCollapseButton,
 } from '@genoffice/ui'
 import { HIGHLIGHT_CSS } from '../editor/extensions'
 import { applyCase, type CaseMode } from '../editor/case-transform'
@@ -963,6 +965,11 @@ function RibbonInner({
   const docEmpty = !hasDoc || fs.docEmpty
   const [tab, setTab] = useState<RibbonTab>('home')
   const [dropdown, setDropdown] = useState<string | null>(null)
+  // R2③: on a portrait phone the host's BACK dispatches a synthetic Escape to
+  // close the open panel; the unified dismissal must listen for it or BACK is
+  // consumed with no effect ("dead BACK"). Desktop keeps escape off so its
+  // keyboard behaviour is byte-for-byte unchanged.
+  const narrowViewport = useNarrowViewport()
   // null = Automatic: the pen button clears the run colour instead of writing one
   const [penColor, setPenColor] = useState<string | null>('FF0000')
   const [penHighlight, setPenHighlight] = useState('yellow')
@@ -1018,6 +1025,7 @@ function RibbonInner({
   // trigger counts as "inside" and falls through to the trigger's onClick
   // toggle (closing it) instead of being treated as an outside press.
   useDismissablePopover(dropdown != null, () => setDropdown(null), {
+    escape: narrowViewport,
     inside: () =>
       Array.from(document.querySelectorAll('[data-rb-panel]')).flatMap((panel) => [
         panel,
@@ -2521,6 +2529,11 @@ function RibbonInner({
           </div>
         </div>
         {trailingActions}
+        <RibbonTabCollapseButton
+          state={collapse}
+          collapseLabel={t('ribbonCollapse')}
+          expandLabel={t('ribbonExpand')}
+        />
       </div>
 
       <div className="ribbon-body" data-ribbon-body="">

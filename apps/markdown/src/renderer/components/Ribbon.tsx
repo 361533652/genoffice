@@ -6,6 +6,7 @@ import {
   Dropdown,
   RibbonCollapseButton,
   RibbonExpandButton,
+  RibbonTabCollapseButton,
   useDismissablePopover,
   useRibbonCollapse,
 } from '@genoffice/ui'
@@ -252,6 +253,10 @@ export function Ribbon({
   const collapse = useRibbonCollapse('mdapp.ribbonCollapsed', {
     collapse: t('ribbonCollapse'),
     expand: t('ribbonExpand'),
+    // P1-3: opt into the icon-only middle density so a portrait phone defaults
+    // to the compact band (the buttons here are already icon-only).
+    compact: t('ribbonCompact'),
+    expandFull: t('ribbonExpand'),
   })
   const [linkOpen, setLinkOpen] = useState(false)
   const [linkUrl, setLinkUrl] = useState('')
@@ -390,6 +395,11 @@ export function Ribbon({
           />
         </label>
         <RibbonExpandButton state={collapse} label={t('ribbonExpand')} />
+        <RibbonTabCollapseButton
+          state={collapse}
+          collapseLabel={t('ribbonCollapse')}
+          expandLabel={t('ribbonExpand')}
+        />
       </div>
 
       <div className="ribbon-body" data-ribbon-body="">

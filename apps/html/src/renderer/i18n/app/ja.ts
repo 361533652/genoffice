@@ -71,6 +71,7 @@ export const ja = {
   saveAs: '名前を付けて保存…',
   aiNameFile: 'AI で名前を変更…',
   ribbonCollapse: 'リボンを折りたたむ',
+  ribbonCompact: 'コンパクトリボン（アイコンのみ）',
   ribbonExpand: 'リボンを展開する',
   ribbonGroupInsert: '挿入',
   editText: 'テキスト編集',

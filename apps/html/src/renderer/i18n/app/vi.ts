@@ -71,6 +71,7 @@ export const vi = {
   saveAs: 'Lưu dưới dạng…',
   aiNameFile: 'Đặt tên bằng AI…',
   ribbonCollapse: 'Thu gọn dải băng',
+  ribbonCompact: 'Dải băng thu gọn (chỉ biểu tượng)',
   ribbonExpand: 'Mở rộng dải băng',
   ribbonGroupInsert: 'Chèn',
   editText: 'Chỉnh sửa văn bản',

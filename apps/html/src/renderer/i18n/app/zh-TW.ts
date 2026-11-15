@@ -68,6 +68,7 @@ export const zhTW = {
   saveAs: '另存新檔…',
   aiNameFile: '用 AI 命名…',
   ribbonCollapse: '摺疊功能區',
+  ribbonCompact: '緊湊功能區（僅圖示）',
   ribbonExpand: '展開功能區',
   ribbonGroupInsert: '插入',
   editText: '編輯文字',

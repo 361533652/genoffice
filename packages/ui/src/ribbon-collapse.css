@@ -38,3 +38,62 @@
 .ribbon-expand-btn {
   margin-left: 4px;
 }
+
+/* Tab-row collapse/expand control (interaction-spec P1-3). Hidden on desktop so
+   the tab row is unchanged; revealed only on a portrait phone, where it is the
+   one discoverable, finger-sized way to fold the band. Colors are tokens. */
+.ribbon-tabs-collapse-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+}
+
+@media (max-width: 720px) {
+  .ribbon-tabs-collapse-btn {
+    display: inline-flex;
+    /* the tab row scrolls horizontally and is often full of tabs; pin the
+       control to the row's trailing edge so it stays visible and reachable
+       instead of being pushed off-screen past the last tab */
+    position: sticky;
+    inset-inline-end: 0;
+    z-index: 2;
+    background: var(--chrome-bg);
+  }
+
+  /* R6: sheets' `.ribbon-tabs > button:not(.qa-btn) { position: relative }`
+     (specificity 0,2,1) outranks the single-class sticky above and pushed the
+     control off-screen (left=552). Re-assert sticky at a specificity that wins
+     regardless of stylesheet order so the button stays pinned in every app. */
+  .ribbon-tabs > button.ribbon-tabs-collapse-btn:not(.qa-btn) {
+    position: sticky;
+  }
+
+  .ribbon-tabs-collapse-btn:hover,
+  .ribbon-tabs-collapse-btn:active {
+    background: var(--hover);
+    color: var(--text);
+  }
+
+  /* the 20×18 band-corner button is a mouse affordance; on touch the tab-row
+     button above replaces it, so hide the tiny duplicate (markdown/html) */
+  .ribbon-collapse-btn {
+    display: none;
+  }
+}
+
+@media (max-width: 720px) and (pointer: coarse) {
+  .ribbon-tabs-collapse-btn {
+    width: 44px;
+    height: 44px;
+  }
+}

@@ -72,6 +72,7 @@ export const pt = {
   saveAs: 'Salvar Como…',
   aiNameFile: 'Nomear com IA…',
   ribbonCollapse: 'Recolher a Faixa de Opções',
+  ribbonCompact: 'Faixa compacta (somente ícones)',
   ribbonExpand: 'Expandir a Faixa de Opções',
   ribbonGroupInsert: 'Inserir',
   editText: 'Editar texto',

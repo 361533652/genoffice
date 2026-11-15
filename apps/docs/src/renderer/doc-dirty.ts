@@ -106,6 +106,50 @@ export function isDocDirty(s: DocDirtyState): boolean {
   )
 }
 
+/**
+ * User-edit subset of {@link isDocDirty}, for the host's file-switch gate.
+ *
+ * Opening a document runs load-time normalization that writes `defaultFonts`,
+ * `numberingDirty` and `styleUpserts` into the edit-tracking state even though
+ * the user changed nothing. The close guard and autosave want those (they are
+ * part of what a save writes), but the gate that asks "may I discard this
+ * session to open another file?" must not fire on them — a freshly opened
+ * document otherwise prompts on every switch, and the prompt stops being
+ * believed. Everything a user can edit (text, sections, headers/footers, page
+ * numbers, protection, comments, …) still reports dirty. (interaction-review R5)
+ */
+export function isDocUserDirty(s: DocDirtyState): boolean {
+  return (
+    s.dirtyRef.current ||
+    s.sectionDirty ||
+    s.sectionsDirty.length > 0 ||
+    s.trailingStartType !== null ||
+    s.pageColorDirty ||
+    s.headerDirty ||
+    s.footerDirty ||
+    s.hfVariantsDirty.length > 0 ||
+    Object.keys(s.sectionHfEdits).length > 0 ||
+    Object.keys(s.hfLinks).length > 0 ||
+    s.pgNumEdit !== null ||
+    s.pgNumDirtySections.length > 0 ||
+    s.titlePgDirty ||
+    s.evenOddHfDirty ||
+    s.mirrorMarginsDirty ||
+    s.trackRevisionsDirty ||
+    s.watermarkDirty ||
+    s.inksDirty ||
+    s.notesDirty ||
+    s.sourcesDirty ||
+    s.zoteroDocumentDataDirty ||
+    s.themeFontsDirty ||
+    s.themeColorsDirty ||
+    s.commentsDirty ||
+    s.protectionDirty ||
+    s.writeProtectionDirty ||
+    s.removePersonalInfoDirty
+  )
+}
+
 /** The edit-tracking setters resetCrossDocEditState clears (structural subset
  *  of FileActionContext, so the helper stays unit-testable without the editor). */
 export interface CrossDocEditStateSink {

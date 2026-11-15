@@ -68,6 +68,7 @@ export const he = {
   saveAs: 'שמירה בשם…',
   aiNameFile: 'מתן שם באמצעות AI…',
   ribbonCollapse: 'כווץ את רצועת הכלים',
+  ribbonCompact: 'רצועת כלים מצומצמת (סמלים בלבד)',
   ribbonExpand: 'הרחב את רצועת הכלים',
   ribbonGroupInsert: 'הוספה',
   editText: 'עריכת טקסט',

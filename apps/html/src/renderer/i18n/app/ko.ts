@@ -70,6 +70,7 @@ export const ko = {
   saveAs: '다른 이름으로 저장…',
   aiNameFile: 'AI로 이름 지정…',
   ribbonCollapse: '리본 축소',
+  ribbonCompact: '간단 리본(아이콘만)',
   ribbonExpand: '리본 확장',
   ribbonGroupInsert: '삽입',
   editText: '텍스트 편집',

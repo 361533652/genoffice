@@ -70,6 +70,7 @@ export const en = {
   saveAs: 'Save As…',
   aiNameFile: 'Name with AI…',
   ribbonCollapse: 'Collapse the Ribbon',
+  ribbonCompact: 'Compact Ribbon (icons only)',
   ribbonExpand: 'Expand the Ribbon',
   ribbonGroupInsert: 'Insert',
   editText: 'Edit text',

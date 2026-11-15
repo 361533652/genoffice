@@ -8,6 +8,10 @@ export const MIN_SCALE = ZOOM_STEPS[0]
 export const MAX_SCALE = ZOOM_STEPS[ZOOM_STEPS.length - 1]
 export const PAGE_GAP = 16
 export const SCROLL_PAD = 24
+/** Portrait-phone gutter: 8px instead of 24px buys back 32px of page width
+ *  (interaction-spec P0-2 item 4). The `.pdf-scroll` padding mirrors this in
+ *  the ≤720px media block; keep the two in sync. */
+export const SCROLL_PAD_NARROW = 8
 // ── Sidebar (thumbnails / outline) width: drag the divider to resize; persisted ──
 export const SIDEBAR_W_KEY = 'genoffice-pdf-sidebar-width'
 export const SIDEBAR_W_DEFAULT = 150

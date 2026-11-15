@@ -3803,3 +3803,16 @@ html.genoffice-popover-open .ribbon-tabs {
   min-width: 0;
   box-sizing: border-box;
 }
+
+/* ---------------------------------------------------------------------------
+ * P1-3: compact band density on a portrait phone. The html toolbar is already
+ * icon-only (.rb-btn), so compact just shortens the 80px band to the suite's
+ * 45px compact contract. Gated ≤720px so the desktop band is unchanged.
+ * ------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .ribbon-compact .ribbon-body {
+    height: 45px;
+    padding-top: 5px;
+    padding-bottom: 1px;
+  }
+}

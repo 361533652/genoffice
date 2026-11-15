@@ -14,6 +14,7 @@ import android.os.Build
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.Gravity
+import android.view.KeyEvent
 import android.view.View
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
@@ -25,6 +26,7 @@ import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -56,7 +58,13 @@ class MainActivity : ComponentActivity() {
     private lateinit var bridge: GenOfficeBridge
     private lateinit var homeTheme: HomeTheme
     private var fileChooserCallback: ValueCallback<Array<Uri>>? = null
+
+    /** the editor currently VISIBLE (null on the home screen) */
     private var currentApp: String? = null
+
+    /** the editor loaded in the WebView, kept across showHome() so a hidden but
+     *  live session is still protected by the unsaved-changes gate (P1-6) */
+    private var webApp: String? = null
 
     /** grid column count of the currently built home (3 portrait / 6 wide) */
     private var homeCols = 0
@@ -132,7 +140,71 @@ class MainActivity : ComponentActivity() {
         root.setBackgroundColor(homeTheme.bg)
         setContentView(root)
         applySystemBars()
+        registerBackNavigation()
         handleViewIntent(intent)
+    }
+
+    /**
+     * BACK navigation (P0-1 + P1-5), on the modern dispatcher instead of the
+     * deprecated [onBackPressed] override so predictive back keeps working.
+     *
+     * Order of precedence while an editor is visible:
+     *  1. ask the web layer to close its topmost dialog/panel (P1-5); if it
+     *     consumed the press, stay in the editor;
+     *  2. otherwise walk the WebView's OWN history — after [onPageFinished]
+     *     clears cross-app entries this is app-internal only (today zero, so
+     *     this branch is future-proofing for renderer pushState routing);
+     *  3. otherwise go home. On the home screen BACK falls through to the
+     *     system and exits the task.
+     */
+    private fun registerBackNavigation() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (currentApp == null) {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                    return
+                }
+                handleEditorBack()
+            }
+        })
+    }
+
+    /** Debounce so a single BACK press delivered as both a key event (see
+     *  [dispatchKeyEvent]) and a predictive-back invocation is handled once. */
+    private var lastEditorBackAt = 0L
+
+    /**
+     * R2①: intercept BACK at the Activity's key dispatch, BEFORE the WebView's
+     * input connection can swallow it. When a dialog auto-focuses an input, the
+     * IME used to eat the first BACK to dismiss the keyboard, so the back
+     * callback (and thus `__genofficeHandleBack`) never ran — the dialog needed
+     * two presses. Routing the key event here first lets the web layer close the
+     * topmost UI on the first press. The web handler also blurs a focused input
+     * when no overlay is open, preserving the keyboard-dismiss-then-leave order.
+     */
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (event.keyCode == KeyEvent.KEYCODE_BACK && currentApp != null && !event.isCanceled) {
+            if (event.action == KeyEvent.ACTION_DOWN) {
+                handleEditorBack()
+                return true
+            }
+            if (event.action == KeyEvent.ACTION_UP) return true
+        }
+        return super.dispatchKeyEvent(event)
+    }
+
+    /** The editor-visible BACK precedence (web-first), shared by both paths. */
+    private fun handleEditorBack() {
+        val now = android.os.SystemClock.uptimeMillis()
+        if (now - lastEditorBackAt < 400) return
+        lastEditorBackAt = now
+        webView.evaluateJavascript(
+            "(function(){try{return !!(window.__genofficeHandleBack&&window.__genofficeHandleBack())}catch(e){return false}})()"
+        ) { consumed ->
+            if (consumed == "true") return@evaluateJavascript
+            if (webView.canGoBack()) webView.goBack() else showHome()
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -556,6 +628,20 @@ class MainActivity : ComponentActivity() {
                 view: WebView,
                 request: android.webkit.WebResourceRequest
             ): android.webkit.WebResourceResponse? = assetLoader.shouldInterceptRequest(request.url)
+
+            override fun onPageFinished(view: WebView, url: String?) {
+                // P0-1: every editor entry is a navigation boundary. The six apps
+                // share one WebView and one history stack; without this, BACK
+                // reloaded the PREVIOUS app's index.html whose one-shot PendingOpen
+                // was already consumed — reviving it as a blank session. Clearing
+                // cross-app history keeps the current page and makes canGoBack()
+                // reflect app-internal history only. Same-document navigations do
+                // not fire onPageFinished, so future in-app pushState entries (which
+                // happen after load) are never cleared.
+                if (url != null && url.startsWith("https://appassets.androidplatform.net/assets/web/")) {
+                    view.clearHistory()
+                }
+            }
         }
         webView.webChromeClient = object : WebChromeClient() {
             override fun onShowFileChooser(
@@ -611,32 +697,97 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    /**
+     * Open an editor. P1-6: if a live session is already loaded (even hidden on
+     * the home screen), ask the web layer whether it is dirty and confirm before
+     * the hard reload discards it. The web "open" path has confirmDocumentReplace;
+     * this is the native-entry equivalent of that gate.
+     */
     private fun openApp(app: String) {
+        if (webApp != null) {
+            // the session may be paused on the home screen; wake it so the probe
+            // evaluates against live state instead of a stale/absent answer
+            webView.onResume()
+            webView.evaluateJavascript(
+                "(function(){try{return !!(window.__genofficeIsDirty&&window.__genofficeIsDirty())}catch(e){return false}})()"
+            ) { dirty ->
+                if (dirty == "true") confirmDiscardThenOpen(app) else doOpenApp(app)
+            }
+        } else {
+            doOpenApp(app)
+        }
+    }
+
+    /** Native unsaved-changes gate shown before a reload would discard a session. */
+    private fun confirmDiscardThenOpen(app: String) {
+        // P1-6 / R5: the gate follows the app language (the same setting the
+        // editors read), and every button is a localized string — the cancel
+        // button must not fall back to the system resource, which surfaced an
+        // English "CANCEL" under a Chinese message on non-English locales.
+        val s = gateStrings()
+        android.app.AlertDialog.Builder(this)
+            .setMessage(s.message)
+            .setPositiveButton(s.open) { _, _ -> doOpenApp(app) }
+            .setNegativeButton(s.cancel) { _, _ ->
+                // keep the session intact; if the user came from home, hand them
+                // back to the editor they were in rather than a dead end
+                if (currentApp == null && webApp != null) resumeEditor()
+            }
+            .setOnCancelListener {
+                if (currentApp == null && webApp != null) resumeEditor()
+            }
+            .show()
+    }
+
+    private data class GateStrings(val message: String, val open: String, val cancel: String)
+
+    /** Localized gate strings keyed by the app language setting (host store). */
+    private fun gateStrings(): GateStrings {
+        val lang = getSharedPreferences("genoffice-host", android.content.Context.MODE_PRIVATE)
+            .getString("language", "zh") ?: "zh"
+        return when (lang) {
+            "en" -> GateStrings("This document has unsaved changes. Open another file anyway?", "Open", "Cancel")
+            "ja" -> GateStrings("このドキュメントには保存されていない変更があります。別のファイルを開きますか？", "開く", "キャンセル")
+            "ko" -> GateStrings("이 문서에 저장되지 않은 변경 사항이 있습니다. 다른 파일을 여시겠습니까?", "열기", "취소")
+            "fr" -> GateStrings("Ce document contient des modifications non enregistrées. Ouvrir un autre fichier quand même ?", "Ouvrir", "Annuler")
+            "de" -> GateStrings("Dieses Dokument hat ungespeicherte Änderungen. Trotzdem eine andere Datei öffnen?", "Öffnen", "Abbrechen")
+            "es" -> GateStrings("Este documento tiene cambios sin guardar. ¿Abrir otro archivo de todos modos?", "Abrir", "Cancelar")
+            "th" -> GateStrings("เอกสารนี้มีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก เปิดไฟล์อื่นต่อไปหรือไม่?", "เปิด", "ยกเลิก")
+            "id" -> GateStrings("Dokumen ini punya perubahan yang belum disimpan. Tetap buka file lain?", "Buka", "Batal")
+            "ru" -> GateStrings("В этом документе есть несохранённые изменения. Всё равно открыть другой файл?", "Открыть", "Отмена")
+            "ar" -> GateStrings("يحتوي هذا المستند على تغييرات غير محفوظة. هل تريد فتح ملف آخر على أي حال؟", "فتح", "إلغاء")
+            "pt" -> GateStrings("Este documento tem alterações não salvas. Abrir outro arquivo mesmo assim?", "Abrir", "Cancelar")
+            "it" -> GateStrings("Questo documento ha modifiche non salvate. Aprire un altro file comunque?", "Apri", "Annulla")
+            "pl" -> GateStrings("Ten dokument ma niezapisane zmiany. Czy mimo to otworzyć inny plik?", "Otwórz", "Anuluj")
+            "cs" -> GateStrings("Tento dokument má neuložené změny. Přesto otevřít jiný soubor?", "Otevřít", "Zrušit")
+            "nl" -> GateStrings("Dit document heeft niet-opgeslagen wijzigingen. Toch een ander bestand openen?", "Openen", "Annuleren")
+            else -> GateStrings("当前文档未保存，仍要打开吗？", "打开", "取消")
+        }
+    }
+
+    private fun doOpenApp(app: String) {
         currentApp = app
+        webApp = app
         home.visibility = View.GONE
         webView.visibility = View.VISIBLE
+        webView.onResume()
         webView.loadUrl("https://appassets.androidplatform.net/assets/web/$app/index.html")
+    }
+
+    /** Return to a hidden-but-live editor (used when the discard gate is cancelled). */
+    private fun resumeEditor() {
+        currentApp = webApp
+        home.visibility = View.GONE
+        webView.visibility = View.VISIBLE
+        webView.onResume()
     }
 
     private fun showHome() {
         currentApp = null
+        webView.onPause()
         webView.visibility = View.GONE
         home.visibility = View.VISIBLE
         refreshRecents()
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        if (currentApp != null && webView.canGoBack()) {
-            webView.goBack()
-            return
-        }
-        if (currentApp != null) {
-            showHome()
-            return
-        }
-        @Suppress("DEPRECATION")
-        super.onBackPressed()
     }
 
     // ---- helpers ---------------------------------------------------------------

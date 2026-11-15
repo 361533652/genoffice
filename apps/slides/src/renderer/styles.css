@@ -9580,3 +9580,64 @@ body.show-curtain::after {
 .m3d-turn.turning .m3d-turn-handle {
   cursor: grabbing;
 }
+
+/* ---------------------------------------------------------------------------
+ * Portrait phone (interaction-spec P1-2 / P1-1 / P0-4 internal wrap). Gated
+ * ≤720px; desktop rail, dialogs and galleries are untouched. Tokens only.
+ * ------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  /* the workspace anchors the overlay rail */
+  .workspace {
+    position: relative;
+  }
+
+  /* P1-2: the thumbnail rail becomes an overlay drawer — out of flow so the
+     stage keeps its full width (≥340px) whether the rail is open or closed */
+  .slide-list.slide-list-drawer {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    inset-inline-start: 0;
+    width: min(78vw, 320px) !important; /* override the inline drag width */
+    z-index: 40;
+    box-shadow: var(--shadow-menu);
+  }
+
+  .slide-side-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 39;
+    background: var(--color-bg-overlay);
+  }
+
+  .thumb-resizer {
+    display: none;
+  }
+
+  /* P0-4: the custom-shows dialog stacks its list above the detail pane */
+  .csd-body {
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .csd-shows {
+    width: 100%;
+    max-height: 160px;
+  }
+
+  /* P1-1 / R3: the shape gallery never paints past the screen edge. A width cap
+     alone left the anchored panel flung off the right when its trigger sat near
+     the edge (offRight=187 on device); centre the panel in the viewport like the
+     docs galleries, keeping the anchor's vertical position. */
+  .rb-shape-gallery {
+    max-width: calc(100vw - 16px);
+  }
+
+  .rb-drop:has(.rb-shape-gallery) {
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: calc(100vw - 16px);
+    /* the centred overlay always fits; a flip would fight the transform */
+    position-try-fallbacks: none;
+  }
+}

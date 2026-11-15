@@ -67,6 +67,7 @@ export const zh = {
   saveAs: '另存为…',
   aiNameFile: '用 AI 命名…',
   ribbonCollapse: '折叠功能区',
+  ribbonCompact: '紧凑功能区（仅图标）',
   ribbonExpand: '展开功能区',
   ribbonGroupInsert: '插入',
   editText: '编辑文字',

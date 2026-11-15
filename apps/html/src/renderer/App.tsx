@@ -1,4 +1,4 @@
-import { getHost } from '@genoffice/host'
+import { getHost, registerDirtyProbe } from '@genoffice/host'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   Dropdown,
@@ -245,6 +245,11 @@ export default function App() {
   statusRef.current = status
   selectedSidRef.current = selectedSid
   const dirty = text !== savedText
+
+  // P1-6: the Android host's hard-reload gate reads the source-vs-saved diff.
+  const hostDirtyRef = useRef(false)
+  hostDirtyRef.current = dirty
+  useEffect(() => registerDirtyProbe(() => hostDirtyRef.current), [])
 
   const getMap = useCallback((): ParseMap => {
     const cached = mapRef.current

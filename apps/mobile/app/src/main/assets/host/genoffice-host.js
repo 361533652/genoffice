@@ -185,6 +185,78 @@
     }).catch(function () { return false; });
   };
 
+  // ---- 3d. BACK closes the topmost web dialog/panel (P1-5) ------------------
+  // The native host asks this before navigating back. If an overlay is open we
+  // consume the press and dismiss it, so BACK matches Android semantics (close
+  // the top UI first, leave the editor on the next press).
+  //
+  // Dismissal is two-tier (interaction-review R2):
+  //  - overlays that own a close control (drawers' scrim, panes' close button,
+  //    the AI dock's collapse button) are closed DIRECTLY — they never listened
+  //    for Escape, so a synthetic keypress did nothing and BACK was consumed
+  //    with no effect ("dead BACK");
+  //  - the rest get a synthetic Escape on the focused control inside them, so
+  //    both React's onKeyDown focus trap and window-level Escape listeners fire.
+  // With no overlay open, a focused input/editable is blurred first (the IME
+  // dismiss the WebView input connection used to swallow BACK for), and only a
+  // press with nothing left to close falls through to native navigation.
+  var BACK_SEL = '[data-rb-panel], .gs-dd-pop, .menu-select-drop, [role="dialog"], ' +
+    '.modal-backdrop, .dialog-backdrop, .pdf-modal-mask, .file-menu, ' +
+    '.modal, .pdf-modal, .find-panel, .cover-gallery, .style-gallery-menu, ' +
+    '.list-gallery, .wordart-palette, .symbol-palette, .equation-gallery, ' +
+    '.rb-drop, .rb-menu, .ctx-menu, .rb-link-pop, .md-math-pop, .pdf-sign-pop, ' +
+    // P0-2 / P1-2 overlay drawers & panes added in round 1 (R2②):
+    '.pdf-thumbs-drawer, .slide-list-drawer, .nav-pane, .styles-pane, ' +
+    '.comments-pane, .ai-dock:not(.collapsed)';
+
+  function backCloseOverlay(el) {
+    // drawers dismiss through their scrim sibling (a real click runs the
+    // React onClick that nulls the sidebar / rail state)
+    var scrimSel = el.classList.contains('pdf-thumbs-drawer') ? '.pdf-side-scrim'
+      : el.classList.contains('slide-list-drawer') ? '.slide-side-scrim' : null;
+    if (scrimSel) {
+      var scrim = document.querySelector(scrimSel);
+      if (scrim) { scrim.click(); return true; }
+    }
+    // panes and the AI dock own a close control; click it directly
+    var btn = el.querySelector('.nav-pane-close, .comments-pane-close, .ai-panel-collapse');
+    if (btn) { btn.click(); return true; }
+    return false;
+  }
+
+  window.__genofficeHandleBack = function () {
+    var nodes = document.querySelectorAll(BACK_SEL);
+    var open = null;
+    for (var i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      if (el.getClientRects().length === 0) continue; // not rendered
+      var cs = window.getComputedStyle(el);
+      if (cs.display === 'none' || cs.visibility === 'hidden') continue;
+      open = el; // last match in document order ≈ topmost
+    }
+    if (open) {
+      if (backCloseOverlay(open)) return true; // consumed this BACK
+      var target = document.activeElement;
+      if (!target || target === document.body || !open.contains(target)) {
+        target = open.querySelector('input, textarea, select, button, [tabindex]') || open;
+      }
+      target.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'Escape', code: 'Escape', keyCode: 27, which: 27,
+        bubbles: true, cancelable: true
+      }));
+      return true; // consumed this BACK
+    }
+    // No overlay: a focused input/editable means the keyboard is up. Dismiss it
+    // first (this is the press the WebView input connection used to eat before
+    // the Activity callback ever ran), so the NEXT BACK leaves the editor.
+    var ae = document.activeElement;
+    if (ae && ae !== document.body && ae !== document.documentElement) {
+      var editable = ae.closest ? ae.closest('input, textarea, select, [contenteditable="true"]') : null;
+      if (editable) { editable.blur(); return true; }
+    }
+    return false;
+  };
+
   // ---- 4. long-press → contextmenu ------------------------------------------
   var pressTimer = null;
   var pressOrigin = null;

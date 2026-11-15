@@ -63,6 +63,7 @@ export async function installSheetsSessionHost(
     ['readWorkbookMedia', (request) => session.readMedia(request as { sessionId: string; visualId: string })],
     ['readSlicerState', (request) => session.readSlicerState(request as { sessionId: string })],
     ['readWorkbookQueries', (request) => session.readQueries(request as { sessionId: string })],
+    ['listWorkbookConnections', (request) => session.listConnections(request as { sessionId: string })],
     ['findWorkbookCells', (request) => session.findCells(request as Record<string, unknown> & { sessionId: string })],
     ['recalcWorkbook', (request) => session.recalc(request as Parameters<typeof session.recalc>[0])],
     ['saveWorkbookEdits', (request) => session.save(request as Parameters<typeof session.save>[0])],

@@ -73,6 +73,7 @@ export const nl = {
   saveAs: 'Opslaan als…',
   aiNameFile: 'Naam geven met AI…',
   ribbonCollapse: 'Het lint samenvouwen',
+  ribbonCompact: 'Compact lint (alleen pictogrammen)',
   ribbonExpand: 'Het lint uitvouwen',
   ribbonGroupInsert: 'Invoegen',
   editText: 'Tekst bewerken',

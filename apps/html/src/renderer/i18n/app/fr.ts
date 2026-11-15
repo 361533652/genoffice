@@ -72,6 +72,7 @@ export const fr = {
   saveAs: 'Enregistrer sous…',
   aiNameFile: "Nommer avec l'IA…",
   ribbonCollapse: 'Réduire le ruban',
+  ribbonCompact: 'Ruban compact (icônes uniquement)',
   ribbonExpand: 'Développer le ruban',
   ribbonGroupInsert: 'Insertion',
   editText: 'Modifier le texte',

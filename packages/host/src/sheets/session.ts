@@ -31,6 +31,7 @@ import {
 } from '@genoffice/xlsx-gateway/gateway/xlsx-package-io'
 import { parseSlicerState } from '@genoffice/xlsx-gateway/gateway/xlsx-slicer'
 import { listWorkbookQueries } from '@genoffice/xlsx-gateway/gateway/xlsx-connections'
+import { refreshableQueriesOf } from '@genoffice/xlsx-gateway/gateway/xlsx-connection-refresh'
 import type {
   BulkConstantFill,
   CellEdit,
@@ -356,6 +357,31 @@ export class WorkbookSessionHost {
     )
   }
 
+  /**
+   * listWorkbookConnections: the Data tab's refreshable web queries, with the
+   * sheet and range each fills. Ports the desktop handler (sheets-main.ts):
+   * prefetch every part the connection walk can ask for in one sidecar round
+   * trip, then run the same `refreshableQueriesOf` walk.
+   *
+   * The renderer reads `result.connections` unguarded into `.length`
+   * (ExcelShell Data tab), so the answer MUST carry a `connections` array —
+   * the legacy bridge's bare `[]` fallback for an unregistered list-shaped
+   * method left `connections` undefined and white-screened the whole app on
+   * the first Data-tab click (interaction-review R1).
+   */
+  async listConnections(request: { sessionId: string }): Promise<{ connections: unknown[] }> {
+    const session = this.session(request.sessionId)
+    const manifest = (await this.client.archiveManifest(session.snapshotPath)) as {
+      entries: { name: string }[]
+    }
+    const wanted = manifest.entries
+      .map((entry) => entry.name)
+      .filter(isConnectionWalkPart)
+    const texts = await readArchiveEntriesText(this.client, session.snapshotPath, wanted)
+    const connections = await refreshableQueriesOf(async (path) => texts.get(path))
+    return { connections }
+  }
+
   // ---- external links (file-level scans over the session's own bytes) -----
 
   async listExternalLinks(request: { sessionId: string }): Promise<unknown> {
@@ -476,6 +502,22 @@ export class WorkbookSessionHost {
 }
 
 // ---- the edit-plan builder (ported from sheets-main.ts writeWorkbookTo) ----
+
+/**
+ * Parts the connection walk reads (ported from sheets-main.ts): the connections
+ * part, the workbook and its relationships, sheet relationship parts, tables and
+ * query tables. Worksheet cell data is never read, so the prefetch stays small.
+ */
+function isConnectionWalkPart(name: string): boolean {
+  return (
+    name === 'xl/connections.xml' ||
+    name === 'xl/workbook.xml' ||
+    name === 'xl/_rels/workbook.xml.rels' ||
+    name.startsWith('xl/tables/') ||
+    name.startsWith('xl/queryTables/') ||
+    /^xl\/worksheets\/_rels\/[^/]+\.rels$/.test(name)
+  )
+}
 
 type PlanArguments = Omit<StreamingSaveRequest, 'client' | 'sourcePath' | 'targetPath'>
 

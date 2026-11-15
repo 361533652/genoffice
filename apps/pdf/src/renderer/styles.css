@@ -5150,3 +5150,95 @@ button {
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
+
+/* ---------------------------------------------------------------------------
+ * Portrait phone (interaction-spec P0-2 / P0-4 / P0-5). Everything here is
+ * gated ≤720px so the desktop sidebar, fit math and dialogs are untouched.
+ * Colors are semantic tokens only.
+ * ------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  /* P0-2: the sidebar becomes an overlay drawer — out of flow, so the page
+     keeps the full width and recomputeFit's clientWidth reads the whole pane.
+     inset-inline-start keeps it on the leading edge under RTL. */
+  .pdf-thumbs.pdf-thumbs-drawer {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    inset-inline-start: 0;
+    width: min(78vw, 320px) !important; /* override the inline drag width */
+    z-index: 40;
+    box-shadow: var(--shadow-menu);
+  }
+
+  .pdf-side-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 39;
+    background: var(--color-bg-overlay);
+  }
+
+  /* the drag divider is a mouse affordance; the drawer is fixed-width */
+  .pdf-side-resizer {
+    display: none;
+  }
+
+  /* P0-2b: the 300px comments margin must not squeeze the page on a phone —
+     comments live in the sidebar panel instead. display:none takes it out of
+     flow, matching the fit formula which stops reserving its width. */
+  .pdf-note-margin {
+    display: none;
+  }
+
+  /* P0-2 item 4: tighter gutter buys back 32px of page width (mirrors
+     SCROLL_PAD_NARROW in view-config.ts) */
+  .pdf-scroll {
+    padding: 0 8px;
+  }
+
+  /* P0-4: dialog field grids fold to one column; permission rows let the input
+     shrink instead of pushing past the card edge */
+  .pdf-field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pdf-perm-row {
+    flex-wrap: wrap;
+  }
+
+  .pdf-perm-row > span:first-child {
+    min-width: 0;
+    flex: 1 0 100%;
+  }
+
+  .pdf-perm-row > input[type='text'],
+  .pdf-perm-row > input[type='number'],
+  .pdf-perm-row > input[type='password'] {
+    min-width: 0;
+    flex: 1;
+  }
+
+  /* P1-1 / R3: the search bar is its own class (not .find-panel), so the shared
+     clamp never reached it; right-anchored at 20px with a 180px input + options
+     it ran to left=-35. Anchor both edges and let the input absorb the width so
+     the whole bar stays inside the viewport. */
+  .pdf-search-bar {
+    left: 8px;
+    right: 8px;
+    max-width: calc(100vw - 16px);
+  }
+
+  .pdf-search-input {
+    width: auto;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .pdf-search-bar .rb-icon {
+    flex: 0 0 auto;
+  }
+
+  .pdf-search-count {
+    min-width: 0;
+    flex: 0 1 auto;
+  }
+}

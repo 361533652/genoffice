@@ -8,6 +8,7 @@ import {
   ShapePreview,
   useDismissablePopover,
   useRibbonCollapse,
+  RibbonTabCollapseButton,
   aiPanelInitiallyOpen,
   rememberAiPanelOpen,
   useAiSidebarEnabled,
@@ -991,6 +992,11 @@ export function ExcelShell({
           <span className="workbook-status" role="status" aria-live="polite">
             {statusMessage}
           </span>
+          <RibbonTabCollapseButton
+            state={collapse}
+            collapseLabel={t('appRibbonCollapse')}
+            expandLabel={t('appRibbonExpand')}
+          />
         </nav>
 
         <Ribbon

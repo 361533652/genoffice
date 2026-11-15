@@ -1,5 +1,5 @@
 /* Per-app accent (word-blue family) + docs-only tokens.
- * Chrome tokens (surface/text/border/…, AI panel --color-*) come from
+ * Chrome tokens (surface/text/border/�? AI panel --color-*) come from
  * @genoffice/ui/tokens.css; nothing here may shadow those names. */
 :root {
   --word-blue: #185abd;
@@ -438,7 +438,7 @@ button {
   background: var(--chrome-bg);
   border-bottom: 1px solid var(--border-strong);
   user-select: none;
-  /* shared toolbar ink (glyphs, letterforms, labels) — same as sheets/slides */
+  /* shared toolbar ink (glyphs, letterforms, labels) �?same as sheets/slides */
   color: var(--text-primary);
 }
 
@@ -446,7 +446,7 @@ button {
   display: flex;
   align-items: center;
   /* same tab-row metrics as PowerPoint's ribbon (slides app): 5px top inset,
-     no bottom padding — the active tab's underline sits on the row's edge */
+     no bottom padding �?the active tab's underline sits on the row's edge */
   padding: 5px 10px 0;
   gap: 2px;
   /* the title-bar row was removed; the tab row doubles as the frameless-window drag area */
@@ -512,7 +512,7 @@ html.genoffice-popover-open .ribbon-tabs {
 }
 
 /* active underline: exactly the text width (insets = horizontal padding),
- * ends slightly rounded — not a full capsule */
+ * ends slightly rounded �?not a full capsule */
 .ribbon-tab.active::after {
   content: '';
   position: absolute;
@@ -743,8 +743,7 @@ html.genoffice-popover-open .ribbon-tabs {
   height: 80px;
   /* Groups never shrink below content, so a narrow window overflows the row:
      scroll it inside the ribbon instead of stretching the document (matching
-     the sheets/slides ribbons). Dropdown panels are NOT clipped by this —
-     they escape the scroll container via anchor positioning (see
+     the sheets/slides ribbons). Dropdown panels are NOT clipped by this �?     they escape the scroll container via anchor positioning (see
      .rb-split-wrap). */
   /* `scroll`, not `auto`: styled scrollbars are classic (non-overlay), so
      `scroll` keeps the 5px lane reserved even without overflow and crossing
@@ -773,7 +772,7 @@ html.genoffice-popover-open .ribbon-tabs {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  /* never shrink below content — squeezed groups paint over each other */
+  /* never shrink below content �?squeezed groups paint over each other */
   flex-shrink: 0;
   padding: 2px 4px;
 }
@@ -792,13 +791,13 @@ html.genoffice-popover-open .ribbon-tabs {
 
 .ribbon-sep {
   width: 1px;
-  /* the overflowing ribbon row squeezes shrinkable items first — without
+  /* the overflowing ribbon row squeezes shrinkable items first �?without
      this the 1px separators collapse to 0 and vanish (slides ribbon parity) */
   flex-shrink: 0;
   background: var(--border);
   /* 2px matches the groups' vertical padding, so the line spans exactly the
      tallest group content (the clipboard stack / two-row font block) instead
-     of stopping short of it — same inset across all three apps */
+     of stopping short of it �?same inset across all three apps */
   margin: 2px 6px;
 }
 
@@ -836,7 +835,7 @@ html.genoffice-popover-open .ribbon-tabs {
   color: var(--text-primary);
 }
 
-/* hover/open paint only the icon row — the label below
+/* hover/open paint only the icon row �?the label below
  * stays outside the gray. The box spans the whole button width (align-self
  * stretch + horizontal bleed), not just the icon content. Negative margins
  * cancel the bleed so button layout/alignment is unchanged. */
@@ -851,14 +850,14 @@ html.genoffice-popover-open .ribbon-tabs {
  * The middle density: the band stays and every command stays reachable, it
  * just drops to icon-only on a shorter band. The three defences above
  * (nowrap on .rb-big, flex-shrink: 0 on .ribbon-group, overflow-x: scroll on
- * .ribbon-body) all still apply — icon-only narrows the buttons, so a narrow
+ * .ribbon-body) all still apply �?icon-only narrows the buttons, so a narrow
  * window packs more of them in before the row overflows.
  */
 .ribbon-compact .ribbon-body {
   /* Same fixed-height contract as the full band, only shorter: switching tabs
      (including the auto-jump to Table Layout) must still never resize the row.
-     38px was measured holding 51px of content — the font and size pickers
-     stacked, style cards at 62px, split carets under their buttons — and
+     38px was measured holding 51px of content �?the font and size pickers
+     stacked, style cards at 62px, split carets under their buttons �?and
      `overflow-y: hidden` sliced the difference off instead of scrolling it,
      which is how the font picker ended up cut through the middle. Every tab
      has been measured since; 45px is the smallest that holds all eight with
@@ -873,7 +872,7 @@ html.genoffice-popover-open .ribbon-tabs {
      adding height are the icon, the column gap and the vertical padding. The
      gap was never dropped here even though the comment claimed it was: the
      button came out 40px tall inside a 38px band, and `overflow-y: hidden` on
-     `.ribbon-body` sliced the bottom off it — the font and size pickers were
+     `.ribbon-body` sliced the bottom off it �?the font and size pickers were
      cut in half and every icon row lost its lower edge. */
   gap: 0;
   padding: 2px 5px;
@@ -918,7 +917,7 @@ html.genoffice-popover-open .ribbon-tabs {
 }
 
 /* The table ribbon groups its tools in .table-tool-group (min-width 66px), not
- * .ribbon-group — without this they keep the full-band inset and the band ends
+ * .ribbon-group �?without this they keep the full-band inset and the band ends
  * up wider than the content it holds. */
 /* Split buttons (Paste Special, font colour, ...) stack a caret under the
  * button: `.rb-big-split` is a column, so 32 + 17 = 49px and the caret alone
@@ -976,7 +975,7 @@ html.genoffice-popover-open .ribbon-tabs {
 }
 
 /* The font and size pickers are two 28px controls stacked in a column, so the
- * group is 28 + 4 + 28 = 60px before padding — taller than the 38px band on
+ * group is 28 + 4 + 28 = 60px before padding �?taller than the 38px band on
  * its own, and the reason the font picker was cut through the middle. Side by
  * side they are 28px, which is what every compact ribbon does anyway. */
 .ribbon-compact .rb-font-group {
@@ -998,7 +997,7 @@ html.genoffice-popover-open .ribbon-tabs {
 
 /* The table tabs stack two rows of controls (font block, cell size grid), which
  * cannot compress to 38px. Let that content scroll inside the band instead of
- * overflowing it and pushing the document down — the band itself keeps its
+ * overflowing it and pushing the document down �?the band itself keeps its
  * fixed height, so switching to a table tab still never resizes the row. */
 .ribbon-compact .table-ribbon-body {
   overflow-y: auto;
@@ -1058,7 +1057,7 @@ html.genoffice-popover-open .ribbon-tabs {
   cursor: default;
 }
 
-/* Big split button (Home ▸ Paste): the icon half runs the default action,
+/* Big split button (Home �?Paste): the icon half runs the default action,
    the label half opens the menu, like Word's Paste. */
 .rb-big-split {
   flex-direction: column;
@@ -1110,7 +1109,7 @@ html.genoffice-popover-open .ribbon-tabs {
   flex-shrink: 0;
 }
 
-/* Active state paints only the gray icon plate — ink stays the standard #232425 */
+/* Active state paints only the gray icon plate �?ink stays the standard #232425 */
 .rb-big.active .rb-big-icon {
   background: var(--active-bg);
 }
@@ -1167,8 +1166,8 @@ html.genoffice-popover-open .ribbon-tabs {
   width: 14px;
   height: 14px;
   color: var(--text-primary);
-  /* CSS resizes these below their attr size — re-pin the painted stroke
-     (1.43 units × 14/16 ≈ 1.25px) */
+  /* CSS resizes these below their attr size �?re-pin the painted stroke
+     (1.43 units × 14/16 �?1.25px) */
   stroke-width: 1.43;
 }
 
@@ -1256,11 +1255,11 @@ html.genoffice-popover-open .ribbon-tabs {
   background: none;
   border-radius: 3px;
   /* letter glyphs (I/U/ab/Aa/A) share 15px/500: matched to the svg icons'
-     1.5px stroke by INTEGRATED ink mass, not run-length — with mac's
+     1.5px stroke by INTEGRATED ink mass, not run-length �?with mac's
      antialiased font smoothing a text stem's peak alpha sits below a
      geometric stroke's, so 450 (same nominal width) still reads thinner while
-     500 lands on the svg legs' 1.29–1.38 effective width. <b>B</b> keeps its
-     semantic 700 (pinned below — an inherited weight makes "bolder" overshoot) */
+     500 lands on the svg legs' 1.29�?.38 effective width. <b>B</b> keeps its
+     semantic 700 (pinned below �?an inherited weight makes "bolder" overshoot) */
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
@@ -1310,7 +1309,7 @@ html.genoffice-popover-open .ribbon-tabs {
   align-items: center;
 }
 
-/* Anchor for the dropdown panels (color-palette / layout-menu / …), which are
+/* Anchor for the dropdown panels (color-palette / layout-menu / �?, which are
    position: fixed so they escape the ribbon-body scroll clip while tracking
    their trigger through ribbon scrolling. Every wrap shares the name, so the
    scope is essential: without it a fixed-position panel (laid out after all
@@ -1367,7 +1366,7 @@ html.genoffice-popover-open .ribbon-tabs {
   background: var(--active-bg);
 }
 
-/* same footprint as the plain .rb-caret — a wider zone reads as a gap
+/* same footprint as the plain .rb-caret �?a wider zone reads as a gap
    between the icon and the chevron */
 .rb-color-caret {
   width: 14px;
@@ -1419,7 +1418,7 @@ html.genoffice-popover-open .ribbon-tabs {
   margin: 0;
 }
 
-/* the svg box carries ~4px of padding below its ink — tuck the bar into it so
+/* the svg box carries ~4px of padding below its ink �?tuck the bar into it so
    both buttons' bars sit on the same line (20px svg bottom is 1.5px below the
    15px letter's em box + 1px gap) */
 .rb-color-glyph-svg .rb-color-bar {
@@ -1503,7 +1502,7 @@ html.genoffice-popover-open .ribbon-tabs {
 }
 
 /* Selected (no highlight applied) is a quiet filled state, matching the
-   shared picker's auto row — an accent ring reads as a stray focus outline. */
+   shared picker's auto row �?an accent ring reads as a stray focus outline. */
 .color-highlight-none.selected {
   background: var(--hover);
 }
@@ -1682,7 +1681,7 @@ html.genoffice-popover-open .ribbon-tabs {
 
 /* ---- Insert: table size picker ---- */
 
-/* Insert → Cover Page gallery */
+/* Insert �?Cover Page gallery */
 .cover-gallery {
   position: fixed;
   position-anchor: --rb-drop-wrap;
@@ -1797,7 +1796,7 @@ html.genoffice-popover-open .ribbon-tabs {
   gap: 3px;
 }
 
-/* "Insert Table…" entry under the hover grid (opens the rows/cols dialog) */
+/* "Insert Table�? entry under the hover grid (opens the rows/cols dialog) */
 .table-picker-custom {
   display: block;
   width: 100%;
@@ -2052,7 +2051,7 @@ html.genoffice-popover-open .ribbon-tabs {
 
 .equation-gallery {
   /* right-aligned to its trigger (the Equation button sits at the ribbon's
-     far right) — fixed + anchored like the other panels */
+     far right) �?fixed + anchored like the other panels */
   position: fixed;
   position-anchor: --rb-drop-wrap;
   top: calc(anchor(bottom) + 4px);
@@ -2403,7 +2402,7 @@ th[data-rev-fmt] {
   align-items: flex-end;
 }
 
-/* Switch Windows sits at the ribbon's right edge — anchor right so it isn't clipped */
+/* Switch Windows sits at the ribbon's right edge �?anchor right so it isn't clipped */
 .layout-menu.align-right {
   left: auto;
   right: anchor(right);
@@ -2761,14 +2760,14 @@ th[data-rev-fmt] {
   background: var(--canvas);
 }
 
-/* the document stays ltr under an RTL UI — the chrome mirrors, the content does not */
+/* the document stays ltr under an RTL UI �?the chrome mirrors, the content does not */
 
 .editor-scroll {
   direction: ltr;
   flex: 1;
   overflow-y: auto;
   /* classic (non-overlay) scrollbars change clientWidth as they come and go,
-     which would make the zoom auto-refit oscillate — reserve the gutter */
+     which would make the zoom auto-refit oscillate �?reserve the gutter */
   scrollbar-gutter: stable;
   padding: 26px 24px 140px;
 }
@@ -2833,7 +2832,7 @@ th[data-rev-fmt] {
 }
 
 /* Format painter armed: Word-style I-beam + brush cursor, but only while
-   hovering the text flow (block children) — page margins and the blank area
+   hovering the text flow (block children) �?page margins and the blank area
    below the content keep their normal cursor. Fixed black/white affordance,
    identical in both themes (the page surface never follows the chrome theme). */
 .ProseMirror.doc-painter-cursor > * {
@@ -3035,7 +3034,7 @@ th[data-rev-fmt] {
 
 /* w:docGrid charSpace character grid (Word probes 2026-09-02, 2026-10-22):
    every character in a typed linesAndChars section advances by natural width
-   + charSpace/4096pt — plain letter-spacing, inherited into tables and
+   + charSpace/4096pt �?plain letter-spacing, inherited into tables and
    textboxes but not into the header/footer strips (they live outside
    .doc-page). Under balanceSingleByteDoubleByteWidth single-byte characters
    get half (--doc-char-space-sb) and the .doc-east-asian-font spans restore
@@ -3066,12 +3065,12 @@ th[data-rev-fmt] {
 /* page/margin-relative X anchors are absolute on the page in Word: undo the
    column shift for boxes riding a column-translated block (Y keeps following
    the anchor paragraph). Boxes with their own inline transform (rotation)
-   keep it — inline wins — a rare combination accepted as-is. */
+   keep it �?inline wins �?a rare combination accepted as-is. */
 .editor-scroll .doc-page:not(.measuring-columns) .doc-col-block [data-page-rel-x='1'] {
   transform: translateX(calc(-1 * var(--col-dx, 0px)));
 }
 /* run-anchored pictures carry their offset in an inline transform: the undo
-   rides a variable that transform reads instead — the measured correction
+   rides a variable that transform reads instead �?the measured correction
    (pinPageRelXPictures: column shift + anchor indent) or the bare column shift */
 .editor-scroll .doc-page:not(.measuring-columns) img[data-page-rel-x='1'] {
   --page-rel-x-undo: var(--page-rel-x-pin, var(--col-dx, 0px));
@@ -3119,7 +3118,7 @@ th[data-rev-fmt] {
 /* natural-flow measuring state: in-paragraph gap widgets force a line break at
    the PREVIOUS pass's cut position, so measuring with them in layout can only
    re-confirm that cut even after decoration-only reflows (justify space-shrink)
-   moved the natural wrap points — a justified page-last line then stays
+   moved the natural wrap points �?a justified page-last line then stays
    stretched sparse until an at-boundary edit (r177). Hidden, the
    paragraph re-wraps naturally and every gapAbove/gapAccum read consistently
    sees zero-height gaps, so the virtual coordinates stay gapless by layout
@@ -3131,7 +3130,7 @@ th[data-rev-fmt] {
 /* block-level gaps leave the measuring flow too: an in-flow box between two
    paragraphs stops their margins collapsing, so the measured distance across a
    page turn was space-after + space-before instead of the larger of the two,
-   and every block below shifted by the difference — a different amount
+   and every block below shifted by the difference �?a different amount
    wherever the previous pass had cut, so passes disagreed and page counts
    oscillated. Hidden, the flow measures exactly as it would without pages. */
 .editor-scroll .doc-page.measuring-natural .page-gap:not(.page-gap-inline) {
@@ -3450,7 +3449,7 @@ th[data-rev-fmt] {
 
 /* w:framePr floated frame (page number at a margin edge): the frame shares
    the next paragraph's flow line instead of stacking above it. Only when a
-   following line exists — a frame that is the last/only paragraph keeps its
+   following line exists �?a frame that is the last/only paragraph keeps its
    line, or the strip's used height collapses and overflow:hidden clips it */
 .page-hf-frame:not(:last-child) {
   height: 0;
@@ -4294,7 +4293,7 @@ th[data-rev-fmt] {
   content: none;
 }
 
-/* inserted then deleted: they cancel out in No Markup view → hidden; also nonexistent in Original view */
+/* inserted then deleted: they cancel out in No Markup view �?hidden; also nonexistent in Original view */
 .rev-display-none .doc-ins .doc-del,
 .rev-display-simple .doc-ins .doc-del,
 .rev-display-original .doc-del .doc-ins {
@@ -4304,7 +4303,7 @@ th[data-rev-fmt] {
 /* balloon mode (print view, All Markup): deletions and format-change chrome move
    to margin balloons and leave the text flow (Word's balloon view); insertions
    stay inline. Collapsed paragraphs are fully deleted ones whose mark is also
-   deleted — Word shows no trace of them in the body. */
+   deleted �?Word shows no trace of them in the body. */
 .rev-balloon .doc-del,
 .rev-balloon .doc-para-del-collapse {
   display: none;
@@ -4330,7 +4329,7 @@ th[data-rev-fmt] {
 }
 
 /* every inline child deleted, mark live: Word keeps the paragraph as one empty
-   line — the strut is that line, so the trailing break after a deleted hard
+   line �?the strut is that line, so the trailing break after a deleted hard
    break must not add a second one. Placed after the has-ppr-change::after
    overrides: same specificity, later wins */
 .rev-display-none .doc-para-content-del::after,
@@ -4395,7 +4394,7 @@ th[data-rev-fmt] {
   background: var(--docs-del-bg);
 }
 
-/* Reviewing Pane (Review → Reviewing Pane): one card per tracked change */
+/* Reviewing Pane (Review �?Reviewing Pane): one card per tracked change */
 .review-pane-meta {
   padding: 8px 14px;
   font-size: 12px;
@@ -5145,7 +5144,7 @@ th[data-rev-fmt] {
   width: var(--page-w, 816px);
   margin: 0 auto;
   /* own stacking context: floating pictures rank via z-index (front band is
-     unbounded upward), so trap those ranks here — editor chrome mounted
+     unbounded upward), so trap those ranks here �?editor chrome mounted
      outside the page (table handles, menus) always paints above them */
   isolation: isolate;
   background: var(--page-bg, var(--docs-paper));
@@ -5197,20 +5196,20 @@ th[data-rev-fmt] {
   font-family: 'GenOffice Balanced Space';
 }
 
-/* dark page in the light theme: Word's gray band around the dark paper — one
+/* dark page in the light theme: Word's gray band around the dark paper �?one
    variable override, every canvas-band rule below reads var(--canvas) */
 .workspace-dark {
   --canvas: #3d3d3d;
 }
 
-/* ---- Dark page (View ▸ Dark Mode; the dark theme's default) ----
+/* ---- Dark page (View �?Dark Mode; the dark theme's default) ----
    Word-style: the paper renders dark and authored document colors are remapped
    for contrast, on screen only. Emission sites append `--dk-*` twins next to the
    authored inline declarations (editor/dark-page.ts); the rules below switch the
    painted property to the twin. Screen media only, so printToPDF of the live
    canvas keeps the authored colors (the pagination preview sits outside
    .page-dark and stays paper-white like Word's print preview). The paper
-   constants are darkPageColor() of their light values — keep the two in step. */
+   constants are darkPageColor() of their light values �?keep the two in step. */
 @media screen {
   .page-dark {
     --ai-highlight: #483d1e;
@@ -5380,7 +5379,7 @@ th[data-rev-fmt] {
 }
 
 /* visual page-break indicator (w:pageBreakBefore): one out-of-flow pseudo-element
-   in the margin above the paragraph — as a border + 14px padding it pushed the
+   in the margin above the paragraph �?as a border + 14px padding it pushed the
    page's content down 15px, where Word reserves nothing. A list item's ::before
    is its numbering marker, so list items carry the band on ::after */
 .doc-page .page-break-before {
@@ -5597,8 +5596,7 @@ th[data-rev-fmt] {
 }
 
 .pv-endnote-separator {
-  /* matches FOOTNOTE_SEPARATOR_H (16px): 11 box + 1 bottom border + 4 spacing —
-     the rule sits at the row's bottom, clear of the last body line above it */
+  /* matches FOOTNOTE_SEPARATOR_H (16px): 11 box + 1 bottom border + 4 spacing �?     the rule sits at the row's bottom, clear of the last body line above it */
   width: min(2in, 100%);
   border-bottom: 1px solid var(--docs-paper-ink-faint);
   margin-bottom: 4px;
@@ -5832,11 +5830,10 @@ th[data-rev-fmt] {
 }
 
 /* clip at the paper edge, not the content box: over-wide tables bleed into the right
-   margin like Word (keep overflow hidden — print pagination needs the box monolithic).
+   margin like Word (keep overflow hidden �?print pagination needs the box monolithic).
    Left side symmetrically: negative w:tblInd tables start inside the left margin, and
    clipping at the content box culled their leading characters from the exported text.
-   The padding compensates the negative margin so the content position is unchanged —
-   only the clip edge moves out to the paper edge. */
+   The padding compensates the negative margin so the content position is unchanged �?   only the clip edge moves out to the paper edge. */
 .pv-sheet > .pv-clip {
   margin-right: calc(-1 * var(--pv-mr, 0px));
   margin-left: calc(-1 * var(--pv-ml, 0px));
@@ -6359,7 +6356,7 @@ body.docs-crop-active .doc-protected[data-doc-protected='image'] .doc-img-wrap {
 
 /* Word-style inactive selection: while a ribbon combobox (font family/size)
    holds keyboard focus the DOM selection lives in that input, so the editor's
-   native highlight vanishes — this decoration keeps the target text visibly
+   native highlight vanishes �?this decoration keeps the target text visibly
    selected (gray, like Word's unfocused selection) until focus returns.
    Translucent on purpose: it overlays run highlights/shading without hiding
    them, which no opaque token can do (document canvas, not themed chrome). */
@@ -6387,7 +6384,7 @@ body.docs-crop-active .doc-protected[data-doc-protected='image'] .doc-img-wrap {
 
 /* chrome layer of a single shape: mirrors the box rect and carries the
    rotation transform, so the frame and handles turn with the shape (Word);
-   the rotation lives here in the editor — the box renders unturned under it.
+   the rotation lives here in the editor �?the box renders unturned under it.
    Shrink-wrap the layer to the box: a plain block would stretch to the
    wrapper (an anchor line sharing the paragraph widens it), and the turn
    would pivot around the wrapper instead of the shape's centre. Floating
@@ -6532,7 +6529,7 @@ body.docs-crop-active .doc-protected[data-doc-protected='image'] .doc-img-wrap {
   /* not positioned: a positioned cell's fill paints over the inner half of the collapsed borders */
   box-sizing: border-box;
   /* the w:docGrid line grid applies to the body flow only, UNLESS settings.xml
-     w:compat carries w:adjustLineHeightInTable — then docStyleCss restores the
+     w:compat carries w:adjustLineHeightInTable �?then docStyleCss restores the
      pitch in cells and they snap like body lines (Word probe 2026-09-02) */
   --doc-grid-pitch: 0.0001px;
 }
@@ -6633,8 +6630,7 @@ body.docs-crop-active .doc-protected[data-doc-protected='image'] .doc-img-wrap {
   content: none;
 }
 
-/* repeated header rows after a table page break (w:tblHeader): pure decoration —
-   not selectable, not editable, invisible to hit-testing. display beats the
+/* repeated header rows after a table page break (w:tblHeader): pure decoration �?   not selectable, not editable, invisible to hit-testing. display beats the
    .page-gap-inline inline-block (that class only marks them as measurement gaps). */
 .doc-table tr.page-repeat-header {
   display: table-row;
@@ -6942,7 +6938,7 @@ body.docs-crop-active .doc-protected[data-doc-protected='image'] .doc-img-wrap {
 
 /* Three stacked rows have to fit the 64px the fixed 80px band leaves after its
    padding and the scrollbar lane: 3 × 20px + 2 × 2px. At the default 25-26px
-   the bottom row (Table Properties, Insert Cells…) was clipped. */
+   the bottom row (Table Properties, Insert Cells�? was clipped. */
 .table-tool-stack-three {
   grid-template-rows: repeat(3, 20px);
   align-content: center;
@@ -7057,7 +7053,7 @@ body.docs-crop-active .doc-protected[data-doc-protected='image'] .doc-img-wrap {
 
 /* floating drawings (wrapNone/front/behind anchors, or several drawings
    anchored in one paragraph): the wrapper marks the anchor paragraph's flow
-   position but takes no flow height — each box positions absolutely at its
+   position but takes no flow height �?each box positions absolutely at its
    own offset, overlapping body text exactly like Word */
 /* canvas-only page-gap compensation for floating boxes (syncFloatShifts);
    the pagination preview clones per-page flow with no gaps, so it neutralizes it */
@@ -7227,7 +7223,7 @@ body.docs-crop-active .doc-protected[data-doc-protected='image'] .doc-img-wrap {
 }
 
 /* preview: wrappers whose boxes spill past the page's flow window (data-pv-hoist,
-   stamped before cloning — cover flows ending in an early page break, page-bottom
+   stamped before cloning �?cover flows ending in an early page break, page-bottom
    overhang) un-position the same way so the boxes escape the pv-clip (which cut
    them at the flow end while the next page's window repainted the spilled part),
    and re-pin to the page box: --pv-hoist-dy is the anchor's content-area Y. */
@@ -7394,7 +7390,7 @@ body.docs-crop-active .doc-protected[data-doc-protected='image'] .doc-img-wrap {
 
 /* floating (wp:anchor) run pictures: zero-size marker at the run, the picture
    overlays without consuming flow space. The hosting paragraph is the
-   positioning origin — wp:posOffset measures from the column / paragraph top
+   positioning origin �?wp:posOffset measures from the column / paragraph top
    (Word anchors the drawing run at the paragraph end, so a run-based origin
    would push the picture off the page) */
 .doc-inline-img-anchor {
@@ -7670,7 +7666,7 @@ body.docs-run-pic-dragging .doc-run-pic-frame {
   user-select: none;
 }
 
-/* body-level invisible markers (stray bookmarkEnd…): occupy no space at all, and
+/* body-level invisible markers (stray bookmarkEnd�?: occupy no space at all, and
    no BFC (overflow) so the neighbouring paragraphs' margins still collapse */
 .doc-protected-invisible {
   height: 0;
@@ -7899,8 +7895,7 @@ body.docs-run-pic-dragging .doc-run-pic-frame {
   display: none;
 }
 
-/* broken pictures: empty frame placeholder (frame/text colors are inline —
-   they substitute document content and must not follow the theme) */
+/* broken pictures: empty frame placeholder (frame/text colors are inline �?   they substitute document content and must not follow the theme) */
 .doc-protected-broken-img {
   border-color: transparent;
   background: transparent;
@@ -8083,7 +8078,7 @@ body.docs-run-pic-dragging .doc-run-pic-frame {
 }
 
 /* field results keep their spaces (Word preserves them; collapsing reflows the
-   wrap column around anchored pictures) — must outrank prosemirror-view's
+   wrap column around anchored pictures) �?must outrank prosemirror-view's
    injected `.ProseMirror [contenteditable=false] { white-space: normal }` */
 .ProseMirror [contenteditable='false'].doc-field-text,
 .ProseMirror [contenteditable='false'] .doc-field-text {
@@ -8320,7 +8315,7 @@ body.docs-run-pic-dragging .doc-run-pic-frame {
   background: var(--docs-paper-select-bg);
 }
 
-/* field rows stay borderless when selected too — the border's 2px would
+/* field rows stay borderless when selected too �?the border's 2px would
    reflow the page under the caret */
 .ProseMirror-focused .doc-protected-field.ProseMirror-selectednode {
   border: none;
@@ -8363,7 +8358,7 @@ body.docs-run-pic-dragging .doc-run-pic-frame {
 }
 
 /* SmartArt degrade: precomputed diagram shapes at absolute positions.
-   Shape/text colors are document data — inline per shape, never themed. */
+   Shape/text colors are document data �?inline per shape, never themed. */
 .doc-diagram {
   position: relative;
   display: inline-block;
@@ -8405,8 +8400,7 @@ body.docs-run-pic-dragging .doc-run-pic-frame {
   line-height: 1.2;
 }
 
-/* OLE embed degrade: the packaged preview picture at its declared size —
-   Word draws no box or caption (the type name lives in the hover tooltip).
+/* OLE embed degrade: the packaged preview picture at its declared size �?   Word draws no box or caption (the type name lives in the hover tooltip).
    The block stays display:block so consecutive objects stack like w:p and
    the paragraph's w:jc (text-align) can place the inline preview. */
 .doc-protected-ole {
@@ -8437,7 +8431,7 @@ body.docs-run-pic-dragging .doc-run-pic-frame {
   display: block;
 }
 
-/* SmartArt / drawing-canvas blocks: the shapes are the content — no chip box.
+/* SmartArt / drawing-canvas blocks: the shapes are the content �?no chip box.
    Zero padding: the block footprint must equal the declared wp:extent so
    pagination matches Word (the dashed 1px border stays as hover chrome). */
 .doc-protected-diagram {
@@ -9048,7 +9042,7 @@ body.docs-crop-active
   color: var(--color-text-primary);
 }
 
-/* drag handle on the panel's right edge — resize the panel horizontally */
+/* drag handle on the panel's right edge �?resize the panel horizontally */
 .ai-panel-resizer {
   position: absolute;
   right: -3px;
@@ -9181,7 +9175,7 @@ body.docs-crop-active
   line-height: 1.5;
 }
 
-/* clickable starter prompts in the empty state — suggestion chips:
+/* clickable starter prompts in the empty state �?suggestion chips:
  * 30px-radius outline pills, 13px/400 */
 .ai-starter-list {
   display: flex;
@@ -9239,7 +9233,7 @@ body.docs-crop-active
   margin-bottom: 0;
 }
 
-/* blank markdown paragraphs would each eat a 16px margin — the stream never renders them */
+/* blank markdown paragraphs would each eat a 16px margin �?the stream never renders them */
 .ai-md p:empty {
   display: none;
 }
@@ -9774,7 +9768,7 @@ body.docs-crop-active
 
 /* streaming typing indicator */
 /* Thinking indicator (white background, no container):
- * phase one = two bouncing blue dots (alternating small/large); phase two = shimmering "Thinking…" text + streaming caret block */
+ * phase one = two bouncing blue dots (alternating small/large); phase two = shimmering "Thinking�? text + streaming caret block */
 .ai-typing {
   display: inline-flex;
   align-items: center;
@@ -10082,7 +10076,7 @@ body.docs-crop-active
   font-size: 10px;
 }
 
-/* Composer floats over the chat scroll area — no top border (agent-shell §4.6) */
+/* Composer floats over the chat scroll area �?no top border (agent-shell §4.6) */
 .ai-composer {
   border-top: none;
   padding: 8px 12px 12px;
@@ -10097,7 +10091,7 @@ body.docs-crop-active
   margin-bottom: 7px;
 }
 
-/* scope chip — guidance accent (blue is reserved for guidance/onboarding) */
+/* scope chip �?guidance accent (blue is reserved for guidance/onboarding) */
 .ai-scope-hint {
   display: inline-flex;
   align-items: center;
@@ -10531,7 +10525,7 @@ body.docs-crop-active
   cursor: default;
 }
 
-/* composer card — 16px radius, default border, production float shadow */
+/* composer card �?16px radius, default border, production float shadow */
 .ai-input-box {
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-16);
@@ -10581,7 +10575,7 @@ body.docs-crop-active
   margin-left: auto;
 }
 
-/* attach — brand-supplied paperclip art, 20×20 (5/9 of the 36px enter button), same as the sheets panel */
+/* attach �?brand-supplied paperclip art, 20×20 (5/9 of the 36px enter button), same as the sheets panel */
 .ai-attach-btn {
   display: inline-flex;
   align-items: center;
@@ -10817,7 +10811,7 @@ body.docs-crop-active
   overflow-x: scroll;
   /* side insets are transparent borders, not padding: overflow clips at the
      padding edge, so side padding would let scrolled items slide flush against
-     the box edges — borders keep the 14px gaps while scrolling */
+     the box edges �?borders keep the 14px gaps while scrolling */
   padding: 13px 0 0;
   border-inline: 14px solid transparent;
   margin-bottom: -6px;
@@ -10902,7 +10896,7 @@ body.docs-crop-active
   height: 26px;
 }
 
-/* Non-image attachments (pdf, xlsx, …): fixed-width bordered card — brand type
+/* Non-image attachments (pdf, xlsx, �?: fixed-width bordered card �?brand type
    icon + truncated name and size, same height and remove button as the thumbs */
 .ai-attachment-card {
   position: relative;
@@ -11106,7 +11100,7 @@ body.docs-crop-active
   padding: 0 12px;
   height: 24px;
   font-size: 11.5px;
-  /* neutral chrome, unified with slides/sheets — no app-brand tint */
+  /* neutral chrome, unified with slides/sheets �?no app-brand tint */
   color: var(--text-dim);
   background: var(--docs-statusbar-bg);
   border-top: 1px solid var(--docs-statusbar-border);
@@ -12065,7 +12059,7 @@ body.docs-crop-active
 /* pre-wrap, NOT prosemirror-view's break-spaces (its runtime-injected sheet
    loads after this one, so the selector is doubled to win): Word hangs the
    space at a line break into the margin, while break-spaces reserves width
-   for it — every line wraps a word early and a space that fits nowhere takes
+   for it �?every line wraps a word early and a space that fits nowhere takes
    a whole blank line (narrow table cells), inflating layout vs Word. */
 .ProseMirror.ProseMirror {
   white-space: pre-wrap;
@@ -12415,7 +12409,7 @@ body.docs-crop-active
   }
 
   /* editor-only affordance chips: Word/LibreOffice print the object (or nothing),
-     never a type label — the label text must not leak into exported PDFs */
+     never a type label �?the label text must not leak into exported PDFs */
   .doc-protected-label {
     display: none !important;
   }
@@ -12430,7 +12424,7 @@ body.docs-crop-active
 
   /* more editor-only markers whose text leaks into the exported text layer:
      transparent ink still emits glyphs into the PDF, so they must not paint at
-     all. visibility (not display) keeps their layout box — pagination sliced
+     all. visibility (not display) keeps their layout box �?pagination sliced
      the canvas with these boxes in the flow. */
   .doc-sectbreak-label,
   .doc-fmt-mark,
@@ -12450,7 +12444,7 @@ body.docs-crop-active
   }
 
   /* degraded blocks (passthrough chips): no dashed box or chip fill in print.
-     Geometry (padding/margin) must stay — pagination sliced the canvas with
+     Geometry (padding/margin) must stay �?pagination sliced the canvas with
      these boxes in the flow. */
   .doc-protected {
     border-color: transparent !important;
@@ -12743,8 +12737,8 @@ body.docs-crop-active
 }
 
 /* Word outline view marks each heading with a collapse handle. The glyph is a
-   real DOM widget (editor/outline-view.ts) — the old ::before had no click
-   target — positioned into the indent gutter the heading padding reserves. */
+   real DOM widget (editor/outline-view.ts) �?the old ::before had no click
+   target �?positioned into the indent gutter the heading padding reserves. */
 .view-outline .doc-page .outline-handle {
   position: absolute;
   left: 0;
@@ -12762,7 +12756,7 @@ body.docs-crop-active
 }
 
 /* folding hides the deeper heading rows of the folded heading; body blocks are
-   already hidden by the :not(h1…) rule above */
+   already hidden by the :not(h1�? rule above */
 .view-outline .doc-page .outline-collapsed {
   display: none;
 }
@@ -12826,7 +12820,7 @@ body.docs-crop-active
   pointer-events: none;
 }
 
-/* ---- Design → Watermark: diagonal ghost text across the page ---- */
+/* ---- Design �?Watermark: diagonal ghost text across the page ---- */
 
 .page-watermark {
   position: absolute;
@@ -12846,7 +12840,7 @@ body.docs-crop-active
   user-select: none;
 }
 
-/* ---- Design → Themes/Colors: accent color preview dots in dropdowns ---- */
+/* ---- Design �?Themes/Colors: accent color preview dots in dropdowns ---- */
 
 .theme-accent-row {
   display: inline-flex;
@@ -12863,7 +12857,7 @@ body.docs-crop-active
   border: 1px solid var(--docs-swatch-outline);
 }
 
-/* ---- References → Footnotes/Endnotes: reference marker + page-bottom notes area ---- */
+/* ---- References �?Footnotes/Endnotes: reference marker + page-bottom notes area ---- */
 
 /* bare superscript number inheriting body ink (Word parity: brackets/color would leak into
    exports and change line widths); accent is a hover/selection-only affordance */
@@ -13030,8 +13024,7 @@ ruby.doc-ruby rt {
   padding-top: 0;
 }
 
-/* Word: endnotes sit right after the last body line, not at the page bottom —
-   anchored at the measured flow end (inline top), over the paper's padded tail */
+/* Word: endnotes sit right after the last body line, not at the page bottom �?   anchored at the measured flow end (inline top), over the paper's padded tail */
 .page-endnotes-anchored {
   position: absolute;
   left: var(--last-page-x, 0px);
@@ -13082,7 +13075,7 @@ ruby.doc-ruby rt {
   color: var(--word-blue);
 }
 
-/* ---- References → Index: XE marks (hidden field codes: Word shows nothing
+/* ---- References �?Index: XE marks (hidden field codes: Word shows nothing
    unless formatting marks are on, so the chip only appears with .show-marks) ---- */
 
 .doc-xe-mark {
@@ -13506,7 +13499,7 @@ ruby.doc-ruby rt {
   display: inline-block;
 }
 
-/* Draw ▸ Pens gallery: one slot per remembered pen, Word style */
+/* Draw �?Pens gallery: one slot per remembered pen, Word style */
 .ink-pens {
   gap: 2px;
 }
@@ -13664,7 +13657,7 @@ ruby.doc-ruby rt {
   gap: 8px;
 }
 
-/* Border Styles / Line Weight / Pen Color stacked beside Borders ▾ (Word) */
+/* Border Styles / Line Weight / Pen Color stacked beside Borders �?(Word) */
 .table-border-opts {
   display: flex;
   flex-direction: column;
@@ -15008,7 +15001,7 @@ tr > .page-gap-cut {
   color: var(--docs-toast-ok);
 }
 
-/* body row (AI dock + content column) — the status bar spans only the content
+/* body row (AI dock + content column) �?the status bar spans only the content
    column so the dock runs the full height of the window */
 .app-main {
   display: flex;
@@ -15077,8 +15070,8 @@ tr > .page-gap-cut {
 }
 
 /* Whitespace-only runs: Word ignores their font size for line height (tdf#137335).
-   Only the run's own [data-doc-style] span carries the oversized font-size — outer
-   comment/ins/del spans inherit the paragraph size and contribute nothing — so zero
+   Only the run's own [data-doc-style] span carries the oversized font-size �?outer
+   comment/ins/del spans inherit the paragraph size and contribute nothing �?so zero
    that span and everything nested inside it (intermediate marks, the decoration),
    without touching ancestor spans that may also wrap real text. */
 .doc-page .doc-ws-run,
@@ -15089,7 +15082,7 @@ tr > .page-gap-cut {
 
 /* Curly quotes in w:hint="eastAsia" runs: Word draws them with the East Asian
    font at a fullwidth advance, while every macOS Chinese system face keeps them
-   proportional — only the bundled Noto subset matches Word's 1em cell. */
+   proportional �?only the bundled Noto subset matches Word's 1em cell. */
 .doc-ea-quotes {
   font-family: 'Noto Serif CJK SC';
 }
@@ -15221,7 +15214,7 @@ tr > .page-gap-cut {
   width: min(380px, calc(100vw - 48px));
 }
 
-/* Review → Track Changes Options (Word's Advanced Track Changes Options layout) */
+/* Review �?Track Changes Options (Word's Advanced Track Changes Options layout) */
 .tco-dialog {
   width: min(560px, calc(100vw - 48px));
   max-height: calc(100vh - 48px);
@@ -15656,7 +15649,7 @@ tr > .page-gap-cut {
   user-select: none;
 }
 
-/* Page Border dialog (Design > Page Borders > Page Border…): Word's Borders
+/* Page Border dialog (Design > Page Borders > Page Border�?: Word's Borders
    and Shading > Page Border tab. The preview paints the document's border
    through the same pageBorderStyleOf as the canvas, so color/width come inline. */
 .pb-dialog {
@@ -15973,7 +15966,7 @@ tr > .page-gap-cut {
   margin: 0;
 }
 
-/* ---- Design → Watermark dialog (Word's Insert Watermark) ---- */
+/* ---- Design �?Watermark dialog (Word's Insert Watermark) ---- */
 .modal.watermark-dialog {
   width: 820px;
   max-width: calc(100vw - 48px);
@@ -16156,4 +16149,74 @@ tr > .page-gap-cut {
   display: flex;
   align-items: center;
   gap: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+ * Portrait phone (interaction-spec P1-1 / P1-2 / P0-4 internal wrap). Gated
+ * �?20px; desktop panes, dialogs and galleries are untouched. Tokens only.
+ * ------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  /* P0-4: the font/paragraph/style dialog field rows stack instead of squeezing
+     three labelled controls onto one 366px line */
+  .font-dialog-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .modal-shortcuts .sc-row {
+    flex-wrap: wrap;
+    gap: 6px 16px;
+  }
+
+  /* P1-2: side panes become overlay drawers �?out of flow so the document keeps
+     its full width whether they are open or closed. The workspace is already
+     position:relative, so they anchor to it. */
+  .nav-pane {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    inset-inline-start: 0;
+    width: min(85vw, 340px) !important; /* override the inline drag width */
+    z-index: 40;
+    box-shadow: var(--shadow-menu);
+  }
+
+  .nav-pane-resizer {
+    display: none;
+  }
+
+  .styles-pane,
+  .comments-pane {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    inset-inline-end: 0;
+    width: min(85vw, 340px);
+    z-index: 40;
+    box-shadow: var(--shadow-menu);
+  }
+
+  /* P1-1 / R3: the shared Word-style color palette (.gcp-palette via
+     .docs-color-pop) is anchor-positioned under its trigger; near the right edge
+     the 260px panel flung 22 swatches off-screen (page color offRight=67). Centre
+     it in the viewport like the other galleries, keeping the anchor's vertical
+     position. The 260px panel fits a 390px screen once centred. */
+  .docs-color-pop {
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: calc(100vw - 16px);
+    position-try-fallbacks: none;
+  }
+
+  /* P1-1 / R3: the small anchored pickers (table grid, bullet/numbering library)
+     landed 2�?px past the right edge when flip-inline was rejected at the
+     boundary. Centre them like the galleries so every cell stays reachable. */
+  .table-picker,
+  .layout-menu.list-gallery-word {
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: calc(100vw - 16px);
+    position-try-fallbacks: none;
+  }
 }

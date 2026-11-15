@@ -7499,3 +7499,62 @@ body:has(.note-pictures-pane) .threaded-comments-pane {
   justify-content: space-between;
   gap: 8px;
 }
+
+/* ---------------------------------------------------------------------------
+ * Portrait phone (interaction-spec P0-4 internal wrap / P1-1). Gated ≤720px;
+ * desktop dialog layouts are untouched. Tokens only.
+ * ------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  /* format-cells: the tab row scrolls horizontally instead of forcing the card
+     wider than the screen; the field grid folds to one column */
+  .dialog-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dialog-tabs button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .dialog-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* select-data combo: the six-column series row stacks vertically */
+  .select-data-row,
+  .select-data-row.combo {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  /* table-style gallery: span the viewport, 4 columns instead of 7 */
+  .table-style-panel {
+    width: auto;
+    left: 0;
+    right: 0;
+    max-width: calc(100vw - 16px);
+  }
+
+  .table-style-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* P0-4 / R3: the equation dialog's preset grid used 1fr tracks whose
+     min-content floor was the 243px math preview, so three columns blew past the
+     clamped card (offRight=113). Let the tracks shrink below content and clip the
+     preview inside its button — the full formula is inserted on pick. */
+  .equation-presets {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .equation-presets button {
+    min-width: 0;
+  }
+
+  .equation-presets button > span {
+    max-width: 100%;
+    overflow: hidden;
+  }
+}

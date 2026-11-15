@@ -68,6 +68,7 @@ export const th = {
   saveAs: 'บันทึกเป็น…',
   aiNameFile: 'ตั้งชื่อด้วย AI…',
   ribbonCollapse: 'ยุบ Ribbon',
+  ribbonCompact: 'Ribbon แบบกระชับ (ไอคอนเท่านั้น)',
   ribbonExpand: 'ขยาย Ribbon',
   ribbonGroupInsert: 'แทรก',
   editText: 'แก้ไขข้อความ',

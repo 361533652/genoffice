@@ -69,6 +69,7 @@ export const ms = {
   saveAs: 'Simpan Sebagai…',
   aiNameFile: 'Namakan dengan AI…',
   ribbonCollapse: 'Runtuhkan Reben',
+  ribbonCompact: 'Reben Padat (ikon sahaja)',
   ribbonExpand: 'Kembangkan Reben',
   ribbonGroupInsert: 'Sisip',
   editText: 'Edit teks',

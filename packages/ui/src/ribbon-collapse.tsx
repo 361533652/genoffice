@@ -18,6 +18,7 @@
  * band's corner).
  */
 import { useCallback, useEffect, useRef, useState, type MouseEvent, type RefObject } from 'react'
+import { isNarrowViewport } from './use-narrow-viewport'
 
 const IS_MAC = typeof navigator !== 'undefined' && navigator.platform.toLowerCase().includes('mac')
 
@@ -69,6 +70,24 @@ export function writeRibbonDensity(storageKey: string, density: RibbonDensity): 
   }
 }
 
+/**
+ * The persisted density, or `null` when the user has never chosen one. The
+ * distinction matters for the phone default: a stored value (even `full`) is an
+ * explicit choice we must honour, while "never chosen" is where the narrow
+ * viewport gets to default to the compact band.
+ */
+export function readPersistedRibbonDensity(storageKey: string): RibbonDensity | null {
+  try {
+    const raw = localStorage.getItem(storageKey)
+    if (raw === 'collapsed' || raw === 'compact' || raw === 'full') return raw
+    if (raw === '1') return 'collapsed'
+    if (raw === '0') return 'full'
+    return null
+  } catch {
+    return null
+  }
+}
+
 /** Ctrl+F1 (Office on Windows) or ⌥⌘R (Office for Mac); key-repeat while held does not re-toggle. */
 export function isRibbonToggleShortcut(e: KeyboardEvent): boolean {
   if (e.repeat) return false
@@ -105,6 +124,10 @@ export interface RibbonCollapse {
   readonly toggle: () => void
   /** cycle full ↔ compact (no-op when the call site did not opt in) */
   readonly toggleCompact: () => void
+  /** cycle full → compact → collapsed → full; falls back to toggle when the
+   *  call site did not opt in. The touch control uses it so compact stays a
+   *  reachable stopping point (interaction-review R6). */
+  readonly cycleDensity: () => void
   /** call from every tab button's click handler */
   readonly onTabPress: (wasActive: boolean) => void
   /** double-click on a tab toggles, like Office; attach to the tab row */
@@ -120,13 +143,19 @@ export function useRibbonCollapse(
   labels: RibbonCollapseLabels,
 ): RibbonCollapse {
   const compactEnabled = Boolean(labels.compact && labels.expandFull)
-  const [density, setDensity] = useState<RibbonDensity>(() =>
-    compactEnabled
-      ? readRibbonDensity(storageKey)
-      : readRibbonCollapsed(storageKey)
-        ? 'collapsed'
-        : 'full',
-  )
+  const [density, setDensity] = useState<RibbonDensity>(() => {
+    const persisted = readPersistedRibbonDensity(storageKey)
+    if (persisted !== null) {
+      // an explicit choice wins on every form factor; two-state callers only
+      // understand collapsed/full, so a stored middle density maps to full
+      if (!compactEnabled) return persisted === 'collapsed' ? 'collapsed' : 'full'
+      return persisted
+    }
+    // never chosen: a portrait phone defaults to the compact band (content
+    // first, interaction-spec P1-3); desktop keeps the full band exactly as before
+    if (compactEnabled && isNarrowViewport()) return 'compact'
+    return 'full'
+  })
   const rootRef = useRef<HTMLDivElement | null>(null)
   const collapsed = density === 'collapsed'
   const densityRef = useRef(density)
@@ -161,6 +190,21 @@ export function useRibbonCollapse(
     persist(next)
     setDensity(next)
   }, [compactEnabled, persist])
+
+  const cycleDensity = useCallback(() => {
+    // two-state callers keep the original collapse/expand toggle
+    if (!compactEnabled) {
+      toggle()
+      return
+    }
+    // R6: on touch the band control must be able to return to compact, not just
+    // shuttle collapsed↔full. Cycle the three densities in collapse order so
+    // every press moves toward more content space and compact is always reachable.
+    const order: RibbonDensity[] = ['full', 'compact', 'collapsed']
+    const next = order[(order.indexOf(densityRef.current) + 1) % order.length] ?? 'full'
+    persist(next)
+    setDensity(next)
+  }, [compactEnabled, persist, toggle])
 
   // state before each of the last two presses: a double-click arrives after its
   // two clicks already ran onTabPress, and must end up toggled relative to the
@@ -225,6 +269,7 @@ export function useRibbonCollapse(
     rootClass,
     toggle,
     toggleCompact,
+    cycleDensity,
     onTabPress,
     onTabsDoubleClick,
     tabClass,
@@ -292,6 +337,41 @@ export function RibbonExpandButton({ state, label }: { state: RibbonCollapse; la
       onClick={state.toggle}
     >
       <ChevronDown />
+    </button>
+  )
+}
+
+/**
+ * A visible, finger-sized collapse/expand control for the tab row's right end
+ * (interaction-spec P1-3). Double-clicking a tab and Ctrl+F1 are undiscoverable
+ * on touch, so every app gets one consistent button. It is rendered on all form
+ * factors but `ribbon-collapse.css` keeps it `display:none` on desktop and only
+ * reveals it at ≤720px (44×44 under `pointer:coarse`), so the desktop tab row is
+ * byte-for-byte unchanged. One button serves both directions: it collapses the
+ * band while expanded and expands it while collapsed.
+ */
+export function RibbonTabCollapseButton({
+  state,
+  collapseLabel,
+  expandLabel,
+}: {
+  state: RibbonCollapse
+  collapseLabel: string
+  expandLabel: string
+}) {
+  const collapsed = state.collapsed
+  const label = collapsed ? expandLabel : collapseLabel
+  return (
+    <button
+      type="button"
+      className="ribbon-tabs-collapse-btn"
+      data-tip={label}
+      aria-label={label}
+      aria-expanded={!collapsed}
+      onMouseDown={(e) => e.preventDefault()}
+      onClick={state.toggle}
+    >
+      {collapsed ? <ChevronDown /> : <ChevronUp />}
     </button>
   )
 }

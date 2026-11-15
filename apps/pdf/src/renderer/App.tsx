@@ -198,7 +198,11 @@ import {
   useDismissablePopover,
   useRibbonCollapse,
   useAiSidebarEnabled,
+  isNarrowViewport,
+  useNarrowViewport,
+  RibbonTabCollapseButton,
 } from '@genoffice/ui'
+import { registerDirtyProbe } from '@genoffice/host'
 import { useI18n } from './i18n/locale'
 import { useAutosave } from './useAutosave'
 import type {
@@ -231,6 +235,7 @@ import {
   MAX_SCALE,
   PAGE_GAP,
   SCROLL_PAD,
+  SCROLL_PAD_NARROW,
   SIDEBAR_W_KEY,
   SIDEBAR_CHROME,
   clampSidebarW,
@@ -454,9 +459,15 @@ export default function App() {
   const [scale, setScale] = useState(1)
   const [currentPage, setCurrentPage] = useState(1)
   const [pageInput, setPageInput] = useState('1')
+  // P0-2: a portrait phone opens with NO sidebar — the page owns the full width
+  // ("直接适应屏幕大小"). Desktop keeps the thumbnails default and the persisted
+  // drag width untouched. Form factor is a viewport question, not a host one.
   const [sidebar, setSidebar] = useState<
     'thumbs' | 'outline' | 'comments' | 'compare' | 'attachments' | null
-  >('thumbs')
+  >(() => (isNarrowViewport() ? null : 'thumbs'))
+  // reactive form factor for DOM-order decisions (the reading-tools ribbon
+  // reorder, P0-5); pure-CSS drawer styling needs no hook
+  const narrow = useNarrowViewport()
   const [compareResult, setCompareResult] = useState<CompareResult | null>(null)
   const [compareName, setCompareName] = useState<string | null>(null)
   const [compareBusy, setCompareBusy] = useState(false)
@@ -1880,8 +1891,14 @@ export default function App() {
     if (!mode || !el || rows.length === 0) return
     const dims = rows.map((r) => rowSize(r))
     const maxW = Math.max(...dims.map((s) => s.width))
-    // The comments margin sits beside the pages and must fit inside the same viewport
-    const availW = el.clientWidth - SCROLL_PAD * 2 - (noteMarginOn ? NOTE_MARGIN_W + PAGE_GAP : 0)
+    // P0-2b: on a portrait phone the 300px comments margin must NOT be carved out
+    // of the fit width — 390 − 48 − 316 = 26px collapsed the page to MIN_SCALE.
+    // The margin is hidden on narrow (comments live in the sidebar panel), and
+    // the gutter shrinks to 8px, so the page fits the full screen width.
+    const isNarrow = isNarrowViewport()
+    const pad = isNarrow ? SCROLL_PAD_NARROW : SCROLL_PAD
+    const availW =
+      el.clientWidth - pad * 2 - (!isNarrow && noteMarginOn ? NOTE_MARGIN_W + PAGE_GAP : 0)
     const next =
       mode === 'width'
         ? clampScale(availW / maxW)
@@ -2227,6 +2244,12 @@ export default function App() {
   useEffect(() => {
     window.pdfApi.setDirty(dirty)
   }, [dirty])
+
+  // P1-6: expose the unsaved state to the Android host's hard-reload gate. The
+  // ref keeps the probe reading the latest value without re-registering per edit.
+  const dirtyProbeRef = useRef(dirty)
+  dirtyProbeRef.current = dirty
+  useEffect(() => registerDirtyProbe(() => dirtyProbeRef.current), [])
 
   // Existing images are listed while edit-image mode is on; `doc` in the deps refreshes
   // the list after a post-save reload (object rects may have changed on disk)
@@ -8029,7 +8052,9 @@ export default function App() {
     setRibbonTab('home')
   }
 
-  const viewNavGroup = (
+  // `includeSearch=false` lets the narrow home tab lead with a dedicated search
+  // button without duplicating it here (P0-5); the View tab keeps the full group.
+  const renderViewNav = (includeSearch = true) => (
     <div className="ribbon-group">
       <div className="ribbon-group-items">
         <button
@@ -8105,7 +8130,7 @@ export default function App() {
           </span>
           <span>{t('attachments')}</span>
         </button>
-        {searchBtn}
+        {includeSearch && searchBtn}
         <button
           className={`rb-big${spread === 2 ? ' active' : ''}`}
           data-tip={spread === 2 ? t('singlePage') : t('twoPage')}
@@ -8127,6 +8152,98 @@ export default function App() {
       </div>
     </div>
   )
+
+  // ── home-tab groups, named so the narrow viewport can reorder them (P0-5) ──
+  const editEntriesGroup = (
+    <div className="ribbon-group">
+      <div className="ribbon-group-items">
+        {editTextBtn}
+        {insertTextBtn}
+      </div>
+    </div>
+  )
+
+  const convertGroup = (
+    <div className="ribbon-group">
+      <div className="ribbon-group-items">
+        <div className="rb-drop-wrap" ref={convertWrapRef}>
+          <button
+            className={`rb-big${convertOpen ? ' active' : ''}`}
+            data-tip={t('convertPdfTip')}
+            disabled={convertBusy || exporting !== null}
+            onClick={() => setConvertOpen((v) => !v)}
+          >
+            <span className="rb-big-icon">
+              <IconConvertPdf />
+              <RbCaret />
+            </span>
+            <span>{exporting ? t('exporting') : t('convertPdf')}</span>
+          </button>
+          {convertOpen && (
+            <div className="rb-drop rb-menu">
+              <button onClick={() => void convertTo('docx')}>{t('convertToWord')}</button>
+              <button onClick={() => void convertTo('xlsx')}>{t('convertToExcel')}</button>
+              <button onClick={() => void convertTo('pptx')}>{t('convertToPpt')}</button>
+              <button onClick={() => void convertTo('md')}>{t('convertToMarkdown')}</button>
+              <button onClick={() => void convertTo('html')}>{t('convertToHtml')}</button>
+              <div className="rb-menu-sep" />
+              <button
+                title={t('exportImagesAll')}
+                onClick={() => {
+                  setConvertOpen(false)
+                  void exportImages(true)
+                }}
+              >
+                {t('exportImages')}
+              </button>
+              <button
+                title={t('exportImagesAllJpg')}
+                onClick={() => {
+                  setConvertOpen(false)
+                  void exportImages(true, 'jpg')
+                }}
+              >
+                {t('exportImagesJpg')}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+
+  const readToolsGroup = (
+    <div className="ribbon-group">
+      <div className="ribbon-group-items">
+        {searchBtn}
+        <button
+          className="rb-big"
+          data-tip={`${t('print')} (${platformShortcuts('⌘P')})`}
+          disabled={printing}
+          onClick={openPrintDlg}
+        >
+          <span className="rb-big-icon">
+            <IconPrint />
+          </span>
+          <span>{printing ? t('printPreparing') : t('print')}</span>
+        </button>
+        <button className="rb-big" data-tip={t('propsTitle')} onClick={() => setPropsDlg(true)}>
+          <span className="rb-big-icon">
+            <IconProps />
+          </span>
+          <span>{t('props')}</span>
+        </button>
+      </div>
+    </div>
+  )
+
+  // Desktop keeps the authored order byte-for-byte. A portrait phone leads with
+  // the reading tools (page/zoom/fit-width + search) so they land inside the
+  // first 390px without scrolling; the view-nav group follows (search omitted
+  // there to avoid a duplicate), then the markup/edit/convert groups (P0-5).
+  const homeGroups = narrow
+    ? [pageZoomGroup, readToolsGroup, renderViewNav(false), markupGroup, editEntriesGroup, convertGroup]
+    : [markupGroup, editEntriesGroup, convertGroup, pageZoomGroup, readToolsGroup]
 
   return (
     <div className="app" inert={redactionCopyInFlight} aria-busy={redactionCopyInFlight}>
@@ -8217,99 +8334,21 @@ export default function App() {
               XFA
             </span>
           )}
+          <RibbonTabCollapseButton
+            state={collapse}
+            collapseLabel={t('ribbonCollapse')}
+            expandLabel={t('ribbonExpand')}
+          />
         </div>
         <div className="ribbon-body" data-ribbon-body="">
           {ribbonTab === 'home' && (
             <>
-              {markupGroup}
-              <div className="ribbon-sep" />
-              {/* Edit entries lead; Search moved after page/zoom (⌘F is the common path) */}
-              <div className="ribbon-group">
-                <div className="ribbon-group-items">
-                  {editTextBtn}
-                  {insertTextBtn}
-                </div>
-              </div>
-              <div className="ribbon-sep" />
-              <div className="ribbon-group">
-                <div className="ribbon-group-items">
-                  <div className="rb-drop-wrap" ref={convertWrapRef}>
-                    <button
-                      className={`rb-big${convertOpen ? ' active' : ''}`}
-                      data-tip={t('convertPdfTip')}
-                      disabled={convertBusy || exporting !== null}
-                      onClick={() => setConvertOpen((v) => !v)}
-                    >
-                      <span className="rb-big-icon">
-                        <IconConvertPdf />
-                        <RbCaret />
-                      </span>
-                      <span>{exporting ? t('exporting') : t('convertPdf')}</span>
-                    </button>
-                    {convertOpen && (
-                      <div className="rb-drop rb-menu">
-                        <button onClick={() => void convertTo('docx')}>{t('convertToWord')}</button>
-                        <button onClick={() => void convertTo('xlsx')}>
-                          {t('convertToExcel')}
-                        </button>
-                        <button onClick={() => void convertTo('pptx')}>{t('convertToPpt')}</button>
-                        <button onClick={() => void convertTo('md')}>
-                          {t('convertToMarkdown')}
-                        </button>
-                        <button onClick={() => void convertTo('html')}>{t('convertToHtml')}</button>
-                        <div className="rb-menu-sep" />
-                        <button
-                          title={t('exportImagesAll')}
-                          onClick={() => {
-                            setConvertOpen(false)
-                            void exportImages(true)
-                          }}
-                        >
-                          {t('exportImages')}
-                        </button>
-                        <button
-                          title={t('exportImagesAllJpg')}
-                          onClick={() => {
-                            setConvertOpen(false)
-                            void exportImages(true, 'jpg')
-                          }}
-                        >
-                          {t('exportImagesJpg')}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="ribbon-sep" />
-              {pageZoomGroup}
-              <div className="ribbon-sep" />
-              <div className="ribbon-group">
-                <div className="ribbon-group-items">
-                  {searchBtn}
-                  <button
-                    className="rb-big"
-                    data-tip={`${t('print')} (${platformShortcuts('⌘P')})`}
-                    disabled={printing}
-                    onClick={openPrintDlg}
-                  >
-                    <span className="rb-big-icon">
-                      <IconPrint />
-                    </span>
-                    <span>{printing ? t('printPreparing') : t('print')}</span>
-                  </button>
-                  <button
-                    className="rb-big"
-                    data-tip={t('propsTitle')}
-                    onClick={() => setPropsDlg(true)}
-                  >
-                    <span className="rb-big-icon">
-                      <IconProps />
-                    </span>
-                    <span>{t('props')}</span>
-                  </button>
-                </div>
-              </div>
+              {homeGroups.map((group, i) => (
+                <Fragment key={i}>
+                  {i > 0 && <div className="ribbon-sep" />}
+                  {group}
+                </Fragment>
+              ))}
             </>
           )}
           {ribbonTab === 'annotate' && (
@@ -9011,7 +9050,7 @@ export default function App() {
           )}
           {ribbonTab === 'view' && (
             <>
-              {viewNavGroup}
+              {renderViewNav()}
               <div className="ribbon-sep" />
               {pageZoomGroup}
             </>
@@ -9052,8 +9091,14 @@ export default function App() {
             </div>
           )}
           <div className="pdf-body">
+            {/* P0-2: on a portrait phone the sidebar is an overlay drawer; the
+                scrim dismisses it and (being out of flow) steals no page width.
+                CSS keeps it display:none on desktop. */}
+            {sidebar !== null && (
+              <div className="pdf-side-scrim" onClick={() => setSidebar(null)} aria-hidden="true" />
+            )}
             {sidebar === 'outline' && outline && (
-              <div className="pdf-thumbs pdf-outline-pane" style={{ width: sidebarW }}>
+              <div className="pdf-thumbs pdf-outline-pane pdf-thumbs-drawer" style={{ width: sidebarW }}>
                 <div className="pdf-outline-header">
                   <span>{t('outline')}</span>
                   {!outlineGenerated && (
@@ -9115,7 +9160,7 @@ export default function App() {
               </div>
             )}
             {sidebar === 'comments' && (
-              <div className="pdf-thumbs pdf-outline-pane" style={{ width: sidebarW }}>
+              <div className="pdf-thumbs pdf-outline-pane pdf-thumbs-drawer" style={{ width: sidebarW }}>
                 <div className="pdf-outline-header">
                   <span>{t('commentsPanel')}</span>
                   <button
@@ -9153,7 +9198,7 @@ export default function App() {
               </div>
             )}
             {sidebar === 'compare' && (
-              <div className="pdf-thumbs" style={{ width: sidebarW }}>
+              <div className="pdf-thumbs pdf-thumbs-drawer" style={{ width: sidebarW }}>
                 <div className="pdf-outline-header">
                   <span>{t('compare')}</span>
                   <button
@@ -9182,7 +9227,7 @@ export default function App() {
               </div>
             )}
             {sidebar === 'attachments' && (
-              <div className="pdf-thumbs" style={{ width: sidebarW }}>
+              <div className="pdf-thumbs pdf-thumbs-drawer" style={{ width: sidebarW }}>
                 <div className="pdf-outline-header">
                   <span>{t('attachments')}</span>
                   <button
@@ -9206,7 +9251,7 @@ export default function App() {
             {sidebar === 'thumbs' && (
               <div
                 ref={thumbsRef}
-                className="pdf-thumbs"
+                className="pdf-thumbs pdf-thumbs-drawer"
                 style={{ width: sidebarW }}
                 onContextMenu={(e) => {
                   // .pdf-thumb's own padding-bottom is the inter-page gap; its handler lets that bubble up
@@ -9267,7 +9312,12 @@ export default function App() {
                         setDragFrom(null)
                         setDragOver(null)
                       }}
-                      onClick={() => scrollToPage(v + 1)}
+                      onClick={() => {
+                        scrollToPage(v + 1)
+                        // P0-2: picking a page dismisses the overlay drawer on a
+                        // phone (desktop keeps the sidebar open as before)
+                        if (isNarrowViewport()) setSidebar(null)
+                      }}
                       onContextMenu={(e) => {
                         if (e.target === e.currentTarget) return
                         e.preventDefault()

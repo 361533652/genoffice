@@ -70,6 +70,7 @@ export const ru = {
   saveAs: 'Сохранить как…',
   aiNameFile: 'Назвать с помощью ИИ…',
   ribbonCollapse: 'Свернуть ленту',
+  ribbonCompact: 'Компактная лента (только значки)',
   ribbonExpand: 'Развернуть ленту',
   ribbonGroupInsert: 'Вставка',
   editText: 'Изменить текст',

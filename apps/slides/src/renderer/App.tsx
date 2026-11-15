@@ -92,8 +92,10 @@ import {
   createWheelPager,
   createZoomWheelClassifier,
   useAutoSavePref,
+  isNarrowViewport,
   type WordArtPreset,
 } from '@genoffice/ui'
+import { registerDirtyProbe } from '@genoffice/host'
 import type { ChartPresetDef, IconDef, SmartArtDef } from './insert-presets'
 import { IconAiBeautify, IconAiFactCheck, IconAiImage } from './components/icons'
 import { ToastHost } from './components/toast'
@@ -416,7 +418,15 @@ export function App() {
     const t = window.setTimeout(() => setStatus(''), 4000)
     return () => window.clearTimeout(t)
   }, [status])
-  const [showThumbs, setShowThumbs] = useState(true)
+
+  // P1-6: the Android host's hard-reload gate reads the deck's dirty flag.
+  const hostDirtyRef = useRef(false)
+  hostDirtyRef.current = dirty
+  useEffect(() => registerDirtyProbe(() => hostDirtyRef.current), [])
+
+  // P1-2: a portrait phone opens with the thumbnail rail hidden so the stage
+  // owns the first screen (≥340px); desktop keeps the rail visible as before.
+  const [showThumbs, setShowThumbs] = useState(() => !isNarrowViewport())
   // ── Thumbnail sidebar width (drag the divider to resize; persisted) ─────────
   const [thumbsW, setThumbsW] = useState(loadThumbsW)
   const thumbsListRef = useRef<HTMLDivElement | null>(null)
@@ -3534,8 +3544,16 @@ export function App() {
                 ) : (
                   showThumbs && (
                     <>
+                      {/* P1-2: on a portrait phone the rail is an overlay drawer;
+                          the scrim dismisses it and steals no stage width. CSS
+                          keeps both display:none on desktop. */}
                       <div
-                        className="slide-list"
+                        className="slide-side-scrim"
+                        onClick={() => setShowThumbs(false)}
+                        aria-hidden="true"
+                      />
+                      <div
+                        className="slide-list slide-list-drawer"
                         role="listbox"
                         tabIndex={0}
                         ref={thumbsListRef}
