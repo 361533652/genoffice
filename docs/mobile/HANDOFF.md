@@ -226,16 +226,17 @@ adb install -r apps/mobile/app/build/outputs/apk/debug/app-debug.apk
 - slides：启动空白稿 → 加文本框 → 编辑 → 保存（SAF）→ **二次保存原地写入（无选择器）**
 - **从其他应用打开（v0.1.1）**：ACTION_VIEW intent filters（PDF/Office/文本），文件管理器「用 GenOffice 打开」→ 自动打开（PDF/xlsx 实测）
 - **主页（v0.1.1）**：最近文件（持久化、点按重开、每次打开/保存自动记录）+ 应用网格 + 打开文件按钮
-- **深色防护（v0.1.1）**：六应用声明 color-scheme light dark，防 HyperOS/WebView 算法变暗把菜单变成暗底暗字
+- **深色防护（v0.1.2）**：六应用 color-scheme + 宿主 setAlgorithmicDarkeningAllowed(false)，防 OEM 强制变暗
+- **竖屏交互（v0.1.4）**：返回键回主页不复活空表格（clearHistory + OnBackPressedCallback + dispatchKeyEvent 抢 BACK，先关对话框/抽屉/面板）；PDF 竖屏无侧栏、页面 96% 屏宽、缩略图改覆盖抽屉；六格式工具带横滑收敛 + 对话框夹持 + 面板居中 + 状态栏不越界；触摸端默认 compact + 44px 折叠钮；sheets 数据页签崩溃修复；dirty 闸门只认用户编辑（isDocUserDirty）
 - 宿主注入：Host 门面、sheets wasm URL、slides 会话开关、长按 contextmenu 合成、
   原生文件钩子（open/saveAs/saveInPlace/read，可写句柄、可等待）、原生确认框、一次性 pending-open。
-详见 apps/mobile/README.md。已发布 Release v0.1.0-android / v0.1.1-android（gh release create）。
+详见 apps/mobile/README.md。已发布 Release v0.1.0～v0.1.4-android（gh release create）。
 
 ## 建议的下一步
 
 按投入产出排序：
 
-1. **确认「文件」菜单真机问题**：用户在 Redmi K80（HyperOS）反馈点「文件」无反应；模拟器正常，已补 color-scheme 防强制变暗。等用户截图/装 v0.1.1 复测确认是否仍现
+1. **真机装 v0.1.4 复测**（Redmi K80 竖屏）：返回导航、PDF 无侧栏、工具栏占比、dirty 闸门；顺带确认「文件」菜单（v0.1.2 防变暗）
 2. **真机验证**（用户自装 v0.1.1 APK）：性能/IME/长按/打开方式
 3. **手机打开 5391 打几个字**（两分钟）→ 确认中文输入法真机行为（`npm run serve:mobile-checks`）
 4. **定 A4 缩放**（你自己想清楚就行）→ 影响所有文档的默认观感
