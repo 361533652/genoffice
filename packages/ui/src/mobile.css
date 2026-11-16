@@ -299,3 +299,70 @@
     box-shadow: var(--shadow-menu);
   }
 }
+
+/* ---------------------------------------------------------------------------
+ * Mobile chrome auto-collapse (installMobileChrome).
+ *
+ * Reading a document on a phone: the ribbon and status bar take ~20% of the
+ * height for controls the reader is not using. After a drag/scroll settles they
+ * slide away; a single tap brings them back (a drag or a pinch does not — see
+ * packages/ui/src/mobile-chrome.ts). Collapsing after the gesture settles, not
+ * during it, keeps the layout from jumping under the finger mid-scroll.
+ * ------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  html[data-mobile-chrome='hidden'] .ribbon,
+  html[data-mobile-chrome='hidden'] .status-bar {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Status bar on a phone: the desktop row packs page + word count + track
+ * changes + the message into 360px, so the last glyph of every cell was sliced
+ * in half — the user read that as mojibake ("打开文件后左下角字符串是乱码").
+ * Give the readout the remaining width, drop the low-value track toggle, and
+ * ellipsize each cell at a glyph boundary instead of cutting through one.
+ * ------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  /* the readout keeps the leftover width; the right cluster drops the view-mode
+     pair and shortens the slider so there IS leftover width */
+  .status-left {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .status-right .status-views {
+    display: none;
+  }
+
+  .status-right .zoom-slider {
+    width: 44px;
+  }
+
+  /* each cell keeps its natural width and ellipsizes at a glyph boundary; the
+     old flex: 0 1 auto let them shrink to 3-6px, so the last glyph of every cell
+     was sliced ("第 1 什"), which read as mojibake */
+  .status-left .status-item {
+    flex: 0 0 auto;
+    min-width: 0;
+    max-width: 40vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* the track toggle moves to the Review tab on a phone; the page and word-count
+     readouts stay (the status bar is where a writer looks for them) */
+  .status-left .status-track {
+    display: none;
+  }
+
+  .status-left .status-msg {
+    display: block;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

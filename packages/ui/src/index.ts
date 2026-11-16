@@ -41,6 +41,11 @@ export {
 } from './color-picker'
 export { installScreenTips } from './screentip'
 export {
+  installMobileChrome,
+  onMobileChromeChange,
+  type MobileChromeHandle,
+} from './mobile-chrome'
+export {
   SentAttachments,
   truncateCardName,
   formatAttachmentSize,

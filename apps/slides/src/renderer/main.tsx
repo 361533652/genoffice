@@ -25,9 +25,11 @@ import './styles.css'
 // after the app's own stylesheet: these rules intentionally override desktop
 // base rules such as `body { min-width: 720px }` at narrow widths
 import '@genoffice/ui/mobile.css'
-import { applyAiPanelPrefs, installScreenTips } from '@genoffice/ui'
+import { applyAiPanelPrefs, installMobileChrome, installScreenTips } from '@genoffice/ui'
 
 installScreenTips()
+// reading on a phone: ribbon/status bar collapse on scroll, return on a tap
+installMobileChrome()
 
 // Canvas fillText never triggers @font-face downloads, so the bundled document fonts
 // (Carlito ↔ Calibri) must be loaded explicitly or Konva silently draws the fallback face.

@@ -2,7 +2,7 @@
 
 > 这份文件写给刚醒来的人。它回答三个问题：现在能做什么、做过什么、卡在哪。
 > 技术细节在 [decisions.md](./decisions.md)，这里有 4 条 ADR 和逐轮记录。
-> 数据截止：2026-11-16 晚 · 166 个移动端 e2e（全量 `11.6m`，166 passed）· 52 个 host 单测 · docs 分档单测 10 个。
+> 数据截止：2026-11-17 02:40 · 169 个移动端 e2e（全量 `12.1m`，169 passed）· 52 个 host 单测 · docs 分档单测 10 个。
 > **已推送 `origin/main`（ahead 0），并发布 v0.1.0 / v0.1.1 / v0.1.2 / v0.1.3 / v0.1.4 五个 Android Release**（`v0.1.4-android`，2026-11-16 03:25 CST）。
 > 2026-11-16 19:57 复核：上一版这里还写着「147 个 e2e」「尚未推送到远端」，两处都已过期，按实测改正。
 
@@ -184,7 +184,7 @@ Web 路线首次加载 docs 5.7 MB / sheets 14.7 MB（3G 下 114s / 294s）。
 ## 测试现状
 
 ```bash
-npm run test:mobile          # 166 个 e2e，零手工准备（2026-11-16 实测 11.6 分钟）
+npm run test:mobile          # 169 个 e2e，零手工准备（2026-11-17 实测 12.1 分钟）
 npx vitest run --root packages/host   # 52 个单测（含 wasm 会话往返）
 npm run verify:mobile-builds # 六应用生产构建逐个验证
 ```
@@ -208,7 +208,7 @@ npm run verify:mobile-builds # 六应用生产构建逐个验证
 
 **六个应用都能在无 Electron 的移动宿主里启动；docs / markdown / html / sheets / slides 能完整读写；pdf 能打开和看；Android 宿主已建成并在模拟器上端到端验证（含 SAF 原地保存）。**
 
-累计 166 个移动端 e2e + 52 个 host 单测，修掉 9+8 个真缺陷（含「用户根本用不了」级：存储不可用白屏、安卓无法保存/打开、sheets 无打开入口、WebView 宿主白屏/状态栏遮挡/确认闸门静默取消、保存假成功）。
+累计 169 个移动端 e2e + 52 个 host 单测，修掉 9+8 个真缺陷（含「用户根本用不了」级：存储不可用白屏、安卓无法保存/打开、sheets 无打开入口、WebView 宿主白屏/状态栏遮挡/确认闸门静默取消、保存假成功）。
 
 ## Android 宿主（apps/mobile）
 
@@ -237,6 +237,17 @@ adb install -r apps/mobile/app/build/outputs/apk/debug/app-debug.apk
 
 1. **docs 把小文档误判只读**——根因确认：`openTierForDevice` 用 `weightForBudget(usableMB)` 反推阈值，而模型的 300MB 固定开销是「大文档分页工作集」基线，不是常驻编辑器成本（真机安卓 WebView 实测空文档 heapUsed≈22MB）。设备报小堆（usable<300MB）时反推得 0，`readOnlyAt=0`，**任何**文档都只读。修法：加 `SMALL_DOC_NORMAL_WEIGHT=1000` 下限夹住 `readOnlyAt`/`refuseAt`，小文档在任何能跑编辑器的设备上都 normal，大文档仍按预算降级/拒绝。守护：`apps/docs/tests/large-document-device.test.ts`（512MB 堆下 2 段落必须 normal，先红后绿）+ `e2e/mobile-large-document.spec.ts`。
 2. **CSV 打不开**——移动 wasm 会话 `openBytes` 原来把 `.csv` 原始字节直接喂 sidecar（报 `invalid Zip archive`）。现对 `.csv/.tsv` 先 `decodeCsvBuffer`+`csvToXlsxBufferForOpen` 转成 xlsx 再喂引擎（与桌面打开路径同一套转换，`.tsv` 钉制表符）。转换副本 `needsSaveAs=true`：移动还没有 CSV 序列化器，首存走另存为 `.xlsx`，避免把 OOXML 字节写回 `.csv`。守护：`e2e/mobile-sheets-wasm.spec.ts`（真浏览器 + 真 wasm 读回单元格）。**真机交叉验证**：MuMu 安卓12 WebView 经 ACTION_VIEW 打开 `people.csv`，读回 Name/Age/Ada/36 正确；同机小文档仍 normal 可编辑（无回归）。
+
+## 2026-11-17 移动交互改造（进行中，MuMu 竖屏实测）
+
+用户反馈「像 PC 版投影」：表格单指/双指都滚不动只能拖滚动条、缺 app 图标、打开文件后左下角字符串像乱码、PDF 不能双指放大、工具栏照搬桌面。专家团（架构/后端/前端/UI/视觉验收/测试）分工评审后先落地三项 P0：
+
+1. **「乱码」其实是被裁切**——实测 DOM `textContent` 是干净中文（`第 1 页,共 1 页 — 已打开 simple.docx`），编码没问题；是状态栏 `.status-left` 被压到 78px、每格缩到 3–6px，末字被切一半（“第 1 什”）。修法：窄屏让左侧占余量、右簇收起视图切换按钮并把滑块压到 44px、每格 `flex: 0 0 auto` + ellipsis、隐藏“修订”开关。守护：`e2e/mobile-chrome.spec.ts`（左簇宽度 >120、msg 用 ellipsis）。**教训：看到乱码先量几何再查编码。**
+2. **滑动自动收缩、仅点击上浮**（用户原话：底部或顶部无所谓，关键是滑动阅读时自动收缩，点击屏幕——仅点击，滑动或多指不算——再上浮）。新增 `packages/ui/src/mobile-chrome.ts`，六应用 main.tsx 安装；`html[data-mobile-chrome=hidden]` 隐藏 `.ribbon`/`.status-bar`。只在**可信**手势上触发：单指拖动 >12px 或非 ctrl+wheel；手势结束后 180ms 才收起（避免拖动中重排跳动）。点击（单指、位移 ≤10px、≤400ms）才恢复。**多指/捏合绝不触发**（否则会把捏合正在操作的缩放缓动条收走）。守护：`e2e/mobile-chrome.spec.ts` 三条（拖动收起 / 点击恢复 / 捏合不收起）。
+   - 踩坑：①监听通用 `scroll` 会把 Playwright 的 `scrollIntoView`、focus、布局回流当成阅读滚动，工具栏随机消失 → 只认可信事件；②`touchstart` 里清零指针计数会在 pointerdown 之后执行，把双指捏合误判成单指拖动 → 去掉。
+3. **app 图标**——`res/` 原先没有 mipmap、Manifest 无 `android:icon`，系统用默认机器人。新增 `mipmap-anydpi-v26/ic_launcher(_round).xml`（自适应，背景 #1F2937 + 四格白 mark）、`drawable/ic_launcher_foreground.xml`、`values/colors.xml`，Manifest 注册 `icon`/`roundIcon`。已在 MuMu 桌面看到新图标。
+
+**未做（下一步）**：工具栏「底部常用带 + 更多抽屉」；sheets 单指/双指滚动（Univer 只认 wheel，需 canvas 合成 wheel）；PDF 双指锚点缩放；A4 缩放决策。
 
 ## 已知缺陷（未修）
 

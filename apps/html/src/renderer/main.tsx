@@ -8,7 +8,7 @@ import App from './App'
 import { PresentView } from './PresentView'
 import { LocaleProvider } from './i18n/locale'
 import type { UiTheme } from '../shared/ipc'
-import { applyAiPanelPrefs, installScreenTips } from '@genoffice/ui'
+import { applyAiPanelPrefs, installMobileChrome, installScreenTips } from '@genoffice/ui'
 import '@genoffice/ui/tokens.css'
 import '@genoffice/ui/screentip.css'
 import '@genoffice/ui/ai-model-picker.css'
@@ -28,6 +28,8 @@ import './styles.css'
 import '@genoffice/ui/mobile.css'
 
 installScreenTips()
+// reading on a phone: ribbon/status bar collapse on scroll, return on a tap
+installMobileChrome()
 
 function applyTheme(theme: UiTheme): void {
   if (theme === 'system') document.documentElement.removeAttribute('data-theme')

@@ -26,10 +26,12 @@ import './styles.css'
 // base rules such as `body { min-width: 720px }` at narrow widths
 import '@genoffice/ui/mobile.css'
 import './markdown-themes.css'
-import { applyAiPanelPrefs, installScreenTips } from '@genoffice/ui'
+import { applyAiPanelPrefs, installMobileChrome, installScreenTips } from '@genoffice/ui'
 import type { MarkdownTheme } from '../shared/markdown-theme'
 
 installScreenTips()
+// reading on a phone: ribbon/status bar collapse on scroll, return on a tap
+installMobileChrome()
 
 function applyTheme(theme: UiTheme): void {
   if (theme === 'system') document.documentElement.removeAttribute('data-theme')

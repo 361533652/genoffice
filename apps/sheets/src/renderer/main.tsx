@@ -4,7 +4,7 @@ import './host-install'
 import { getHost } from '@genoffice/host'
 import ReactDOM from 'react-dom/client'
 import { htmlDir, htmlLang, type Lang } from '@genoffice/i18n'
-import { applyAiPanelPrefs, installScreenTips } from '@genoffice/ui'
+import { applyAiPanelPrefs, installMobileChrome, installScreenTips } from '@genoffice/ui'
 
 import '@genoffice/ui/tokens.css'
 import '@genoffice/ui/screentip.css'
@@ -46,6 +46,8 @@ const root = document.getElementById('root')
 if (!root) throw new Error('Missing application root.')
 
 installScreenTips()
+// reading on a phone: ribbon/status bar collapse on scroll, return on a tap
+installMobileChrome()
 installCanvasFontFallback()
 
 function applyTheme(theme: UiTheme): void {

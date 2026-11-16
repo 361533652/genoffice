@@ -25,11 +25,13 @@ import './styles.css'
 // base rules such as `body { min-width: 720px }` at narrow widths
 import '@genoffice/ui/mobile.css'
 import './fonts/fonts.css'
-import { applyAiPanelPrefs, installScreenTips } from '@genoffice/ui'
+import { applyAiPanelPrefs, installMobileChrome, installScreenTips } from '@genoffice/ui'
 import { setAltChunkHtmlConverter } from '@genoffice/docx-engine'
 import { getHost } from '@genoffice/host'
 
 installScreenTips()
+// reading on a phone: ribbon/status bar collapse on scroll, return on a tap
+installMobileChrome()
 if (window.desktop?.convertAltChunkHtml) {
   setAltChunkHtmlConverter((html) => window.desktop.convertAltChunkHtml(html))
 }
