@@ -247,6 +247,7 @@ import {
   parsePageRanges,
 } from './view-config'
 import type { PageSize, FitMode } from './view-config'
+import { installPdfPinchZoom } from './pinch-zoom'
 import { useVisibleSet, PdfPage, MarkupOverlay } from './PdfPage'
 import { probePageGeometry } from './page-probe'
 import { loadPdfForView } from './open-document'
@@ -7646,6 +7647,14 @@ export default function App() {
     el.addEventListener('wheel', onWheel, { passive: false })
     return () => el.removeEventListener('wheel', onWheel)
   })
+
+  // Two-finger pinch: the browser would zoom the whole UI; the page must zoom
+  // instead, anchored at the fingers (replayed onto the Ctrl+wheel path above).
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    return installPdfPinchZoom(el)
+  }, [doc])
 
   // Progress ticks for a running conversion. Clearing on unmount keeps a closed
   // tab from leaving a stuck overlay behind. The effect must not RETURN the

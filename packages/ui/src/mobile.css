@@ -311,6 +311,7 @@
  * ------------------------------------------------------------------------- */
 @media (max-width: 720px) {
   html[data-mobile-chrome='hidden'] .ribbon,
+  html[data-mobile-chrome='hidden'] .ribbon-tabs,
   html[data-mobile-chrome='hidden'] .status-bar {
     display: none;
   }

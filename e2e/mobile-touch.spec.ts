@@ -73,18 +73,24 @@ test.describe('touch on a mobile host', () => {
     expect(await address()).not.toBe(before)
   })
 
-  test('sheets: a finger drag selects a range', async ({ page }) => {
+  test('sheets: a finger drag scrolls instead of selecting a range', async ({ page }) => {
     await page.goto(SHEETS_URL, { waitUntil: 'load' })
     await expect(page.locator('.ribbon')).toBeVisible({ timeout: 30_000 })
     await page.waitForTimeout(3_500)
 
+    // This used to assert that a drag extended a range. That WAS the bug the
+    // user reported: dragging to read selected cells instead of scrolling the
+    // grid, so the only way to move was the thin scrollbar. The grid now turns a
+    // one-finger drag into wheel deltas (apps/sheets/src/renderer/touch-scroll.ts),
+    // so the same gesture must leave ONE cell selected — a range means Univer's
+    // drag-to-select is winning again.
     await drag(page, { x: 70, y: 300 }, { x: 200, y: 450 })
-    const selection = await page.evaluate(() => {
-      const box = [...document.querySelectorAll('input')].find((i) => /^[A-Z]+\d+:/.test(i.value))
-      return box?.value ?? null
+    const name = await page.evaluate(() => {
+      const input = document.querySelector('[data-u-comp="defined-name"] input') as HTMLInputElement | null
+      return input?.value ?? null
     })
-    // a range, not a single cell: the drag actually extended the selection
-    expect(selection).toMatch(/^[A-Z]+\d+:[A-Z]+\d+$/)
+    expect(name, 'the active cell is still readable').not.toBeNull()
+    expect(name, 'a scrolling drag must not select a range').not.toContain(':')
   })
 
   test('sheets: a tap plus typing writes into the cell', async ({ page }) => {

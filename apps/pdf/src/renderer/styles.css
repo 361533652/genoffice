@@ -5242,3 +5242,12 @@ button {
     flex: 0 1 auto;
   }
 }
+
+/* A phone owns the pinch inside the reader: one-finger panning still scrolls,
+   but the browser must not zoom the whole page (the page itself zooms instead,
+   via the anchored Ctrl+wheel path replayed by pinch-zoom.ts). */
+@media (pointer: coarse) {
+  .pdf-scroll {
+    touch-action: pan-x pan-y;
+  }
+}

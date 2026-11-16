@@ -21,6 +21,7 @@ import '@genoffice/ui/ai-scope-quote.css'
 import '@univerjs/preset-sheets-core/lib/index.css'
 
 import { App } from './App'
+import { installSheetTouchScroll } from './touch-scroll'
 import {
   installCanvasFontFallback,
   registerTextDingbatsFace,
@@ -48,6 +49,9 @@ if (!root) throw new Error('Missing application root.')
 installScreenTips()
 // reading on a phone: ribbon/status bar collapse on scroll, return on a tap
 installMobileChrome()
+// before React/Univer boot: the grid's touch scroll must register its capture
+// listener ahead of Univer's drag-to-select handlers
+installSheetTouchScroll()
 installCanvasFontFallback()
 
 function applyTheme(theme: UiTheme): void {

@@ -43,6 +43,8 @@ export { installScreenTips } from './screentip'
 export {
   installMobileChrome,
   onMobileChromeChange,
+  hideMobileChrome,
+  showMobileChrome,
   type MobileChromeHandle,
 } from './mobile-chrome'
 export {

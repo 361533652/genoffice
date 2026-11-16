@@ -2,7 +2,7 @@
 
 > 这份文件写给刚醒来的人。它回答三个问题：现在能做什么、做过什么、卡在哪。
 > 技术细节在 [decisions.md](./decisions.md)，这里有 4 条 ADR 和逐轮记录。
-> 数据截止：2026-11-17 02:40 · 169 个移动端 e2e（全量 `12.1m`，169 passed）· 52 个 host 单测 · docs 分档单测 10 个。
+> 数据截止：2026-11-17 03:20 · 173 个移动端 e2e（新增 sheets 手势 2 + PDF 捏合 2）· 52 个 host 单测 · docs 分档单测 10 个。
 > **已推送 `origin/main`（ahead 0），并发布 v0.1.0 / v0.1.1 / v0.1.2 / v0.1.3 / v0.1.4 五个 Android Release**（`v0.1.4-android`，2026-11-16 03:25 CST）。
 > 2026-11-16 19:57 复核：上一版这里还写着「147 个 e2e」「尚未推送到远端」，两处都已过期，按实测改正。
 
@@ -247,7 +247,10 @@ adb install -r apps/mobile/app/build/outputs/apk/debug/app-debug.apk
    - 踩坑：①监听通用 `scroll` 会把 Playwright 的 `scrollIntoView`、focus、布局回流当成阅读滚动，工具栏随机消失 → 只认可信事件；②`touchstart` 里清零指针计数会在 pointerdown 之后执行，把双指捏合误判成单指拖动 → 去掉。
 3. **app 图标**——`res/` 原先没有 mipmap、Manifest 无 `android:icon`，系统用默认机器人。新增 `mipmap-anydpi-v26/ic_launcher(_round).xml`（自适应，背景 #1F2937 + 四格白 mark）、`drawable/ic_launcher_foreground.xml`、`values/colors.xml`，Manifest 注册 `icon`/`roundIcon`。已在 MuMu 桌面看到新图标。
 
-**未做（下一步）**：工具栏「底部常用带 + 更多抽屉」；sheets 单指/双指滚动（Univer 只认 wheel，需 canvas 合成 wheel）；PDF 双指锚点缩放；A4 缩放决策。
+4. **表格单指/双指手势**——Univer 只认 wheel，手指拖动被它当成「框选」（实测：拖动后选出 B19:B27、视口一点没动），只能拖滚动条。新增 `apps/sheets/src/renderer/touch-scroll.ts`：单指拖动合成 wheel 事件给 canvas（复用 Univer 的惯性/边界），双指捏合合成 Ctrl+wheel 复用既有缩放步进；8px 阈值区分点选与滚动。**必须在 main.tsx 启动期安装**——Univer 的框选监听在 window 捕获阶段、且注册更早，晚装就拦不住；拖动结束后补一次合成点击，把 Univer 拖出来的选区收敛成单格（facade 的 `getRange().activate()` 清不掉主选区，实测无效）。守护 `e2e/mobile-sheets-touch.spec.ts`（像素哈希证明内容真的滚了 + 名称框必须是单格）。
+5. **PDF 双指缩放**——原来捏合缩放的是整个页面（visualViewport scale>1），阅读器自己的 scale 不动。新增 `apps/pdf/src/renderer/pinch-zoom.ts`：`.pdf-scroll` 在 `(pointer: coarse)` 下 `touch-action: pan-x pan-y` 夺回捏合，双指距离变化合成 Ctrl+wheel，复用既有「锚点 + 连续缩放」路径；单指滚动保留。守护 `e2e/mobile-pdf-pinch.spec.ts`（含「文档确实可滚动」的前提断言——单页 fixture 要先放大再拖，否则测的是不会发生的行为）。
+
+**未做（下一步）**：工具栏「底部常用带 + 更多抽屉」（当前窄屏仍是桌面两行，只做了自动收起）；A4 缩放决策。
 
 ## 已知缺陷（未修）
 

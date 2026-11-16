@@ -190,3 +190,18 @@ export function onMobileChromeChange(fn: (hidden: boolean) => void): () => void 
   listeners.add(fn)
   return () => listeners.delete(fn)
 }
+
+/**
+ * Collapse or restore the chrome from outside this module.
+ *
+ * A canvas app that swallows pointer gestures before they reach the document
+ * listener (sheets turns a drag into wheel deltas) still has to tell the chrome
+ * that the user is reading; it calls these once its gesture settles.
+ */
+export function hideMobileChrome(): void {
+  installed?.hide()
+}
+
+export function showMobileChrome(): void {
+  installed?.show()
+}

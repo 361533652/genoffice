@@ -724,6 +724,7 @@ export function App({
   const hostDirtyRef = useRef(false)
   hostDirtyRef.current = pendingEdits > 0 || workbookFile?.unsavedNew === true
   useEffect(() => registerDirtyProbe(() => hostDirtyRef.current), [])
+
   // The card follows the note it belongs to: a file reload that drops the
   // picture (or drops the note) takes the card with it.
   useEffect(() => {
