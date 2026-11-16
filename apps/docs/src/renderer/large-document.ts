@@ -23,6 +23,17 @@ export const HUGE_DOC_REFUSE_WEIGHT = 230_000
  * measurable on an 81-page one (~4k). Review › Spelling turns it back on.
  */
 export const LITE_DOC_WEIGHT = 4_000
+/**
+ * A document at or below this weight is small enough that any device able to run
+ * the editor can hold it, so device scaling must never degrade it. The working-set
+ * model's 300MB fixed overhead is the *large-document pagination* baseline, not the
+ * resident editor cost (≈22MB used / ≈33MB total measured on a real Android WebView);
+ * without this floor, a WebView reporting a small heap inverted the model to a zero
+ * threshold and marked even a 2-paragraph document read-only. ~1000 weight is a
+ * couple dozen pages of prose — comfortably below the lite line and safe on the
+ * weakest heap that can still show the editor.
+ */
+export const SMALL_DOC_NORMAL_WEIGHT = 1_000
 
 export type OpenTier = 'normal' | 'lite' | 'readOnly' | 'refuse'
 
@@ -122,8 +133,14 @@ export function openTierForDevice(weight: number): OpenTier {
 
   // never allow more than the desktop constants: a device that reports a huge heap
   // still should not open a document known to need 2 GB
-  const readOnlyAt = Math.min(LARGE_DOC_READ_ONLY_WEIGHT, deviceReadOnly)
-  const refuseAt = Math.min(HUGE_DOC_REFUSE_WEIGHT, deviceRefuse)
+  let readOnlyAt = Math.min(LARGE_DOC_READ_ONLY_WEIGHT, deviceReadOnly)
+  let refuseAt = Math.min(HUGE_DOC_REFUSE_WEIGHT, deviceRefuse)
+  // ...and never less than the small-document floor: on a weak heap the model can
+  // invert to 0, which would refuse/read-only EVERY document. A small document is
+  // always safe, so clamp the thresholds up to the floor (and keep refuse above
+  // read-only). Large documents are still degraded/refused by the budget above it.
+  readOnlyAt = Math.max(SMALL_DOC_NORMAL_WEIGHT, readOnlyAt)
+  refuseAt = Math.max(readOnlyAt + 1, refuseAt)
 
   if (weight > refuseAt) return 'refuse'
   if (weight > readOnlyAt) return 'readOnly'

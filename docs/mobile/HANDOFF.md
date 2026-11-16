@@ -2,7 +2,7 @@
 
 > 这份文件写给刚醒来的人。它回答三个问题：现在能做什么、做过什么、卡在哪。
 > 技术细节在 [decisions.md](./decisions.md)，这里有 4 条 ADR 和逐轮记录。
-> 数据截止：HEAD `4d28b49f`（2026-11-16 03:26）· 164 个移动端 e2e（2026-11-16 19:57 全量跑过，`11.5m`，164 passed）· 52 个 host 单测。
+> 数据截止：2026-11-16 晚 · 166 个移动端 e2e（全量 `11.6m`，166 passed）· 52 个 host 单测 · docs 分档单测 10 个。
 > **已推送 `origin/main`（ahead 0），并发布 v0.1.0 / v0.1.1 / v0.1.2 / v0.1.3 / v0.1.4 五个 Android Release**（`v0.1.4-android`，2026-11-16 03:25 CST）。
 > 2026-11-16 19:57 复核：上一版这里还写着「147 个 e2e」「尚未推送到远端」，两处都已过期，按实测改正。
 
@@ -184,7 +184,7 @@ Web 路线首次加载 docs 5.7 MB / sheets 14.7 MB（3G 下 114s / 294s）。
 ## 测试现状
 
 ```bash
-npm run test:mobile          # 164 个 e2e，零手工准备（2026-11-16 实测 11.5 分钟）
+npm run test:mobile          # 166 个 e2e，零手工准备（2026-11-16 实测 11.6 分钟）
 npx vitest run --root packages/host   # 52 个单测（含 wasm 会话往返）
 npm run verify:mobile-builds # 六应用生产构建逐个验证
 ```
@@ -208,7 +208,7 @@ npm run verify:mobile-builds # 六应用生产构建逐个验证
 
 **六个应用都能在无 Electron 的移动宿主里启动；docs / markdown / html / sheets / slides 能完整读写；pdf 能打开和看；Android 宿主已建成并在模拟器上端到端验证（含 SAF 原地保存）。**
 
-累计 164 个移动端 e2e + 52 个 host 单测，修掉 9+8 个真缺陷（含「用户根本用不了」级：存储不可用白屏、安卓无法保存/打开、sheets 无打开入口、WebView 宿主白屏/状态栏遮挡/确认闸门静默取消、保存假成功）。
+累计 166 个移动端 e2e + 52 个 host 单测，修掉 9+8 个真缺陷（含「用户根本用不了」级：存储不可用白屏、安卓无法保存/打开、sheets 无打开入口、WebView 宿主白屏/状态栏遮挡/确认闸门静默取消、保存假成功）。
 
 ## Android 宿主（apps/mobile）
 
@@ -233,24 +233,27 @@ adb install -r apps/mobile/app/build/outputs/apk/debug/app-debug.apk
   原生文件钩子（open/saveAs/saveInPlace/read，可写句柄、可等待）、原生确认框、一次性 pending-open。
 详见 apps/mobile/README.md。已发布 Release v0.1.0～v0.1.4-android（gh release create）。
 
-## 已知缺陷（未修，2026-11-16 复核）
+## 本轮已修（2026-11-16 晚，单测 + e2e 验证）
+
+1. **docs 把小文档误判只读**——根因确认：`openTierForDevice` 用 `weightForBudget(usableMB)` 反推阈值，而模型的 300MB 固定开销是「大文档分页工作集」基线，不是常驻编辑器成本（真机安卓 WebView 实测空文档 heapUsed≈22MB）。设备报小堆（usable<300MB）时反推得 0，`readOnlyAt=0`，**任何**文档都只读。修法：加 `SMALL_DOC_NORMAL_WEIGHT=1000` 下限夹住 `readOnlyAt`/`refuseAt`，小文档在任何能跑编辑器的设备上都 normal，大文档仍按预算降级/拒绝。守护：`apps/docs/tests/large-document-device.test.ts`（512MB 堆下 2 段落必须 normal，先红后绿）+ `e2e/mobile-large-document.spec.ts`。
+2. **CSV 打不开**——移动 wasm 会话 `openBytes` 原来把 `.csv` 原始字节直接喂 sidecar（报 `invalid Zip archive`）。现对 `.csv/.tsv` 先 `decodeCsvBuffer`+`csvToXlsxBufferForOpen` 转成 xlsx 再喂引擎（与桌面打开路径同一套转换，`.tsv` 钉制表符）。转换副本 `needsSaveAs=true`：移动还没有 CSV 序列化器，首存走另存为 `.xlsx`，避免把 OOXML 字节写回 `.csv`。守护：`e2e/mobile-sheets-wasm.spec.ts`（真浏览器 + 真 wasm 读回单元格）。**真机交叉验证**：MuMu 安卓12 WebView 经 ACTION_VIEW 打开 `people.csv`，读回 Name/Age/Ada/36 正确；同机小文档仍 normal 可编辑（无回归）。
+
+## 已知缺陷（未修）
 
 | 缺陷 | 表现 | 线索 |
 |---|---|---|
-| CSV 打不开 | sheets 把 `.csv` 当 zip 解析，报 `invalid Zip archive` | 桌面网关有 `packages/xlsx-gateway/src/gateway/csv-import.ts`（含 `csvToXlsxBufferForOpen`），移动 wasm 会话的 `openBytes` 没接这一层 |
-| 大文档被误判只读 | 真机上 2 段落的文档也提示「文档很大，只读」 | **嫌疑点（未验证）**：`openTierForDevice` 里 `weightForBudget(usableMB)` 在 `usableMB < 300`（模型固定开销）时返回 0，于是 `readOnlyAt = 0`，任何文档都超线——缺一个下限夹持。见 `apps/docs/src/renderer/large-document.ts:125` |
 | 横屏空态按钮裁切 7px | MuMu 横屏 1280×720 首页按钮贴底 | 未修 |
 | media URI 打开显示数字 ID | 状态栏显示 `content://.../数字id` 而非文件名 | 未修 |
 | Android 15 `file://` 直读被拒 | 只有 `content://` 正常 | scoped storage 的平台行为，记着别当成缺陷 |
+| CSV 保存回 `.csv` | 打开/编辑已通，但首存只能另存为 `.xlsx` | 移动缺 CSV 序列化器；桌面有写回 `.csv` 的完整流程可移植 |
 
 ## 建议的下一步
 
 按投入产出排序：
 
-1. **修 docs 只读误判**——先复现（真机开 2 段落文档、打印 `deviceBudget()` / `openTierForDevice()` 的实际输入输出），确认是阈值下限问题还是保护/写锁判定；这是「功能不可用」级。
-2. **修 CSV 打开**——把桌面已有的 csv-import 接进移动 wasm 会话的打开路径。
-3. **真机装 v0.1.4 复测**（Redmi K80 竖屏）：返回导航、PDF 无侧栏、工具栏占比、dirty 闸门；这次复测通过才能把 `.task/interaction-review/interaction-spec.md` 的 HOLD 改判。
-4. **手机打开 5391 打几个字**（两分钟）→ 确认中文输入法真机行为（`npm run serve:mobile-checks`）。
-5. **定 A4 缩放**（需要你拍板）→ 影响所有文档的默认观感。
-6. 小项：横屏空态裁切、media URI 文件名。
-7. slides 字体精度（canvas 测量 provider）与 master view 移植；纯浏览器部署的首屏代码分割（APK 路线已解此问题）。
+1. **真机装新 APK 复测**（Redmi K80 竖屏）：本轮两个修复 + v0.1.4 的返回导航、PDF 无侧栏、工具栏占比、dirty 闸门；竖屏五项复测通过才能把 `.task/interaction-review/interaction-spec.md` 的 HOLD 改判。
+2. **手机打开 5391 打几个字**（两分钟）→ 确认中文输入法真机行为（`npm run serve:mobile-checks`）。
+3. **定 A4 缩放**（需要你拍板）→ 影响所有文档的默认观感。
+4. CSV 写回 `.csv`（移植桌面序列化器），让 CSV 不止能开还能原格式存。
+5. 小项：横屏空态裁切、media URI 文件名。
+6. slides 字体精度（canvas 测量 provider）与 master view 移植；纯浏览器部署的首屏代码分割（APK 路线已解此问题）。

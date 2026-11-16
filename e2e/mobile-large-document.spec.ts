@@ -99,4 +99,46 @@ test.describe('device-scaled tiers', () => {
     expect(decision.readOnly).toBe('readOnly')
     expect(decision.refuse).toBe('refuse')
   })
+
+  test('a tiny document is never read-only on a small-heap WebView', async ({ page }) => {
+    // Real Android WebViews can report a ~512MB heap. A third of it (170MB) is
+    // under the model's 300MB pagination baseline, so the raw inversion returns 0
+    // and, before the fix, EVERY document — even two paragraphs — was read-only.
+    // The editor is already running, so a small document must stay editable.
+    await page.addInitScript(() => {
+      const perf = performance as unknown as { memory?: Record<string, number> }
+      Object.defineProperty(perf, 'memory', {
+        configurable: true,
+        get() {
+          return {
+            jsHeapSizeLimit: 512 * 1024 * 1024,
+            usedJSHeapSize: 22 * 1024 * 1024,
+            totalJSHeapSize: 33 * 1024 * 1024,
+          }
+        },
+      })
+    })
+
+    await page.goto(DOCS_URL, { waitUntil: 'load' })
+    await expect(page.locator('.ProseMirror')).toBeVisible({ timeout: 30_000 })
+    await page.waitForTimeout(800)
+
+    const decision = await page.evaluate(async () => {
+      const mod = await import('/large-document.ts')
+      return {
+        heapMB: mod.deviceBudget().heapMB,
+        tiny: mod.openTierForDevice(3),
+        small: mod.openTierForDevice(500),
+        // a genuinely large document must still be protected on this weak device
+        big: mod.openTierForDevice(mod.LARGE_DOC_READ_ONLY_WEIGHT + 1),
+        huge: mod.openTierForDevice(mod.HUGE_DOC_REFUSE_WEIGHT + 1),
+      }
+    })
+
+    expect(decision.heapMB, 'the emulated small heap is visible').toBe(512)
+    expect(decision.tiny, 'two paragraphs must open normally').toBe('normal')
+    expect(decision.small, 'a modest document must open normally').toBe('normal')
+    expect(decision.big === 'readOnly' || decision.big === 'refuse', 'large docs still degraded').toBe(true)
+    expect(decision.huge).toBe('refuse')
+  })
 })

@@ -38,12 +38,15 @@ import type {
   SheetStructuralOps,
 } from '@genoffice/xlsx-gateway/gateway/xlsx-gateway'
 import type { SheetEditPlan } from '@genoffice/xlsx-gateway/gateway/xlsx-sheets'
+import { csvToXlsxBufferForOpen, decodeCsvBuffer } from '@genoffice/xlsx-gateway/gateway/csv-import'
 import { sha256Hex } from '../node-globals.js'
 import { createShimFileSystem, shimPaths } from './shim-fs.js'
 import type { WasmSidecarClient } from './wasm-sidecar.js'
 
 /** Same threshold as apps/sheets/src/main/recovery-policy.ts. */
 const MAX_AUTOMATIC_RECOVERY_WORKSHEET_XML_BYTES = 64 * 1024 * 1024
+/** Same cap as the desktop open path (sheets-main.ts): stops a huge text file OOMing before the sidecar limits. */
+const MAX_DELIMITED_IMPORT_BYTES = 64 * 1024 * 1024
 
 interface SessionInfo {
   /** the user-facing handle (SAF uri / browser file), the write-back target */
@@ -165,10 +168,34 @@ export class WorkbookSessionHost {
   async openBytes(bytes: Uint8Array, handle: FileHandle): Promise<unknown> {
     this.ensureGateway()
     const id = crypto.randomUUID()
-    const safeName = handle.name.replace(/[^\w.\-]+/g, '_') || 'workbook.xlsx'
+    // The wasm sidecar only reads OOXML zip packages. A .csv/.tsv handed to it
+    // raw fails with "invalid Zip archive". The desktop open path converts
+    // delimited text to a temporary .xlsx first (sheets-main.ts); do the same
+    // here so CSV opens on a mobile host. Identity (sha/bytes/name) stays the
+    // original file's; only the bytes fed to the engine are the converted copy.
+    const ext = handle.name.slice(handle.name.lastIndexOf('.') + 1).toLowerCase()
+    const isDelimited = ext === 'csv' || ext === 'tsv'
+    let engineBytes = bytes
+    let engineName = handle.name
+    if (isDelimited) {
+      if (bytes.byteLength > MAX_DELIMITED_IMPORT_BYTES) {
+        throw new Error('The CSV file is too large to import.')
+      }
+      const converted = await csvToXlsxBufferForOpen(
+        // no legacy-charset setting on a mobile host: BOM / UTF-16 auto-detection
+        decodeCsvBuffer(bytes),
+        'Sheet1',
+        // a .tsv's delimiter is declared by its extension; sniffing by frequency
+        // shatters comma-heavy annotation columns (same reason as the desktop)
+        ext === 'tsv' ? '\t' : undefined,
+      )
+      engineBytes = new Uint8Array(converted.buffer)
+      engineName = handle.name.replace(/\.[^.]+$/, '') + '.xlsx'
+    }
+    const safeName = engineName.replace(/[^\w.\-]+/g, '_') || 'workbook.xlsx'
     const virtualPath = `/data/${id}/${safeName}`
     const snapshotPath = `/tmp/snapshots/${id}.xlsx`
-    await this.fs.writeFile(virtualPath, bytes)
+    await this.fs.writeFile(virtualPath, engineBytes)
     await this.fs.copyFile(virtualPath, snapshotPath)
     const sha256 = await sha256Hex(bytes)
     const opened = (await this.client.open(
@@ -194,7 +221,11 @@ export class WorkbookSessionHost {
       sha256,
       fileBytes: bytes.byteLength,
       sheetNames: new Map(opened.sheets.map((sheet) => [sheet.id, sheet.name])),
-      needsSaveAs: handle.writable === false,
+      // A converted .csv/.tsv has no CSV serializer on this host yet, so the
+      // first save must route to Save As (a fresh .xlsx) rather than writing
+      // OOXML bytes back over the original text file — the desktop's .tsv path
+      // makes the same choice. Writing xlsx into a .csv would corrupt it.
+      needsSaveAs: handle.writable === false || isDelimited,
     }
     this.sessions.set(opened.sessionId, session)
     return {

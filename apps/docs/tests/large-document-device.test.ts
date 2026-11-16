@@ -1,6 +1,6 @@
 
 import { describe, expect, it } from 'vitest'
-import { CHARS_PER_BLOCK, LARGE_DOC_READ_ONLY_WEIGHT, HUGE_DOC_REFUSE_WEIGHT, weightForBudget, deviceBudget } from '../src/renderer/large-document'
+import { CHARS_PER_BLOCK, LARGE_DOC_READ_ONLY_WEIGHT, HUGE_DOC_REFUSE_WEIGHT, weightForBudget, deviceBudget, openTierForDevice } from '../src/renderer/large-document'
 
 /**
  * Device-scaled document tiers.
@@ -34,9 +34,13 @@ describe('working-set model', () => {
     expect(phoneWeight).toBeLessThan(LARGE_DOC_READ_ONLY_WEIGHT)
   })
 
-  it('yields nothing for a budget below the fixed overhead', () => {
-    // 500MB heap, a third for the document: 167MB is under the 300MB floor, so
-    // there is no document size that fits. Refusing everything is the right answer.
+  it('the raw inversion yields nothing below the fixed overhead', () => {
+    // 500MB heap, a third for the document: 167MB is under the model's 300MB
+    // pagination baseline, so the raw inversion returns 0. That is a property of
+    // the model, NOT a licence to refuse every document: openTierForDevice floors
+    // the thresholds at SMALL_DOC_NORMAL_WEIGHT so small docs still open (see the
+    // regression suite below). The 300MB is a large-doc baseline, not the resident
+    // editor cost.
     expect(weightForBudget(500 / 3)).toBe(0)
   })
 
@@ -52,5 +56,55 @@ describe('working-set model', () => {
     // node has no navigator.deviceMemory and no performance.memory
     const budget = deviceBudget()
     expect(budget.unknown).toBe(true)
+  })
+})
+
+/**
+ * A tiny document must open normally on ANY device that can run the editor.
+ *
+ * Regression: the working-set model has a 300MB fixed overhead, so on a WebView
+ * that reports a small heap (a third of it under 300MB) weightForBudget() returns
+ * 0 and openTierForDevice() classified EVERY document — even a 2-paragraph one —
+ * as read-only. Real Android WebViews do report heaps this small. The editor
+ * itself is already running (≈22MB used / ≈33MB total measured on-device), so a
+ * small document cannot exhaust a device that is showing the editor at all.
+ */
+describe('small documents are never degraded by device scaling', () => {
+  function withHeap(heapMB: number, fn: () => void): void {
+    const perf = performance as unknown as { memory?: unknown }
+    const nav = navigator as unknown as { deviceMemory?: number }
+    const origMem = Object.getOwnPropertyDescriptor(perf, 'memory')
+    const origNav = Object.getOwnPropertyDescriptor(nav, 'deviceMemory')
+    Object.defineProperty(perf, 'memory', {
+      configurable: true,
+      get: () => ({ jsHeapSizeLimit: heapMB * 1024 * 1024, usedJSHeapSize: 22 * 1024 * 1024, totalJSHeapSize: 33 * 1024 * 1024 }),
+    })
+    Object.defineProperty(nav, 'deviceMemory', { configurable: true, get: () => 4 })
+    try {
+      fn()
+    } finally {
+      if (origMem) Object.defineProperty(perf, 'memory', origMem)
+      else delete (perf as { memory?: unknown }).memory
+      if (origNav) Object.defineProperty(nav, 'deviceMemory', origNav)
+      else delete (nav as { deviceMemory?: number }).deviceMemory
+    }
+  }
+
+  it('a 2-paragraph document stays normal on a 512MB-heap WebView', () => {
+    withHeap(512, () => {
+      expect(deviceBudget().heapMB).toBe(512)
+      // weight of a couple of short paragraphs
+      expect(openTierForDevice(3)).toBe('normal')
+      expect(openTierForDevice(50)).toBe('normal')
+    })
+  })
+
+  it('a genuinely large document is still protected on that same weak device', () => {
+    withHeap(512, () => {
+      // the desktop read-only line must not open normally on a 512MB device
+      const big = openTierForDevice(LARGE_DOC_READ_ONLY_WEIGHT + 1)
+      expect(big === 'readOnly' || big === 'refuse').toBe(true)
+      expect(openTierForDevice(HUGE_DOC_REFUSE_WEIGHT + 1)).toBe('refuse')
+    })
   })
 })

@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs'
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { expect, test } from '@playwright/test'
 
@@ -134,5 +134,65 @@ test('a workbook opens, edits and saves through the wasm session', async ({ page
     return cell ? cell.value : null
   })
   expect(a1Value).toBe('HelloWasm')
+  expect(errors).toEqual([])
+})
+
+test('a .csv opens through the wasm session (converted, not fed raw to the zip reader)', async ({ page }) => {
+  test.setTimeout(180_000)
+  const errors: string[] = []
+  page.on('pageerror', (e) => errors.push(String(e.stack ?? e)))
+  page.on('dialog', (d) => void d.accept())
+
+  await page.addInitScript((wasmUrl: string) => {
+    const w = window as unknown as Record<string, unknown>
+    Object.defineProperty(w, 'showOpenFilePicker', { configurable: true, value: undefined })
+    Object.defineProperty(w, 'showSaveFilePicker', { configurable: true, value: undefined })
+    w.__genofficeSheetsWasmUrl = wasmUrl
+  }, '/@fs/' + WASM.replace(/\\/g, '/'))
+
+  await page.goto(SHEETS_URL, { waitUntil: 'load' })
+  await expect(page.locator('.ribbon')).toBeVisible({ timeout: 30_000 })
+  await page.waitForFunction(
+    () => (window as unknown as { __genofficeSheetsSessionReady?: boolean }).__genofficeSheetsSessionReady === true,
+    null,
+    { timeout: 30_000 },
+  )
+
+  // a real delimited file, not an xlsx: before the fix the sidecar rejected it
+  // with "invalid Zip archive" because the bytes were never converted
+  const csvPath = join(test.info().outputDir, 'people.csv')
+  mkdirSync(test.info().outputDir, { recursive: true })
+  writeFileSync(csvPath, 'Name,Age\nAda,36\nGrace,45\n', 'utf8')
+
+  const [chooser] = await Promise.all([
+    page.waitForEvent('filechooser'),
+    page.getByRole('button', { name: /打开/ }).first().click(),
+  ])
+  await chooser.setFiles(csvPath)
+  await page.waitForFunction(() => document.body.textContent?.includes('Sheet1'), null, { timeout: 30_000 })
+  await page.waitForTimeout(1_500)
+
+  // the converted grid is readable through the session's data layer
+  const cells = await page.evaluate(async () => {
+    const w = window as unknown as {
+      __genofficeSheetsSessionHost: { debugSessions: () => { sessionId: string; sheetIds: string[] }[] }
+      desktopApi: {
+        readWorkbookRange: (req: unknown) => Promise<{ cells: { row: number; column: number; value: unknown }[] }>
+      }
+    }
+    const sessions = w.__genofficeSheetsSessionHost.debugSessions()
+    const current = sessions[sessions.length - 1]!
+    const range = await w.desktopApi.readWorkbookRange({
+      sessionId: current.sessionId,
+      sheetId: current.sheetIds[0],
+      range: { startRow: 0, endRow: 1, startColumn: 0, endColumn: 1 },
+    })
+    return range.cells
+  })
+  const at = (r: number, c: number): unknown => cells.find((x) => x.row === r && x.column === c)?.value
+  expect(at(0, 0)).toBe('Name')
+  expect(at(0, 1)).toBe('Age')
+  expect(at(1, 0)).toBe('Ada')
+  expect(Number(at(1, 1))).toBe(36)
   expect(errors).toEqual([])
 })
