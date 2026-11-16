@@ -61,7 +61,7 @@ test('a workbook opens, edits and saves through the wasm session', async ({ page
   }, '/@fs/' + WASM.replace(/\\/g, '/'))
 
   await page.goto(SHEETS_URL, { waitUntil: 'load' })
-  await expect(page.locator('.ribbon')).toBeVisible({ timeout: 30_000 })
+  await expect(page.locator('.ribbon-tabs')).toBeVisible({ timeout: 30_000 })
   try {
     await page.waitForFunction(
       () => (window as unknown as { __genofficeSheetsSessionReady?: boolean }).__genofficeSheetsSessionReady === true,
@@ -151,7 +151,7 @@ test('a .csv opens through the wasm session (converted, not fed raw to the zip r
   }, '/@fs/' + WASM.replace(/\\/g, '/'))
 
   await page.goto(SHEETS_URL, { waitUntil: 'load' })
-  await expect(page.locator('.ribbon')).toBeVisible({ timeout: 30_000 })
+  await expect(page.locator('.ribbon-tabs')).toBeVisible({ timeout: 30_000 })
   await page.waitForFunction(
     () => (window as unknown as { __genofficeSheetsSessionReady?: boolean }).__genofficeSheetsSessionReady === true,
     null,

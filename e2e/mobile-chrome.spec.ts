@@ -38,7 +38,13 @@ test.describe('mobile chrome', () => {
     await page.goto(DOCS_URL, { waitUntil: 'load' })
     await expect(page.locator('.ProseMirror')).toBeVisible({ timeout: 30_000 })
     await page.waitForTimeout(600)
-    await expect(page.locator('.ribbon')).toBeVisible()
+
+    // a phone starts with the command band CLOSED (the "only common tools, open
+    // the rest when I want it" half of the ask); the tab row stays reachable
+    // the band body is what collapses (docs wraps the tab row and the band in
+    // .ribbon; sheets keeps them as siblings), so assert the body, not .ribbon
+    await expect(page.locator('[data-ribbon-body]')).toBeHidden()
+    await expect(page.locator('.ribbon-tabs')).toBeVisible()
 
     const cdp = await page.context().newCDPSession(page)
 
@@ -46,17 +52,18 @@ test.describe('mobile chrome', () => {
     await touchDrag(cdp, { x: 195, y: 520 }, { x: 195, y: 300 })
     // collapse fires after the gesture settles, not during it
     await expect(page.locator('html')).toHaveAttribute('data-mobile-chrome', 'hidden', { timeout: 5_000 })
-    await expect(page.locator('.ribbon')).toBeHidden()
+    await expect(page.locator('.ribbon-tabs')).toBeHidden()
 
     // a drag must NOT be mistaken for a tap
     await touchDrag(cdp, { x: 195, y: 500 }, { x: 195, y: 320 })
     await page.waitForTimeout(400)
     await expect(page.locator('html')).toHaveAttribute('data-mobile-chrome', 'hidden')
 
-    // a genuine tap brings the chrome back
+    // a genuine tap brings the chrome back — and the band with it
     await touchTap(cdp, { x: 195, y: 420 })
     await expect(page.locator('html')).toHaveAttribute('data-mobile-chrome', 'shown', { timeout: 5_000 })
-    await expect(page.locator('.ribbon')).toBeVisible()
+    await expect(page.locator('.ribbon-tabs')).toBeVisible()
+    await expect(page.locator('[data-ribbon-body]'), 'the tap also reveals the band').toBeVisible()
   })
 
   test('the status readout no longer slices a glyph in half', async ({ page }) => {

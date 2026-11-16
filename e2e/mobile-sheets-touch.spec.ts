@@ -40,7 +40,7 @@ test.describe('grid touch gestures', () => {
   test('a one-finger drag scrolls instead of selecting a range', async ({ page }) => {
     test.setTimeout(120_000)
     await page.goto(SHEETS_URL, { waitUntil: 'load' })
-    await expect(page.locator('.ribbon')).toBeVisible({ timeout: 30_000 })
+    await expect(page.locator('.ribbon-tabs')).toBeVisible({ timeout: 30_000 })
     await page.waitForTimeout(3_000)
     await expect(definedName(page)).toHaveValue('A1')
 
@@ -73,7 +73,7 @@ test.describe('grid touch gestures', () => {
   test('a two-finger pinch zooms and leaves one cell selected', async ({ page }) => {
     test.setTimeout(120_000)
     await page.goto(SHEETS_URL, { waitUntil: 'load' })
-    await expect(page.locator('.ribbon')).toBeVisible({ timeout: 30_000 })
+    await expect(page.locator('.ribbon-tabs')).toBeVisible({ timeout: 30_000 })
     await page.waitForTimeout(3_000)
 
     const zoomValue = page.locator('.zoom-value')

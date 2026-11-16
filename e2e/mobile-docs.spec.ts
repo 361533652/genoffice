@@ -27,8 +27,8 @@ test.use({
 /** Every editor that must boot on the mobile host. */
 const APPS = [
   { name: 'docs', url: 'http://127.0.0.1:5199', ready: '.ProseMirror' },
-  { name: 'sheets', url: 'http://127.0.0.1:5201', ready: '.ribbon' },
-  { name: 'slides', url: 'http://127.0.0.1:5202', ready: '.ribbon' },
+  { name: 'sheets', url: 'http://127.0.0.1:5201', ready: '.ribbon-tabs' },
+  { name: 'slides', url: 'http://127.0.0.1:5202', ready: '.ribbon-tabs' },
   { name: 'pdf', url: 'http://127.0.0.1:5203', ready: 'body' },
   { name: 'markdown', url: 'http://127.0.0.1:5204', ready: 'body' },
   { name: 'html', url: 'http://127.0.0.1:5205', ready: 'body' },

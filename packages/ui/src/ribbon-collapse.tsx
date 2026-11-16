@@ -151,9 +151,13 @@ export function useRibbonCollapse(
       if (!compactEnabled) return persisted === 'collapsed' ? 'collapsed' : 'full'
       return persisted
     }
-    // never chosen: a portrait phone defaults to the compact band (content
-    // first, interaction-spec P1-3); desktop keeps the full band exactly as before
-    if (compactEnabled && isNarrowViewport()) return 'compact'
+    // never chosen: a phone starts with the band CLOSED. The tab/QAT row stays,
+    // so a one-tap expand (any tab, or the band control) is always in reach, and
+    // reading gets the whole screen. This is the phone half of the user's ask:
+    // "only the common tools, collapse the rest, open it when I want it". A
+    // stored choice (even 'full') still wins on every form factor; desktop is
+    // untouched.
+    if (isNarrowViewport()) return 'collapsed'
     return 'full'
   })
   const rootRef = useRef<HTMLDivElement | null>(null)
@@ -257,6 +261,22 @@ export function useRibbonCollapse(
       ? `${labels.expandFull} (${RIBBON_COMPACT_SHORTCUT})`
       : `${labels.collapse} (${RIBBON_TOGGLE_SHORTCUT}) · ${labels.compact} (${RIBBON_COMPACT_SHORTCUT})`
   }
+
+  // A tap on the page restores the chrome; on a phone the band starts collapsed,
+  // so restoring must also reveal the band instead of leaving a bare tab row.
+  // The call is exposed on globalThis because the chrome module knows about
+  // taps, not about React state.
+  useEffect(() => {
+    const host = globalThis as { __genofficeExpandRibbon?: () => void }
+    host.__genofficeExpandRibbon = () => {
+      setDensity((current) =>
+        current === 'collapsed' ? (compactEnabled ? 'compact' : 'full') : current,
+      )
+    }
+    return () => {
+      delete host.__genofficeExpandRibbon
+    }
+  }, [compactEnabled])
 
   const rootClass = `ribbon-collapsible${collapsed ? ' ribbon-collapsed' : ''}${
     density === 'compact' ? ' ribbon-compact' : ''

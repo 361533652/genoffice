@@ -21,7 +21,7 @@ function entry(pkg: string, file: string): string {
 
 async function bootSheets(page: Page): Promise<void> {
   await page.goto(SHEETS_URL, { waitUntil: 'load' })
-  await expect(page.locator('.ribbon')).toBeVisible({ timeout: 30_000 })
+  await expect(page.locator('.ribbon-tabs')).toBeVisible({ timeout: 30_000 })
 }
 
 test.describe('xlsx on a mobile host', () => {

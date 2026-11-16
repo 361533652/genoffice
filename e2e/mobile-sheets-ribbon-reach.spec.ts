@@ -15,12 +15,20 @@ const PHONE = { width: 390, height: 844 }
 
 test.use({ viewport: PHONE, hasTouch: true, isMobile: true, deviceScaleFactor: 2 })
 
+/** A phone starts with the command band collapsed; this spec is about the band. */
+async function expandBand(page: import('@playwright/test').Page): Promise<void> {
+  if (await page.locator('.ribbon').first().isVisible()) return
+  await page.locator('.ribbon-tabs button').filter({ hasText: /开始|Home/ }).first().click()
+  await expect(page.locator('.ribbon').first()).toBeVisible({ timeout: 15_000 })
+}
+
 test.describe('sheets ribbon reach on a portrait phone', () => {
   test('the band scrolls and the last group is reachable', async ({ page }) => {
     const errors: string[] = []
     page.on('pageerror', (e) => errors.push(String(e)))
     await page.goto(SHEETS_URL, { waitUntil: 'load' })
-    await expect(page.locator('.ribbon').first()).toBeVisible({ timeout: 30_000 })
+    await expect(page.locator('.ribbon-tabs').first()).toBeVisible({ timeout: 30_000 })
+    await expandBand(page)
     await page.waitForTimeout(1_000)
 
     const metrics = await page.evaluate(() => {
@@ -66,7 +74,8 @@ test.describe('sheets ribbon reach on a portrait phone', () => {
 
   test('a far-right tool button can be scrolled into view and clicked', async ({ page }) => {
     await page.goto(SHEETS_URL, { waitUntil: 'load' })
-    await expect(page.locator('.ribbon').first()).toBeVisible({ timeout: 30_000 })
+    await expect(page.locator('.ribbon-tabs').first()).toBeVisible({ timeout: 30_000 })
+    await expandBand(page)
     await page.waitForTimeout(1_000)
 
     // the last group's first button: scroll it into view within the band, then

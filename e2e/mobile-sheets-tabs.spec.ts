@@ -22,7 +22,7 @@ test.describe('sheets ribbon tabs never crash', () => {
     const errors: string[] = []
     page.on('pageerror', (e) => errors.push(String(e)))
     await page.goto(SHEETS_URL, { waitUntil: 'load' })
-    await expect(page.locator('.ribbon').first()).toBeVisible({ timeout: 30_000 })
+    await expect(page.locator('.ribbon-tabs').first()).toBeVisible({ timeout: 30_000 })
     await page.waitForTimeout(1_500)
 
     for (const label of TABS) {

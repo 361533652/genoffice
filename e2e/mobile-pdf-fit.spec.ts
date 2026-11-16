@@ -21,6 +21,13 @@ const PHONE = { width: 390, height: 844 }
 
 test.use({ viewport: PHONE, hasTouch: true, isMobile: true, deviceScaleFactor: 2 })
 
+/** A phone starts with the command band collapsed; these specs measure the band. */
+async function expandBand(page: Page): Promise<void> {
+  if (await page.locator('[data-ribbon-body]').isVisible()) return
+  await page.keyboard.press('Control+F1')
+  await expect(page.locator('[data-ribbon-body]')).toBeVisible({ timeout: 10_000 })
+}
+
 /** Open the sample through the app's own consumePending → readFileChunk path. */
 async function openSample(page: Page): Promise<void> {
   const fixture = readFileSync(FIXTURE)
@@ -94,6 +101,7 @@ test.describe('PDF fit on a portrait phone', () => {
 
   test('the thumbnail drawer overlays without changing the page width', async ({ page }) => {
     await openSample(page)
+    await expandBand(page)
     const before = await pageCanvasWidth(page)
 
     // open the thumbnails drawer (the button lives in the view-nav group)
@@ -111,6 +119,7 @@ test.describe('PDF fit on a portrait phone', () => {
 
   test('reading tools sit in the first screen without scrolling the ribbon', async ({ page }) => {
     await openSample(page)
+    await expandBand(page)
     // P0-5: page input, zoom −/+, fit-width and search are visible at scrollLeft 0
     const reach = await page.evaluate(() => {
       const body = document.querySelector('.ribbon-body') as HTMLElement | null

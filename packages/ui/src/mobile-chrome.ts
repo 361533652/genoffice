@@ -63,6 +63,23 @@ export function installMobileChrome(doc: Document = document): MobileChromeHandl
   const hide = (): void => setHidden(true)
   const show = (): void => setHidden(false)
 
+  /**
+   * A tap is the "bring it back" gesture: restore the chrome AND the band.
+   *
+   * A tap that lands ON the chrome is a deliberate control press, not a reading
+   * tap: the tab/button underneath owns the band transition. Expanding here
+   * first made a tap on a tab race its own toggle — the tap expanded the band to
+   * compact, then the tab press collapsed it again (net: nothing happened).
+   */
+  const revealByTap = (target: EventTarget | null): void => {
+    const el = target instanceof Element ? target : null
+    const onChrome = !!el?.closest('.ribbon, .ribbon-tabs, .status-bar')
+    if (!onChrome) {
+      ;(globalThis as { __genofficeExpandRibbon?: () => void }).__genofficeExpandRibbon?.()
+    }
+    show()
+  }
+
   const scheduleHide = (): void => {
     if (idleTimer) clearTimeout(idleTimer)
     idleTimer = setTimeout(() => {
@@ -117,7 +134,7 @@ export function installMobileChrome(doc: Document = document): MobileChromeHandl
     const moved = Math.hypot(event.clientX - start.x, event.clientY - start.y)
     const elapsed = Date.now() - start.t
     // a tap — and only a tap — brings the chrome back
-    if (moved <= TAP_SLOP_PX && elapsed <= TAP_MAX_MS) show()
+    if (moved <= TAP_SLOP_PX && elapsed <= TAP_MAX_MS) revealByTap(event.target)
   }
 
   const onPointerCancel = (): void => {

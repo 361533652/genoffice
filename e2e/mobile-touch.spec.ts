@@ -56,7 +56,7 @@ async function drag(page: Page, from: { x: number; y: number }, to: { x: number;
 test.describe('touch on a mobile host', () => {
   test('sheets: a tap moves the cell cursor', async ({ page }) => {
     await page.goto(SHEETS_URL, { waitUntil: 'load' })
-    await expect(page.locator('.ribbon')).toBeVisible({ timeout: 30_000 })
+    await expect(page.locator('.ribbon-tabs')).toBeVisible({ timeout: 30_000 })
     await page.waitForTimeout(3_500)
 
     const address = (): Promise<string | null> =>
@@ -75,7 +75,7 @@ test.describe('touch on a mobile host', () => {
 
   test('sheets: a finger drag scrolls instead of selecting a range', async ({ page }) => {
     await page.goto(SHEETS_URL, { waitUntil: 'load' })
-    await expect(page.locator('.ribbon')).toBeVisible({ timeout: 30_000 })
+    await expect(page.locator('.ribbon-tabs')).toBeVisible({ timeout: 30_000 })
     await page.waitForTimeout(3_500)
 
     // This used to assert that a drag extended a range. That WAS the bug the
@@ -95,7 +95,7 @@ test.describe('touch on a mobile host', () => {
 
   test('sheets: a tap plus typing writes into the cell', async ({ page }) => {
     await page.goto(SHEETS_URL, { waitUntil: 'load' })
-    await expect(page.locator('.ribbon')).toBeVisible({ timeout: 30_000 })
+    await expect(page.locator('.ribbon-tabs')).toBeVisible({ timeout: 30_000 })
     await page.waitForTimeout(3_500)
 
     // the grid rasterises into a canvas, so neither innerText nor a DOM node
@@ -144,7 +144,7 @@ test.describe('touch on a mobile host', () => {
 
   test('slides: the deck canvas paints', async ({ page }) => {
     await page.goto(SLIDES_URL, { waitUntil: 'load' })
-    await expect(page.locator('.ribbon')).toBeVisible({ timeout: 30_000 })
+    await expect(page.locator('.ribbon-tabs')).toBeVisible({ timeout: 30_000 })
     await page.waitForTimeout(5_000)
 
     // the app asks for a blank deck on boot; returning undefined there left it
