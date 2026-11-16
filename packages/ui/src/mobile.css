@@ -367,3 +367,33 @@
     white-space: nowrap;
   }
 }
+
+
+/* ---------------------------------------------------------------------------
+ * The expanded command band is a BOTTOM tool bar on a phone.
+ *
+ * The tab/QAT row on top is the navigation/common surface; the selected tab's
+ * command groups ride above the status bar instead of stacking a second row
+ * under the tabs, and scroll horizontally there. This is the "common band on
+ * the bottom" half of the phone ask: the default state is still the collapsed
+ * band, expanding it brings the tools up from the bottom where a thumb reaches
+ * them. Pure geometry — no overlay, no scrim, no extra button, and desktop is
+ * untouched (the media query gates it).
+ * ------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  /* 24px is the existing status-bar height; keep the band above it.
+     Sheets is excluded: its sheet-tab strip already lives just above the status
+     bar, and a fixed band would cover it (measured on-device). Sheets keeps the
+     band under the tabs, where it belongs to the grid header. */
+  html:not(:has(.app-shell)) .ribbon-collapsible:not(.ribbon-collapsed) [data-ribbon-body] {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 24px;
+    z-index: 60;
+    background: var(--chrome-bg);
+    border-top: 1px solid var(--border);
+    box-shadow: var(--shadow-menu);
+  }
+}
+

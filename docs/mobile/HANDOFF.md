@@ -250,9 +250,11 @@ adb install -r apps/mobile/app/build/outputs/apk/debug/app-debug.apk
 4. **表格单指/双指手势**——Univer 只认 wheel，手指拖动被它当成「框选」（实测：拖动后选出 B19:B27、视口一点没动），只能拖滚动条。新增 `apps/sheets/src/renderer/touch-scroll.ts`：单指拖动合成 wheel 事件给 canvas（复用 Univer 的惯性/边界），双指捏合合成 Ctrl+wheel 复用既有缩放步进；8px 阈值区分点选与滚动。**必须在 main.tsx 启动期安装**——Univer 的框选监听在 window 捕获阶段、且注册更早，晚装就拦不住；拖动结束后补一次合成点击，把 Univer 拖出来的选区收敛成单格（facade 的 `getRange().activate()` 清不掉主选区，实测无效）。守护 `e2e/mobile-sheets-touch.spec.ts`（像素哈希证明内容真的滚了 + 名称框必须是单格）。
 5. **PDF 双指缩放**——原来捏合缩放的是整个页面（visualViewport scale>1），阅读器自己的 scale 不动。新增 `apps/pdf/src/renderer/pinch-zoom.ts`：`.pdf-scroll` 在 `(pointer: coarse)` 下 `touch-action: pan-x pan-y` 夺回捏合，双指距离变化合成 Ctrl+wheel，复用既有「锚点 + 连续缩放」路径；单指滚动保留。守护 `e2e/mobile-pdf-pinch.spec.ts`（含「文档确实可滚动」的前提断言——单页 fixture 要先放大再拖，否则测的是不会发生的行为）。
 
-6. **手机默认收起功能区**——窄屏首次进入只留页签/QAT 行（≈48px），点任意页签或展开钮才打开命令带。**点击屏幕恢复时连命令带一起展开**：只恢复 chrome 的话「上浮展示」回来是一条空页签栏，命令带仍是收起的（实测暴露的矛盾，所以把展开挂到点击恢复上）。桌面、以及已经选过密度的设备不受影响（localStorage 的显式选择优先）。
+6. **手机默认收起功能区**——窄屏首次进入只留页签/QAT 行（≈48px），点任意页签或展开钮才打开命令带。**点击屏幕恢复时连命令带一起展开**：只恢复 chrome 的话「上浮展示」回来是一条空页签栏，命令带仍是收起的（实测暴露的矛盾，所以把展开挂到点击恢复上）。但**点在 chrome 上的点击不能抢先展开**——它和页签/按钮自己的 toggle 抢跑，实测「点开始页签没反应」（tap 先展开到 compact，页签 press 又把它收回去）；现在落在 `.ribbon/.ribbon-tabs/.status-bar` 上的点击交给控件自己处理。桌面、以及已经选过密度的设备不受影响（localStorage 的显式选择优先）。
 
-**未做（下一步）**：真正的「底部常用带 + 更多抽屉」信息架构（当前是收起 + 按需展开，不是常用工具筛选）；A4 缩放决策。
+7. **展开的命令带落在底部**——顶部只留页签/QAT 当导航，展开后当前页签的工具组 fixed 在状态栏上方（bottom 24px），文档区不再被第二行压掉高度。**表格排除**：它的工作表页签就在状态栏上方，底部带会盖住（真机实测），所以 sheets 仍在页签下方展开——用 `html:not(:has(.app-shell))` 区分。纯 CSS，无遮罩无新按钮；桌面不受影响。守护：`e2e/mobile-chrome.spec.ts`「展开的命令带贴在底部」（断言 position:fixed 且距底 20–32px）。
+
+**未做（下一步）**：A4 缩放决策；media URI 打开显示数字 ID（桥接把 content:// 直接当 handle id，违反「末段必须是文件名」契约）。
 
 ## 已知缺陷（未修）
 

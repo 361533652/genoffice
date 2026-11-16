@@ -119,4 +119,22 @@ test.describe('mobile chrome', () => {
     await expect(page.locator('html')).not.toHaveAttribute('data-mobile-chrome', 'hidden')
     await expect(page.locator('.status-bar')).toBeVisible()
   })
+  test('the expanded band rides the bottom edge on a document app', async ({ page }) => {
+    await page.goto(DOCS_URL, { waitUntil: 'load' })
+    await expect(page.locator('.ProseMirror')).toBeVisible({ timeout: 30_000 })
+    await page.waitForTimeout(600)
+    await expect(page.locator('[data-ribbon-body]')).toBeHidden()
+    // the band control in the tab row expands it at the bottom
+    await page.locator('.ribbon-tabs-collapse-btn').click()
+    await expect(page.locator('[data-ribbon-body]')).toBeVisible()
+    const gap = await page.evaluate(() => {
+      const body = document.querySelector('[data-ribbon-body]')!
+      const r = body.getBoundingClientRect()
+      return { bottom: Math.round(window.innerHeight - r.bottom), position: getComputedStyle(body).position }
+    })
+    expect(gap.position, 'the band is pinned').toBe('fixed')
+    // 24px status bar sits under it
+    expect(gap.bottom).toBeGreaterThanOrEqual(20)
+    expect(gap.bottom).toBeLessThanOrEqual(32)
+  })
 })
