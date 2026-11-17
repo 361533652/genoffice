@@ -136,9 +136,6 @@ test.describe('grid touch gestures', () => {
     const box = await page.locator('.ribbon').boundingBox()
     expect(box, 'the band has a box').not.toBeNull()
     const y = box!.y + box!.height / 2
-    const before = await page.evaluate(
-      () => (document.querySelector('.ribbon') as HTMLElement).scrollLeft,
-    )
 
     const cdp = await page.context().newCDPSession(page)
     await cdp.send('Input.dispatchTouchEvent', {
@@ -155,11 +152,14 @@ test.describe('grid touch gestures', () => {
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
     await page.waitForTimeout(400)
 
-    const after = await page.evaluate(
-      () => (document.querySelector('.ribbon') as HTMLElement).scrollLeft,
-    )
-    expect(after, 'the band scrolled horizontally').toBeGreaterThan(before)
-    // the reported bug: scrolling the toolbar collapsed the toolbar
+    // a phone band wraps: there is no sideways scroll to perform, so the drag
+    // above is exactly the gesture that used to collapse the toolbar by mistake
+    const band = await page.evaluate(() => {
+      const el = document.querySelector('.ribbon') as HTMLElement
+      return { sw: el.scrollWidth, cw: el.clientWidth }
+    })
+    expect(band.sw, 'the band wraps instead of scrolling sideways').toBeLessThanOrEqual(band.cw + 4)
+    // the reported bug: dragging the toolbar collapsed the toolbar
     await expect(page.locator('html')).not.toHaveAttribute('data-mobile-chrome', 'hidden')
     await expect(page.locator('.ribbon')).toBeVisible()
   })

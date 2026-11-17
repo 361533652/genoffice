@@ -2,7 +2,7 @@
 
 > 这份文件写给刚醒来的人。它回答三个问题：现在能做什么、做过什么、卡在哪。
 > 技术细节在 [decisions.md](./decisions.md)，这里有 4 条 ADR 和逐轮记录。
-> 数据截止：2026-11-17 03:20 · 173 个移动端 e2e（新增 sheets 手势 2 + PDF 捏合 2）· 52 个 host 单测 · docs 分档单测 10 个。
+> 数据截止：2026-11-17 15:25 · 177 个移动端 e2e（含表格手势、PDF 捏合、.doc 导入、工具栏两组/更多、横滑不收起）· 52 个 host 单测 · docs 分档单测 10 个。
 > **已推送 `origin/main`（ahead 0），并发布 v0.1.0 / v0.1.1 / v0.1.2 / v0.1.3 / v0.1.4 五个 Android Release**（`v0.1.4-android`，2026-11-16 03:25 CST）。
 > 2026-11-16 19:57 复核：上一版这里还写着「147 个 e2e」「尚未推送到远端」，两处都已过期，按实测改正。
 
@@ -185,7 +185,7 @@ Web 路线首次加载 docs 5.7 MB / sheets 14.7 MB（3G 下 114s / 294s）。
 ## 测试现状
 
 ```bash
-npm run test:mobile          # 169 个 e2e，零手工准备（2026-11-17 实测 12.1 分钟）
+npm run test:mobile          # 177 个 e2e，零手工准备（2026-11-17 实测 13.8 分钟）
 npx vitest run --root packages/host   # 52 个单测（含 wasm 会话往返）
 npm run verify:mobile-builds # 六应用生产构建逐个验证
 ```
@@ -209,7 +209,7 @@ npm run verify:mobile-builds # 六应用生产构建逐个验证
 
 **六个应用都能在无 Electron 的移动宿主里启动；docs / markdown / html / sheets / slides 能完整读写；pdf 能打开和看；Android 宿主已建成并在模拟器上端到端验证（含 SAF 原地保存）。**
 
-累计 169 个移动端 e2e + 52 个 host 单测，修掉 9+8 个真缺陷（含「用户根本用不了」级：存储不可用白屏、安卓无法保存/打开、sheets 无打开入口、WebView 宿主白屏/状态栏遮挡/确认闸门静默取消、保存假成功）。
+累计 177 个移动端 e2e + 52 个 host 单测，修掉 9+8 个真缺陷（含「用户根本用不了」级：存储不可用白屏、安卓无法保存/打开、sheets 无打开入口、WebView 宿主白屏/状态栏遮挡/确认闸门静默取消、保存假成功）。
 
 ## Android 宿主（apps/mobile）
 
@@ -261,18 +261,23 @@ adb install -r apps/mobile/app/build/outputs/apk/debug/app-debug.apk
 9. **工具栏只留两组常用工具 + 「更多」**——手机命令带只显示前两个分组（文档是粘贴/字体，表格是剪贴板/字体），其余分组由页签行右端的「⋯」按钮展开/收回（`RibbonMoreButton`，状态在 `useRibbonCollapse` 里，root 加 `ribbon-all-groups`）。分组标记由 hook 里一个 MutationObserver 完成（切换页签会重渲染），**分隔符要两遍扫**——先标分组再标分隔符，一遍会把「下一个分组还没标记」读成 false，留下空的竖线。这样手机不再需要左右滑才能看到工具；桌面不受影响。**「More tools」标签目前是英文**（没加 18 语言的 key），后续可本地化。
 10. **修掉「滑工具栏反而把工具栏藏了」**——自动收起把「起点在工具栏上的拖动」也当成阅读滑动。现在 `pointerdown` 记录起点是否落在 `.ribbon/.ribbon-tabs/.status-bar` 内，是则整个手势不触发收起（横滑命令带只滚动，不收起）。守护：`e2e/mobile-sheets-touch.spec.ts`「scrolling the tool band horizontally does not hide the chrome」（先点「更多」确保有可滚内容）。
 
-**未做（下一步）**：A4 缩放决策；media URI 打开显示数字 ID（桥接把 content:// 直接当 handle id，违反「末段必须是文件名」契约）；.hwp 移动端导入；「More tools」标签本地化。
+11. **工具栏不再横向滚动**——命令带的分组改为**换行排布**（含组内 `.ribbon-group-content/.ribbon-group-items/.ribbon-rows/.inline-tools` 也允许 wrap），不再需要左右拖动；「更多」展开后是一个高度上限 44dvh、可纵向滚动的面板。守护改为断言「无横向溢出 + 最后一组在视口内」，旧的「scrollLeft 写入存活」断言随横向滚动一起退役。
+12. **PDF 手机默认按宽度适配**——打开时若本机是窄屏，忽略别处保存的自定义缩放（fitMode 强制 'width'，阅读位置仍恢复）；`recomputeFit` 在首帧 `clientWidth === 0` 时回退到 `window.innerWidth`，不再把页面锁在 MIN_SCALE。
+13. **Markdown 手机版式与文件名**——窄屏页边距 72px→18px（390px 屏正文从约 246px 提到 354px）；状态栏文件名先 `decodeURIComponent` 再取末段，SAF 的 `primary%3ADownload%2Fnote.md` 显示为 `note.md`。守护：mobile-text 的版面与文件名用例。
+14. **SAF 句柄改成真正的不透明 id**（根因修复）——原生桥原先把 `content://…` 整个 URI 当 handle id 交给网页，违反「末段必须是文件名」的契约：状态栏出现百分号编码（用户说的「乱码」）、`.md` 因为没有扩展名被判成纯文本而进了源码视图、文件名显示成提供商 token。新增 `SafHandles.kt`：id 形如 `saf/<uuid>/<文件名>`，URI 存在进程内映射里；打开/另存为时注册，Recents/ACTION_VIEW 传来的裸 URI 在消费时归一化。`saveInPlace`/`readDocument` 改走映射（旧裸 URI 仍可解析，兼容历史 id）。真机验证：.md 直接进富文本、状态栏显示 sample.md；工作簿编辑→保存→回读 SAFTEST。
+
+**未做（下一步）**：A4 缩放决策；.hwp 移动端导入；「More tools」标签本地化。
 
 ## 已知缺陷（未修）
 
-| 缺陷                          | 表现                                             | 线索                                                                                                               |
-| ----------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| 横屏空态按钮裁切 7px          | MuMu 横屏 1280×720 首页按钮贴底                  | 未修                                                                                                               |
-| media URI 打开显示数字 ID     | 状态栏显示 `content://.../数字id` 而非文件名     | 未修                                                                                                               |
-| Android 15 `file://` 直读被拒 | 只有 `content://` 正常                           | scoped storage 的平台行为，记着别当成缺陷                                                                          |
-| CSV 保存回 `.csv`             | 打开/编辑已通，但首存只能另存为 `.xlsx`          | 移动缺 CSV 序列化器；桌面有写回 `.csv` 的完整流程可移植                                                            |
-| .hwp/.hwpx 导入               | 移动端明确报「需要桌面版」，桌面可转             | 转换器依赖 node:fs/zlib，未做浏览器移植                                                                            |
-| 桌面 Release 曾长期红         | 2026-11-14→17 每次 push 都失败，只出 Android APK | 已修：Electron 渲染器缺 `./fs-node → fs-browser-stub` 别名（见 electron.vite.config.ts）；修复后 v0.12.31 首发出包 |
+| 缺陷                          | 表现                                                            | 线索                                                                                                               |
+| ----------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| 横屏空态按钮裁切 7px          | MuMu 横屏 1280×720 首页按钮贴底                                 | 未修                                                                                                               |
+| ~~media URI 显示数字 ID~~     | 已修：`SafHandles` 的 id 末段是文件名，状态栏与扩展名判断都正常 | fixed（v0.1.12）                                                                                                   |
+| Android 15 `file://` 直读被拒 | 只有 `content://` 正常                                          | scoped storage 的平台行为，记着别当成缺陷                                                                          |
+| CSV 保存回 `.csv`             | 打开/编辑已通，但首存只能另存为 `.xlsx`                         | 移动缺 CSV 序列化器；桌面有写回 `.csv` 的完整流程可移植                                                            |
+| .hwp/.hwpx 导入               | 移动端明确报「需要桌面版」，桌面可转                            | 转换器依赖 node:fs/zlib，未做浏览器移植                                                                            |
+| 桌面 Release 曾长期红         | 2026-11-14→17 每次 push 都失败，只出 Android APK                | 已修：Electron 渲染器缺 `./fs-node → fs-browser-stub` 别名（见 electron.vite.config.ts）；修复后 v0.12.31 首发出包 |
 
 ## 建议的下一步
 
@@ -282,5 +287,5 @@ adb install -r apps/mobile/app/build/outputs/apk/debug/app-debug.apk
 2. **手机打开 5391 打几个字**（两分钟）→ 确认中文输入法真机行为（`npm run serve:mobile-checks`）。
 3. **定 A4 缩放**（需要你拍板）→ 影响所有文档的默认观感。
 4. CSV 写回 `.csv`（移植桌面序列化器），让 CSV 不止能开还能原格式存。
-5. 小项：横屏空态裁切、media URI 文件名。
+5. 小项：横屏空态裁切。
 6. slides 字体精度（canvas 测量 provider）与 master view 移植；纯浏览器部署的首屏代码分割（APK 路线已解此问题）。

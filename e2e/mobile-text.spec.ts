@@ -23,11 +23,7 @@ const HTML_URL = process.env.MOBILE_HTML_URL ?? 'http://127.0.0.1:5205'
  * global during module evaluation, and a `setInterval` poller loses the race
  * against the mount effect that calls `consumePending`.
  */
-async function stubBridge(
-  page: Page,
-  globalName: string,
-  text: string,
-): Promise<void> {
+async function stubBridge(page: Page, globalName: string, text: string): Promise<void> {
   await page.addInitScript(
     ({ globalName, text }) => {
       const host = window as unknown as Record<string, unknown>
@@ -84,5 +80,81 @@ test.describe('opening a text document on a mobile host', () => {
     // 0 字符 means the file never arrived
     await expect(page.getByText('0 字符')).toHaveCount(0)
     expect(errors).toEqual([])
+  })
+})
+
+test.describe('markdown reading layout on a phone', () => {
+  test('the page keeps a phone gutter instead of a 72px desktop margin', async ({ page }) => {
+    // a '.md' id opens in the rich (rendered) mode; a bare token counts as plain
+    // text and lands in the source pane, where .doc-page does not exist
+    await page.addInitScript(() => {
+      const host = window as unknown as Record<string, unknown>
+      let real: Record<string, unknown> | undefined
+      Object.defineProperty(host, 'markdownApi', {
+        configurable: true,
+        get() {
+          return real
+        },
+        set(value: Record<string, unknown>) {
+          real = new Proxy(value, {
+            get(target, prop: string) {
+              if (prop === 'consumePending') return async () => 'host/browser-1/sample.md'
+              if (prop === 'readFile')
+                return async () => '# 标题\n\n正文段落，包含 English words 和数字 123。'
+              if (prop === 'getPreviewInfo') return async () => ({ url: 'about:blank' })
+              if (prop === 'updatePreview') return async () => undefined
+              return target[prop]
+            },
+          })
+        },
+      })
+    })
+    await page.goto(MARKDOWN_URL, { waitUntil: 'load' })
+    await expect(page.locator('.doc-page')).toBeVisible({ timeout: 30_000 })
+    const metrics = await page.evaluate(() => {
+      const el = document.querySelector('.doc-page') as HTMLElement
+      const cs = getComputedStyle(el)
+      const r = el.getBoundingClientRect()
+      return {
+        padLeft: parseFloat(cs.paddingLeft),
+        padRight: parseFloat(cs.paddingRight),
+        column: Math.round(r.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)),
+      }
+    })
+    // the desktop 72px pair left ~246px of text on a 390px phone
+    expect(metrics.padLeft, 'left gutter').toBeLessThanOrEqual(20)
+    expect(metrics.padRight, 'right gutter').toBeLessThanOrEqual(20)
+    expect(metrics.column, 'readable text column').toBeGreaterThan(300)
+  })
+
+  test('a SAF handle id shows the file name, not the percent-encoded URI', async ({ page }) => {
+    await stubBridge(page, 'markdownApi', '# 文件名')
+    // the host hands over a content:// id whose path is percent-encoded
+    await page.addInitScript(() => {
+      const host = window as unknown as Record<string, unknown>
+      let real: Record<string, unknown> | undefined
+      Object.defineProperty(host, 'markdownApi', {
+        configurable: true,
+        get() {
+          return real
+        },
+        set(value: Record<string, unknown>) {
+          real = new Proxy(value, {
+            get(target, prop: string) {
+              if (prop === 'consumePending')
+                return async () =>
+                  'content://com.android.externalstorage.documents/document/primary%3ADownload%2Fsample.md'
+              if (prop === 'readFile') return async () => '# 文件名'
+              if (prop === 'getPreviewInfo') return async () => ({ url: 'about:blank' })
+              if (prop === 'updatePreview') return async () => undefined
+              return target[prop]
+            },
+          })
+        },
+      })
+    })
+    await page.goto(MARKDOWN_URL, { waitUntil: 'load' })
+    await expect(page.locator('.status-bar')).toContainText('sample.md', { timeout: 30_000 })
+    await expect(page.locator('.status-bar')).not.toContainText('%3A')
   })
 })

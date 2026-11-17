@@ -111,7 +111,9 @@ class GenOfficeBridge(
         }
         val result = JSONObject()
             .put("name", p.name)
-            .put("handleId", p.handleId)
+            // Recents/ACTION_VIEW park a raw URI here; mint the opaque id the web
+            // contract expects (last segment = file name) before handing it over
+            .put("handleId", SafHandles.normalise(p.handleId, p.name))
             .put("writable", p.writable)
             .put("data", Base64.encodeToString(p.bytes, Base64.NO_WRAP))
         resolve(id, JSONObject().put("ok", true).put("result", result))
@@ -138,7 +140,7 @@ class GenOfficeBridge(
                 val name = displayName(uri) ?: "document"
                 Recents.add(activity, appForName(name), name, uri.toString())
                 val handle = JSONObject()
-                    .put("id", uri.toString())
+                    .put("id", SafHandles.register(uri, name))
                     .put("name", name)
                     .put("writable", true)
                 resolve(
@@ -187,7 +189,7 @@ class GenOfficeBridge(
                 val name = displayName(uri) ?: save.name
                 Recents.add(activity, appForName(name), name, uri.toString())
                 val handle = JSONObject()
-                    .put("id", uri.toString())
+                    .put("id", SafHandles.register(uri, name))
                     .put("name", name)
                     .put("writable", true)
                 resolve(save.id, JSONObject().put("ok", true).put("result", JSONObject().put("handle", handle)))
@@ -202,7 +204,8 @@ class GenOfficeBridge(
         val bytes = Base64.decode(params.optString("data"), Base64.DEFAULT)
         io.execute {
             try {
-                val uri = Uri.parse(handleId)
+                val uri = SafHandles.uri(handleId)
+                    ?: throw IllegalStateException("unknown handle $handleId")
                 activity.contentResolver.openOutputStream(uri, "wt")?.use { it.write(bytes) }
                     ?: throw IllegalStateException("cannot open $handleId for writing")
                 resolve(id, JSONObject().put("ok", true).put("result", JSONObject().put("ok", true)))
@@ -219,7 +222,9 @@ class GenOfficeBridge(
     private fun readDocument(id: String, handleId: String) {
         io.execute {
             try {
-                val bytes = activity.contentResolver.openInputStream(Uri.parse(handleId))?.use {
+                val uri = SafHandles.uri(handleId)
+                    ?: throw IllegalStateException("unknown handle $handleId")
+                val bytes = activity.contentResolver.openInputStream(uri)?.use {
                     it.readBytes()
                 } ?: throw IllegalStateException("cannot open $handleId")
                 resolve(

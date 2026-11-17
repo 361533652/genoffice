@@ -1107,6 +1107,20 @@ html.markdown-graph-open .ribbon-tabs {
   color: var(--text-muted);
 }
 
+/* A phone cannot spare the 72px side margins: at 390px the 144px pair left the
+   reading column ~246px wide, so headings wrapped mid-word and body copy read
+   oversized against the page. Keep a comfortable 18px gutter; the 860px column
+   cap still applies on desktop. */
+@media (max-width: 720px) {
+  .doc-page {
+    padding: 20px 18px 80px;
+  }
+
+  .source-head {
+    padding: 10px 18px 6px;
+  }
+}
+
 .source-textarea {
   flex: 1;
   width: 100%;

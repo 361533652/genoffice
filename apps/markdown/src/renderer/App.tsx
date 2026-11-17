@@ -133,6 +133,15 @@ export { deriveAutoFileName } from './auto-file-name'
 export default function App() {
   const { lang, t } = useI18n()
   const [status, setStatus] = useState<LoadStatus>('loading')
+  /** Last path segment of a handle id, URI-decoded (SAF ids are percent-encoded). */
+  function displayNameOf(id: string): string {
+    try {
+      return decodeURIComponent(id).replace(/^.*[/\\]/, '')
+    } catch {
+      return id.replace(/^.*[/\\]/, '')
+    }
+  }
+
   const [filePath, setFilePath] = useState<string | null>(null)
   // a .txt/.json has no block document behind it: it is edited as source so
   // that saving cannot reinterpret it as markdown
@@ -1226,7 +1235,11 @@ export default function App() {
     current.view.dispatch(current.state.tr.setSelection(selection).scrollIntoView())
     current.view.focus()
   }, [])
-  const fileName = filePath ? filePath.replace(/^.*[/\\]/, '') : null
+  // A file opened through SAF arrives as an opaque handle id shaped like a
+  // content:// URI whose path is percent-encoded (primary%3ADownload%2Fnote.md).
+  // Splitting that on "/" yielded "primary%3ADownload%2Fnote.md" in the status
+  // bar — the "乱码" the user saw. Decode first, then take the last segment.
+  const fileName = filePath ? displayNameOf(filePath) : null
   const statusText =
     saveState === 'saving'
       ? t('saving')

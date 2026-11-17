@@ -395,3 +395,52 @@
     box-shadow: var(--shadow-menu);
   }
 }
+/* A toolbar that must be dragged left/right is not a phone toolbar. On narrow
+   screens the command groups WRAP into rows instead of scrolling sideways; the
+   full set ("More") is capped in height and scrolls vertically. Desktop keeps
+   its single scrolling row. */
+@media (max-width: 720px) {
+  /* sheets' band IS the collapsible root (data-ribbon-body on the same element);
+     docs' body is a child — cover both shapes. */
+  .ribbon-collapsible[data-ribbon-body],
+  .ribbon-collapsible [data-ribbon-body] {
+    flex-wrap: wrap;
+    overflow-x: hidden;
+  }
+
+  /* A group can be wider than the phone (sheets' font group is 420px): let it
+     shrink and wrap its own row instead of overflowing the band. */
+  .ribbon-group {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .ribbon-group-content,
+  .ribbon-group-items {
+    flex-wrap: wrap;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  /* sheets lays a group out as a grid of rows plus a nowrap inline tool row */
+  .ribbon-rows {
+    display: flex;
+    flex-wrap: wrap;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .inline-tools {
+    flex-wrap: wrap;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .ribbon-collapsible[data-ribbon-body].ribbon-all-groups,
+  .ribbon-collapsible.ribbon-all-groups [data-ribbon-body] {
+    overflow-y: auto;
+    max-height: 44dvh;
+    align-content: flex-start;
+  }
+}

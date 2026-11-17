@@ -1726,10 +1726,15 @@ export default function App() {
         // zoom (fitMode null) must be applied before 'ready', or the initial
         // fit-width recompute would take over; fit modes are recomputed anyway.
         const savedView = loadViewState(path)
+        // A phone reads at fit-width. A custom zoom saved elsewhere (a desktop
+        // window at 39%, say) made the phone open with a tiny page and no
+        // obvious way to know why — "有时候有点小，不会默认适配". The page
+        // position is still restored; only the custom scale is dropped.
+        const narrow = isNarrowViewport()
         if (savedView) {
           pendingViewRestoreRef.current = savedView
-          fitModeRef.current = savedView.fitMode
-          if (savedView.fitMode === null)
+          fitModeRef.current = narrow ? 'width' : savedView.fitMode
+          if (!narrow && savedView.fitMode === null)
             setScale(Math.min(MAX_SCALE, Math.max(MIN_SCALE, savedView.scale)))
         }
         setStatus('ready')
@@ -1899,8 +1904,11 @@ export default function App() {
     // the gutter shrinks to 8px, so the page fits the full screen width.
     const isNarrow = isNarrowViewport()
     const pad = isNarrow ? SCROLL_PAD_NARROW : SCROLL_PAD
-    const availW =
-      el.clientWidth - pad * 2 - (!isNarrow && noteMarginOn ? NOTE_MARGIN_W + PAGE_GAP : 0)
+    // clientWidth can be 0 on the first pass (the viewer mounted while hidden);
+    // feeding 0 into clampScale pinned the page at MIN_SCALE until the user
+    // tapped fit-width. Fall back to the viewport width for that pass.
+    const containerW = el.clientWidth > 0 ? el.clientWidth : window.innerWidth
+    const availW = containerW - pad * 2 - (!isNarrow && noteMarginOn ? NOTE_MARGIN_W + PAGE_GAP : 0)
     const next =
       mode === 'width'
         ? clampScale(availW / maxW)

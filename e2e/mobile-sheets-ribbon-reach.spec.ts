@@ -68,14 +68,13 @@ test.describe('sheets ribbon reach on a portrait phone', () => {
     })
 
     expect(metrics).not.toBeNull()
-    // the band keeps its own scroll, never clipped
-    expect(metrics!.overflowX, 'ribbon overflow-x').toBe('scroll')
-    expect(metrics!.readBack, 'scrollLeft write survives').toBe(500)
-    expect(metrics!.scrollWidth, 'band has overflow to reach').toBeGreaterThan(metrics!.clientWidth)
-    // scrolling to the end brings the last group's far edge into the viewport.
-    // (A group wider than the screen still has its left edge off-screen — that
-    // is reachable by scrolling, not a defect; the button hit-test below proves
-    // an actual control in the last group can be reached and clicked.)
+    // a phone band WRAPS its groups: everything fits without a sideways scroll
+    // (the old guard asserted scrollLeft survived a write, from the era when the
+    // band was a horizontal scroller — the user asked us to remove that drag)
+    expect(metrics!.overflowX, 'band no longer scrolls sideways').toBe('hidden')
+    expect(metrics!.scrollWidth, 'no horizontal overflow to hide tools').toBeLessThanOrEqual(
+      metrics!.clientWidth + 4,
+    )
     expect(metrics!.lastRight, 'last group right edge').toBeLessThanOrEqual(metrics!.vw + 1)
     // the document never grows past the device width
     expect(metrics!.docScrollWidth, 'document scroll width').toBeLessThanOrEqual(PHONE.width)

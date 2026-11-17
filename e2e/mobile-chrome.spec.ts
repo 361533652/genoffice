@@ -173,6 +173,12 @@ test.describe('mobile chrome', () => {
 
     await page.locator('.ribbon-more-btn').click()
     expect(await visibleGroups(), 'More reveals every group').toBeGreaterThan(2)
+    // and the full band wraps instead of demanding a sideways scroll
+    const band = await page.evaluate(() => {
+      const el = document.querySelector('[data-ribbon-body]') as HTMLElement
+      return { sw: el.scrollWidth, cw: el.clientWidth }
+    })
+    expect(band.sw, 'the full band wraps, no horizontal scroll').toBeLessThanOrEqual(band.cw + 4)
 
     await page.locator('.ribbon-more-btn').click()
     expect(await visibleGroups(), 'More toggles back to the short band').toBe(2)
