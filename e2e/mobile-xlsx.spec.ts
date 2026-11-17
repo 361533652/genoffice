@@ -104,9 +104,14 @@ test.describe('xlsx on a mobile host', () => {
         const g = await import(globals)
         await g.installNodeGlobals()
         const mod = await import(gateway)
-        return typeof mod.readBasicWorkbook === 'function' && typeof mod.applyPlanToXlsx === 'function'
+        return (
+          typeof mod.readBasicWorkbook === 'function' && typeof mod.applyPlanToXlsx === 'function'
+        )
       },
-      { globals: entry('host', 'node-globals.ts'), gateway: entry('xlsx-gateway', 'gateway/xlsx-gateway.ts') },
+      {
+        globals: entry('host', 'node-globals.ts'),
+        gateway: entry('xlsx-gateway', 'gateway/xlsx-gateway.ts'),
+      },
     )
     expect(ok).toBe(true)
   })

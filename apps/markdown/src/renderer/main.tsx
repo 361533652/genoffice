@@ -55,9 +55,15 @@ void (async () => {
   // markdown paper theme has no place on the facade yet, so it keeps reading the
   // bridge until that group moves over.
   const [lang, theme, docTheme, mdTheme] = await Promise.all([
-    getHost().language().catch(() => 'zh' as const),
-    getHost().theme().catch(() => 'system' as const),
-    getHost().documentTheme().catch(() => 'follow' as const),
+    getHost()
+      .language()
+      .catch(() => 'zh' as const),
+    getHost()
+      .theme()
+      .catch(() => 'system' as const),
+    getHost()
+      .documentTheme()
+      .catch(() => 'follow' as const),
     window.markdownApi.getMarkdownTheme?.().catch(() => 'default' as const),
   ])
   document.documentElement.lang = htmlLang(lang as Lang)

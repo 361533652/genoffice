@@ -8251,7 +8251,14 @@ export default function App() {
   // first 390px without scrolling; the view-nav group follows (search omitted
   // there to avoid a duplicate), then the markup/edit/convert groups (P0-5).
   const homeGroups = narrow
-    ? [pageZoomGroup, readToolsGroup, renderViewNav(false), markupGroup, editEntriesGroup, convertGroup]
+    ? [
+        pageZoomGroup,
+        readToolsGroup,
+        renderViewNav(false),
+        markupGroup,
+        editEntriesGroup,
+        convertGroup,
+      ]
     : [markupGroup, editEntriesGroup, convertGroup, pageZoomGroup, readToolsGroup]
 
   return (
@@ -9107,7 +9114,10 @@ export default function App() {
               <div className="pdf-side-scrim" onClick={() => setSidebar(null)} aria-hidden="true" />
             )}
             {sidebar === 'outline' && outline && (
-              <div className="pdf-thumbs pdf-outline-pane pdf-thumbs-drawer" style={{ width: sidebarW }}>
+              <div
+                className="pdf-thumbs pdf-outline-pane pdf-thumbs-drawer"
+                style={{ width: sidebarW }}
+              >
                 <div className="pdf-outline-header">
                   <span>{t('outline')}</span>
                   {!outlineGenerated && (
@@ -9169,7 +9179,10 @@ export default function App() {
               </div>
             )}
             {sidebar === 'comments' && (
-              <div className="pdf-thumbs pdf-outline-pane pdf-thumbs-drawer" style={{ width: sidebarW }}>
+              <div
+                className="pdf-thumbs pdf-outline-pane pdf-thumbs-drawer"
+                style={{ width: sidebarW }}
+              >
                 <div className="pdf-outline-header">
                   <span>{t('commentsPanel')}</span>
                   <button

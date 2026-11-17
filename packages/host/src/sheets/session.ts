@@ -20,9 +20,7 @@
  *  - single tab: listWorkbookTabs answers [], the cross-workbook pick is inert
  */
 import type { FileHandle, FileHost, OpenResult } from '@genoffice/host-contract'
-import {
-  configureGatewayHost,
-} from '@genoffice/xlsx-gateway/gateway/gateway-host'
+import { configureGatewayHost } from '@genoffice/xlsx-gateway/gateway/gateway-host'
 import {
   readArchiveEntriesText,
   readArchiveEntryText,
@@ -113,16 +111,18 @@ export interface WorkbookSaveRequestLike {
   definedNamesState?: unknown
   themeState?: unknown
   workbookProtectionState?: unknown
-  redactionStates?: readonly {
-    sheetName: string
-    marks: readonly (Record<string, unknown> & {
-      startRow: number
-      endRow: number
-      startColumn: number
-      endColumn: number
-      label: string
-    })[]
-  }[] | null
+  redactionStates?:
+    | readonly {
+        sheetName: string
+        marks: readonly (Record<string, unknown> & {
+          startRow: number
+          endRow: number
+          startColumn: number
+          endColumn: number
+          label: string
+        })[]
+      }[]
+    | null
   externalLinkOps?: unknown
 }
 
@@ -359,7 +359,9 @@ export class WorkbookSessionHost {
       (name) =>
         name === 'xl/workbook.xml' ||
         name === 'xl/_rels/workbook.xml.rels' ||
-        /^xl\/(?:slicers|timelines|slicerCaches|timelineCaches|pivotTables)\/[^/]+\.xml$/.test(name) ||
+        /^xl\/(?:slicers|timelines|slicerCaches|timelineCaches|pivotTables)\/[^/]+\.xml$/.test(
+          name,
+        ) ||
         /^xl\/pivotCache\/pivotCacheDefinition\d*\.xml$/.test(name) ||
         /^xl\/worksheets\/(?:_rels\/)?[^/]+\.xml(?:\.rels)?$/.test(name),
     )
@@ -405,9 +407,7 @@ export class WorkbookSessionHost {
     const manifest = (await this.client.archiveManifest(session.snapshotPath)) as {
       entries: { name: string }[]
     }
-    const wanted = manifest.entries
-      .map((entry) => entry.name)
-      .filter(isConnectionWalkPart)
+    const wanted = manifest.entries.map((entry) => entry.name).filter(isConnectionWalkPart)
     const texts = await readArchiveEntriesText(this.client, session.snapshotPath, wanted)
     const connections = await refreshableQueriesOf(async (path) => texts.get(path))
     return { connections }
@@ -819,7 +819,9 @@ function buildSavePlan(session: SessionInfo, request: WorkbookSaveRequestLike): 
         startColumn: mark.startColumn,
         endColumn: mark.endColumn,
         label: mark.label,
-        ...('previousFill' in mark ? { previousFill: (mark.previousFill as string | null) ?? null } : {}),
+        ...('previousFill' in mark
+          ? { previousFill: (mark.previousFill as string | null) ?? null }
+          : {}),
       })),
     })) ?? null
 
@@ -862,7 +864,12 @@ function buildSavePlan(session: SessionInfo, request: WorkbookSaveRequestLike): 
             relayout: (({ sheetId: _sheetId, sourceSheetId, ...rest }) => ({
               ...rest,
               sourceSheetName: resolveSheetName(sourceSheetId as string),
-            }))(update.relayout as Record<string, unknown> & { sheetId: string; sourceSheetId: string }),
+            }))(
+              update.relayout as Record<string, unknown> & {
+                sheetId: string
+                sourceSheetId: string
+              },
+            ),
           }),
     })) as unknown as StreamingSaveRequest['pivotRefreshUpdates'],
     redactionStates: redactionStates as StreamingSaveRequest['redactionStates'],

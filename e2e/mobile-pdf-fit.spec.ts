@@ -105,7 +105,10 @@ test.describe('PDF fit on a portrait phone', () => {
     const before = await pageCanvasWidth(page)
 
     // open the thumbnails drawer (the button lives in the view-nav group)
-    await page.getByRole('button', { name: /缩略图|Thumbnails/ }).first().click()
+    await page
+      .getByRole('button', { name: /缩略图|Thumbnails/ })
+      .first()
+      .click()
     await expect(page.locator('.pdf-thumbs-drawer')).toBeVisible()
 
     const during = await pageCanvasWidth(page)
@@ -130,14 +133,19 @@ test.describe('PDF fit on a portrait phone', () => {
         const el = document.querySelector(sel)
         if (!el) return null
         const r = el.getBoundingClientRect()
-        return { left: r.left, right: r.right, visible: r.width > 0 && r.right <= vw + 1 && r.left >= -1 }
+        return {
+          left: r.left,
+          right: r.right,
+          visible: r.width > 0 && r.right <= vw + 1 && r.left >= -1,
+        }
       }
       return {
         pageInput: rect('.tb-page-input'),
         zoomOut: rect('.tb-zoom'),
-        fitWidth: Array.from(document.querySelectorAll('.rb-big')).find((b) =>
-          /适应宽度|Fit Width/i.test(b.textContent ?? ''),
-        )?.getBoundingClientRect().right ?? null,
+        fitWidth:
+          Array.from(document.querySelectorAll('.rb-big'))
+            .find((b) => /适应宽度|Fit Width/i.test(b.textContent ?? ''))
+            ?.getBoundingClientRect().right ?? null,
         vw,
       }
     })

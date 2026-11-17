@@ -103,7 +103,11 @@ test.describe('docs IME on a mobile host', () => {
     await page.locator('.ProseMirror').click({ position: { x: 120, y: 120 } })
     const before = await text(page)
     const cdp = await page.context().newCDPSession(page)
-    await cdp.send('Input.imeSetComposition', { text: 'zhongwen', selectionStart: 8, selectionEnd: 8 })
+    await cdp.send('Input.imeSetComposition', {
+      text: 'zhongwen',
+      selectionStart: 8,
+      selectionEnd: 8,
+    })
     await page.waitForTimeout(100)
     await cdp.send('Input.imeSetComposition', { text: '', selectionStart: 0, selectionEnd: 0 })
     await page.waitForTimeout(200)
@@ -124,9 +128,7 @@ test.describe('sheets needs a spreadsheet that can take input', () => {
     await boot(page, APPS[1])
     // Univer renders to canvas; a real edit has to go through its API, so this
     // asserts the grid mounted and reports a sheet instead of pretending to type
-    const hasGrid = await page.evaluate(
-      () => document.querySelectorAll('canvas').length > 0,
-    )
+    const hasGrid = await page.evaluate(() => document.querySelectorAll('canvas').length > 0)
     expect(hasGrid).toBe(true)
   })
 })

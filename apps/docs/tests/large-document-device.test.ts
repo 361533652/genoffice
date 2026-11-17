@@ -1,6 +1,12 @@
-
 import { describe, expect, it } from 'vitest'
-import { CHARS_PER_BLOCK, LARGE_DOC_READ_ONLY_WEIGHT, HUGE_DOC_REFUSE_WEIGHT, weightForBudget, deviceBudget, openTierForDevice } from '../src/renderer/large-document'
+import {
+  CHARS_PER_BLOCK,
+  LARGE_DOC_READ_ONLY_WEIGHT,
+  HUGE_DOC_REFUSE_WEIGHT,
+  weightForBudget,
+  deviceBudget,
+  openTierForDevice,
+} from '../src/renderer/large-document'
 
 /**
  * Device-scaled document tiers.
@@ -77,7 +83,11 @@ describe('small documents are never degraded by device scaling', () => {
     const origNav = Object.getOwnPropertyDescriptor(nav, 'deviceMemory')
     Object.defineProperty(perf, 'memory', {
       configurable: true,
-      get: () => ({ jsHeapSizeLimit: heapMB * 1024 * 1024, usedJSHeapSize: 22 * 1024 * 1024, totalJSHeapSize: 33 * 1024 * 1024 }),
+      get: () => ({
+        jsHeapSizeLimit: heapMB * 1024 * 1024,
+        usedJSHeapSize: 22 * 1024 * 1024,
+        totalJSHeapSize: 33 * 1024 * 1024,
+      }),
     })
     Object.defineProperty(nav, 'deviceMemory', { configurable: true, get: () => 4 })
     try {

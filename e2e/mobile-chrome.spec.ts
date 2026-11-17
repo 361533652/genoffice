@@ -18,8 +18,15 @@ const DOCS_URL = process.env.MOBILE_DOCS_URL ?? 'http://127.0.0.1:5199'
 
 test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })
 
-async function touchDrag(cdp: any, from: { x: number; y: number }, to: { x: number; y: number }): Promise<void> {
-  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: from.x, y: from.y }] })
+async function touchDrag(
+  cdp: any,
+  from: { x: number; y: number },
+  to: { x: number; y: number },
+): Promise<void> {
+  await cdp.send('Input.dispatchTouchEvent', {
+    type: 'touchStart',
+    touchPoints: [{ x: from.x, y: from.y }],
+  })
   for (let i = 1; i <= 4; i++) {
     const x = from.x + ((to.x - from.x) * i) / 4
     const y = from.y + ((to.y - from.y) * i) / 4
@@ -29,7 +36,10 @@ async function touchDrag(cdp: any, from: { x: number; y: number }, to: { x: numb
 }
 
 async function touchTap(cdp: any, at: { x: number; y: number }): Promise<void> {
-  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: at.x, y: at.y }] })
+  await cdp.send('Input.dispatchTouchEvent', {
+    type: 'touchStart',
+    touchPoints: [{ x: at.x, y: at.y }],
+  })
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
 }
 
@@ -51,7 +61,9 @@ test.describe('mobile chrome', () => {
     // reading gesture: drag up through the page content
     await touchDrag(cdp, { x: 195, y: 520 }, { x: 195, y: 300 })
     // collapse fires after the gesture settles, not during it
-    await expect(page.locator('html')).toHaveAttribute('data-mobile-chrome', 'hidden', { timeout: 5_000 })
+    await expect(page.locator('html')).toHaveAttribute('data-mobile-chrome', 'hidden', {
+      timeout: 5_000,
+    })
     await expect(page.locator('.ribbon-tabs')).toBeHidden()
 
     // a drag must NOT be mistaken for a tap
@@ -61,7 +73,9 @@ test.describe('mobile chrome', () => {
 
     // a genuine tap brings the chrome back — and the band with it
     await touchTap(cdp, { x: 195, y: 420 })
-    await expect(page.locator('html')).toHaveAttribute('data-mobile-chrome', 'shown', { timeout: 5_000 })
+    await expect(page.locator('html')).toHaveAttribute('data-mobile-chrome', 'shown', {
+      timeout: 5_000,
+    })
     await expect(page.locator('.ribbon-tabs')).toBeVisible()
     await expect(page.locator('[data-ribbon-body]'), 'the tap also reveals the band').toBeVisible()
   })
@@ -102,12 +116,18 @@ test.describe('mobile chrome', () => {
     const cy = 420
     await cdp.send('Input.dispatchTouchEvent', {
       type: 'touchStart',
-      touchPoints: [{ x: cx - 25, y: cy, id: 1 }, { x: cx + 25, y: cy, id: 2 }],
+      touchPoints: [
+        { x: cx - 25, y: cy, id: 1 },
+        { x: cx + 25, y: cy, id: 2 },
+      ],
     })
     for (let i = 1; i <= 6; i++) {
       await cdp.send('Input.dispatchTouchEvent', {
         type: 'touchMove',
-        touchPoints: [{ x: cx - 25 - i * 10, y: cy, id: 1 }, { x: cx + 25 + i * 10, y: cy, id: 2 }],
+        touchPoints: [
+          { x: cx - 25 - i * 10, y: cy, id: 1 },
+          { x: cx + 25 + i * 10, y: cy, id: 2 },
+        ],
       })
       await page.waitForTimeout(30)
     }
@@ -130,7 +150,10 @@ test.describe('mobile chrome', () => {
     const gap = await page.evaluate(() => {
       const body = document.querySelector('[data-ribbon-body]')!
       const r = body.getBoundingClientRect()
-      return { bottom: Math.round(window.innerHeight - r.bottom), position: getComputedStyle(body).position }
+      return {
+        bottom: Math.round(window.innerHeight - r.bottom),
+        position: getComputedStyle(body).position,
+      }
     })
     expect(gap.position, 'the band is pinned').toBe('fixed')
     // 24px status bar sits under it

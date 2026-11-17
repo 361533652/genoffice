@@ -197,8 +197,11 @@ export function installMobileChrome(doc: Document = document): MobileChromeHandl
   }
   installed = handle
   // hand the tests (and the native back handler) a live handle
-  ;(globalThis as { __genofficeMobileChrome?: { hide: () => void; show: () => void; hidden: () => boolean } })
-    .__genofficeMobileChrome = { hide, show, hidden: () => handle.hidden }
+  ;(
+    globalThis as {
+      __genofficeMobileChrome?: { hide: () => void; show: () => void; hidden: () => boolean }
+    }
+  ).__genofficeMobileChrome = { hide, show, hidden: () => handle.hidden }
   return handle
 }
 

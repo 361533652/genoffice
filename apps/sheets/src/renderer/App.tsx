@@ -4689,7 +4689,8 @@ export function App({
         // `connections` is missing. The Data tab reads `queryConnections.length`
         // unguarded, so an undefined here white-screens the app on the first
         // Data-tab click (interaction-review R1). Default to an empty list.
-        if (!cancelled) setQueryConnections(Array.isArray(result?.connections) ? result.connections : [])
+        if (!cancelled)
+          setQueryConnections(Array.isArray(result?.connections) ? result.connections : [])
       })
       .catch(() => {
         if (!cancelled) setQueryConnections([])

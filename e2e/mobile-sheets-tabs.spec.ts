@@ -59,7 +59,9 @@ test.describe('sheets ribbon tabs never crash', () => {
     await page.waitForTimeout(400)
     const dataControls = await page.evaluate(() => {
       const body = document.body.innerText
-      return ['数据透视表', '合并工作簿', '查询和连接', '删除重复值'].filter((s) => body.includes(s)).length
+      return ['数据透视表', '合并工作簿', '查询和连接', '删除重复值'].filter((s) =>
+        body.includes(s),
+      ).length
     })
     expect(dataControls).toBeGreaterThanOrEqual(3)
     expect(errors, 'no page errors across every tab').toEqual([])

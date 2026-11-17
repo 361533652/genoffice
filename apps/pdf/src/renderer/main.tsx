@@ -37,8 +37,12 @@ function applyTheme(theme: UiTheme): void {
 void (async () => {
   // through the host facade: a browser or WebView host has no preload
   const [lang, theme] = await Promise.all([
-    getHost().language().catch(() => 'zh' as const),
-    getHost().theme().catch(() => 'system' as const),
+    getHost()
+      .language()
+      .catch(() => 'zh' as const),
+    getHost()
+      .theme()
+      .catch(() => 'system' as const),
   ])
   document.documentElement.lang = htmlLang(lang as Lang)
   document.documentElement.dir = htmlDir(lang)

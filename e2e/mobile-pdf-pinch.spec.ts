@@ -16,7 +16,12 @@ const FIXTURE = join(process.cwd(), 'e2e', 'assets', 'mobile-sample.pdf')
 /** multi-page, so one-finger scrolling has somewhere to go */
 const MULTI_PAGE = join(process.cwd(), 'apps', 'pdf', 'tests', 'fixtures', 'plain-sample.pdf')
 
-test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 })
+test.use({
+  viewport: { width: 390, height: 844 },
+  hasTouch: true,
+  isMobile: true,
+  deviceScaleFactor: 2,
+})
 
 async function openSample(page: Page, path = FIXTURE): Promise<void> {
   const fixture = readFileSync(path)
@@ -70,12 +75,18 @@ test('a pinch zooms the page, not the phone UI', async ({ page }) => {
   const cdp = await page.context().newCDPSession(page)
   await cdp.send('Input.dispatchTouchEvent', {
     type: 'touchStart',
-    touchPoints: [{ x: 160, y: 420, id: 1 }, { x: 230, y: 420, id: 2 }],
+    touchPoints: [
+      { x: 160, y: 420, id: 1 },
+      { x: 230, y: 420, id: 2 },
+    ],
   })
   for (let i = 1; i <= 8; i++) {
     await cdp.send('Input.dispatchTouchEvent', {
       type: 'touchMove',
-      touchPoints: [{ x: 160 - i * 7, y: 420, id: 1 }, { x: 230 + i * 7, y: 420, id: 2 }],
+      touchPoints: [
+        { x: 160 - i * 7, y: 420, id: 1 },
+        { x: 230 + i * 7, y: 420, id: 2 },
+      ],
     })
     await page.waitForTimeout(30)
   }
@@ -108,9 +119,15 @@ test('one-finger scrolling still works after owning the pinch', async ({ page })
   expect(scrollable, 'the fixture must be taller than the phone viewport').toBe(true)
   const top0 = await page.evaluate(() => document.querySelector('.pdf-scroll')!.scrollTop)
   const cdp = await page.context().newCDPSession(page)
-  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: 195, y: 700 }] })
+  await cdp.send('Input.dispatchTouchEvent', {
+    type: 'touchStart',
+    touchPoints: [{ x: 195, y: 700 }],
+  })
   for (let i = 1; i <= 8; i++) {
-    await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: 195, y: 700 - i * 30 }] })
+    await cdp.send('Input.dispatchTouchEvent', {
+      type: 'touchMove',
+      touchPoints: [{ x: 195, y: 700 - i * 30 }],
+    })
     await page.waitForTimeout(25)
   }
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })

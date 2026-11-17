@@ -21,8 +21,14 @@ const SHEETS_URL = process.env.MOBILE_SHEETS_URL ?? 'http://127.0.0.1:5201'
 const REPO = process.cwd()
 const WASM = join(
   REPO,
-  'apps', 'sheets', 'native', 'xlsx-engine',
-  'target', 'wasm32-wasip1', 'release', 'xlsx_sidecar.wasm',
+  'apps',
+  'sheets',
+  'native',
+  'xlsx-engine',
+  'target',
+  'wasm32-wasip1',
+  'release',
+  'xlsx_sidecar.wasm',
 )
 const BLANK = join(REPO, 'apps', 'shell', 'build', 'shell-new', 'blank.xlsx')
 
@@ -48,23 +54,30 @@ test('a workbook opens, edits and saves through the wasm session', async ({ page
   const failedRequests: string[] = []
   page.on('pageerror', (e) => errors.push(String(e.stack ?? e)))
   page.on('console', (msg) => consoleLines.push(`[${msg.type()}] ${msg.text()}`))
-  page.on('requestfailed', (req) => failedRequests.push(`${req.url()} — ${req.failure()?.errorText}`))
+  page.on('requestfailed', (req) =>
+    failedRequests.push(`${req.url()} — ${req.failure()?.errorText}`),
+  )
   // replacing the open workbook asks for confirmation; accept it
   page.on('dialog', (d) => void d.accept())
 
-  await page.addInitScript((wasmUrl: string) => {
-    const w = window as unknown as Record<string, unknown>
-    // the Android shape: neither picker exists
-    Object.defineProperty(w, 'showOpenFilePicker', { configurable: true, value: undefined })
-    Object.defineProperty(w, 'showSaveFilePicker', { configurable: true, value: undefined })
-    w.__genofficeSheetsWasmUrl = wasmUrl
-  }, '/@fs/' + WASM.replace(/\\/g, '/'))
+  await page.addInitScript(
+    (wasmUrl: string) => {
+      const w = window as unknown as Record<string, unknown>
+      // the Android shape: neither picker exists
+      Object.defineProperty(w, 'showOpenFilePicker', { configurable: true, value: undefined })
+      Object.defineProperty(w, 'showSaveFilePicker', { configurable: true, value: undefined })
+      w.__genofficeSheetsWasmUrl = wasmUrl
+    },
+    '/@fs/' + WASM.replace(/\\/g, '/'),
+  )
 
   await page.goto(SHEETS_URL, { waitUntil: 'load' })
   await expect(page.locator('.ribbon-tabs')).toBeVisible({ timeout: 30_000 })
   try {
     await page.waitForFunction(
-      () => (window as unknown as { __genofficeSheetsSessionReady?: boolean }).__genofficeSheetsSessionReady === true,
+      () =>
+        (window as unknown as { __genofficeSheetsSessionReady?: boolean })
+          .__genofficeSheetsSessionReady === true,
       null,
       { timeout: 30_000 },
     )
@@ -95,7 +108,10 @@ test('a workbook opens, edits and saves through the wasm session', async ({ page
   // ── save: no writable handle on this host, so it degrades to a download ──
   const [download] = await Promise.all([
     page.waitForEvent('download', { timeout: 60_000 }),
-    page.getByRole('button', { name: /保存|^Save$/ }).first().click(),
+    page
+      .getByRole('button', { name: /保存|^Save$/ })
+      .first()
+      .click(),
   ])
   const savedPath = join(test.info().outputDir, 'saved.xlsx')
   await download.saveAs(savedPath)
@@ -118,9 +134,13 @@ test('a workbook opens, edits and saves through the wasm session', async ({ page
   await expect(page.locator('[data-u-comp="defined-name"] input')).toHaveValue('A1')
   const a1Value = await page.evaluate(async () => {
     const w = window as unknown as {
-      __genofficeSheetsSessionHost: { debugSessions: () => { sessionId: string; sheetIds: string[] }[] }
+      __genofficeSheetsSessionHost: {
+        debugSessions: () => { sessionId: string; sheetIds: string[] }[]
+      }
       desktopApi: {
-        readWorkbookRange: (req: unknown) => Promise<{ cells: { row: number; column: number; value: unknown }[] }>
+        readWorkbookRange: (
+          req: unknown,
+        ) => Promise<{ cells: { row: number; column: number; value: unknown }[] }>
       }
     }
     const sessions = w.__genofficeSheetsSessionHost.debugSessions()
@@ -137,23 +157,30 @@ test('a workbook opens, edits and saves through the wasm session', async ({ page
   expect(errors).toEqual([])
 })
 
-test('a .csv opens through the wasm session (converted, not fed raw to the zip reader)', async ({ page }) => {
+test('a .csv opens through the wasm session (converted, not fed raw to the zip reader)', async ({
+  page,
+}) => {
   test.setTimeout(180_000)
   const errors: string[] = []
   page.on('pageerror', (e) => errors.push(String(e.stack ?? e)))
   page.on('dialog', (d) => void d.accept())
 
-  await page.addInitScript((wasmUrl: string) => {
-    const w = window as unknown as Record<string, unknown>
-    Object.defineProperty(w, 'showOpenFilePicker', { configurable: true, value: undefined })
-    Object.defineProperty(w, 'showSaveFilePicker', { configurable: true, value: undefined })
-    w.__genofficeSheetsWasmUrl = wasmUrl
-  }, '/@fs/' + WASM.replace(/\\/g, '/'))
+  await page.addInitScript(
+    (wasmUrl: string) => {
+      const w = window as unknown as Record<string, unknown>
+      Object.defineProperty(w, 'showOpenFilePicker', { configurable: true, value: undefined })
+      Object.defineProperty(w, 'showSaveFilePicker', { configurable: true, value: undefined })
+      w.__genofficeSheetsWasmUrl = wasmUrl
+    },
+    '/@fs/' + WASM.replace(/\\/g, '/'),
+  )
 
   await page.goto(SHEETS_URL, { waitUntil: 'load' })
   await expect(page.locator('.ribbon-tabs')).toBeVisible({ timeout: 30_000 })
   await page.waitForFunction(
-    () => (window as unknown as { __genofficeSheetsSessionReady?: boolean }).__genofficeSheetsSessionReady === true,
+    () =>
+      (window as unknown as { __genofficeSheetsSessionReady?: boolean })
+        .__genofficeSheetsSessionReady === true,
     null,
     { timeout: 30_000 },
   )
@@ -169,15 +196,21 @@ test('a .csv opens through the wasm session (converted, not fed raw to the zip r
     page.getByRole('button', { name: /打开/ }).first().click(),
   ])
   await chooser.setFiles(csvPath)
-  await page.waitForFunction(() => document.body.textContent?.includes('Sheet1'), null, { timeout: 30_000 })
+  await page.waitForFunction(() => document.body.textContent?.includes('Sheet1'), null, {
+    timeout: 30_000,
+  })
   await page.waitForTimeout(1_500)
 
   // the converted grid is readable through the session's data layer
   const cells = await page.evaluate(async () => {
     const w = window as unknown as {
-      __genofficeSheetsSessionHost: { debugSessions: () => { sessionId: string; sheetIds: string[] }[] }
+      __genofficeSheetsSessionHost: {
+        debugSessions: () => { sessionId: string; sheetIds: string[] }[]
+      }
       desktopApi: {
-        readWorkbookRange: (req: unknown) => Promise<{ cells: { row: number; column: number; value: unknown }[] }>
+        readWorkbookRange: (
+          req: unknown,
+        ) => Promise<{ cells: { row: number; column: number; value: unknown }[] }>
       }
     }
     const sessions = w.__genofficeSheetsSessionHost.debugSessions()
@@ -189,7 +222,8 @@ test('a .csv opens through the wasm session (converted, not fed raw to the zip r
     })
     return range.cells
   })
-  const at = (r: number, c: number): unknown => cells.find((x) => x.row === r && x.column === c)?.value
+  const at = (r: number, c: number): unknown =>
+    cells.find((x) => x.row === r && x.column === c)?.value
   expect(at(0, 0)).toBe('Name')
   expect(at(0, 1)).toBe('Age')
   expect(at(1, 0)).toBe('Ada')

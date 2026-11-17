@@ -97,11 +97,7 @@ export {
   type RibbonCollapseLabels,
   type RibbonDensity,
 } from './ribbon-collapse'
-export {
-  isNarrowViewport,
-  useNarrowViewport,
-  NARROW_VIEWPORT_QUERY,
-} from './use-narrow-viewport'
+export { isNarrowViewport, useNarrowViewport, NARROW_VIEWPORT_QUERY } from './use-narrow-viewport'
 export { AiTypingIndicator } from './AiTypingIndicator'
 export { IconSend, IconStop, type IconProps } from './icons'
 export { Markdown, type MarkdownNav } from './Markdown'

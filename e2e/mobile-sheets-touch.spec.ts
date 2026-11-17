@@ -19,9 +19,13 @@ const SHEETS_URL = process.env.MOBILE_SHEETS_URL ?? 'http://127.0.0.1:5201'
 
 test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })
 
-async function gridClip(page: import('@playwright/test').Page): Promise<{ x: number; y: number; width: number; height: number; scale: number }> {
+async function gridClip(
+  page: import('@playwright/test').Page,
+): Promise<{ x: number; y: number; width: number; height: number; scale: number }> {
   return page.evaluate(() => {
-    const canvas = [...document.querySelectorAll('canvas')].find((c) => c.getBoundingClientRect().width > 300)!
+    const canvas = [...document.querySelectorAll('canvas')].find(
+      (c) => c.getBoundingClientRect().width > 300,
+    )!
     const r = canvas.getBoundingClientRect()
     return { x: Math.round(r.x) + 60, y: Math.round(r.y) + 90, width: 140, height: 140, scale: 1 }
   })
@@ -47,9 +51,15 @@ test.describe('grid touch gestures', () => {
     const cdp = await page.context().newCDPSession(page)
     const before = await gridHash(cdp, page)
 
-    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: 195, y: 600 }] })
+    await cdp.send('Input.dispatchTouchEvent', {
+      type: 'touchStart',
+      touchPoints: [{ x: 195, y: 600 }],
+    })
     for (let i = 1; i <= 10; i++) {
-      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: 195, y: 600 - i * 20 }] })
+      await cdp.send('Input.dispatchTouchEvent', {
+        type: 'touchMove',
+        touchPoints: [{ x: 195, y: 600 - i * 20 }],
+      })
       await page.waitForTimeout(25)
     }
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
@@ -82,12 +92,18 @@ test.describe('grid touch gestures', () => {
     const cdp = await page.context().newCDPSession(page)
     await cdp.send('Input.dispatchTouchEvent', {
       type: 'touchStart',
-      touchPoints: [{ x: 170, y: 420, id: 1 }, { x: 220, y: 420, id: 2 }],
+      touchPoints: [
+        { x: 170, y: 420, id: 1 },
+        { x: 220, y: 420, id: 2 },
+      ],
     })
     for (let i = 1; i <= 8; i++) {
       await cdp.send('Input.dispatchTouchEvent', {
         type: 'touchMove',
-        touchPoints: [{ x: 170 - i * 6, y: 420, id: 1 }, { x: 220 + i * 6, y: 420, id: 2 }],
+        touchPoints: [
+          { x: 170 - i * 6, y: 420, id: 1 },
+          { x: 220 + i * 6, y: 420, id: 2 },
+        ],
       })
       await page.waitForTimeout(30)
     }

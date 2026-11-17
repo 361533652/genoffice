@@ -138,7 +138,10 @@ test.describe('device-scaled tiers', () => {
     expect(decision.heapMB, 'the emulated small heap is visible').toBe(512)
     expect(decision.tiny, 'two paragraphs must open normally').toBe('normal')
     expect(decision.small, 'a modest document must open normally').toBe('normal')
-    expect(decision.big === 'readOnly' || decision.big === 'refuse', 'large docs still degraded').toBe(true)
+    expect(
+      decision.big === 'readOnly' || decision.big === 'refuse',
+      'large docs still degraded',
+    ).toBe(true)
     expect(decision.huge).toBe('refuse')
   })
 })

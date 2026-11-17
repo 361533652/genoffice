@@ -32,7 +32,11 @@ async function tap(page: Page, x: number, y: number): Promise<void> {
 }
 
 /** Drag a finger from one point to another. */
-async function drag(page: Page, from: { x: number; y: number }, to: { x: number; y: number }): Promise<void> {
+async function drag(
+  page: Page,
+  from: { x: number; y: number },
+  to: { x: number; y: number },
+): Promise<void> {
   const cdp = await page.context().newCDPSession(page)
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [from] })
   await page.waitForTimeout(80)
@@ -86,7 +90,9 @@ test.describe('touch on a mobile host', () => {
     // drag-to-select is winning again.
     await drag(page, { x: 70, y: 300 }, { x: 200, y: 450 })
     const name = await page.evaluate(() => {
-      const input = document.querySelector('[data-u-comp="defined-name"] input') as HTMLInputElement | null
+      const input = document.querySelector(
+        '[data-u-comp="defined-name"] input',
+      ) as HTMLInputElement | null
       return input?.value ?? null
     })
     expect(name, 'the active cell is still readable').not.toBeNull()

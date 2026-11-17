@@ -368,7 +368,6 @@
   }
 }
 
-
 /* ---------------------------------------------------------------------------
  * The expanded command band is a BOTTOM tool bar on a phone.
  *
@@ -396,4 +395,3 @@
     box-shadow: var(--shadow-menu);
   }
 }
-

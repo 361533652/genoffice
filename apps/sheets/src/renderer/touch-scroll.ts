@@ -37,8 +37,7 @@ let installed: (() => void) | null = null
  */
 export function installSheetTouchScroll(host?: HTMLElement): () => void {
   if (installed) return installed
-  const resolveHost = (): HTMLElement | null =>
-    host ?? document.getElementById('univer-container')
+  const resolveHost = (): HTMLElement | null => host ?? document.getElementById('univer-container')
   const points = new Map<number, { x: number; y: number }>()
   let mode: Mode = 'idle'
   let primaryId: number | null = null

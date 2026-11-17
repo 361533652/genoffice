@@ -60,8 +60,12 @@ async function bootstrap(): Promise<void> {
     // through the host facade, not a global: a browser or WebView host has no
     // preload, and the facade answers from its own store instead of throwing
     ;[lang, theme] = await Promise.all([
-      getHost().language().catch(() => 'zh' as const),
-      getHost().theme().catch(() => 'system' as const),
+      getHost()
+        .language()
+        .catch(() => 'zh' as const),
+      getHost()
+        .theme()
+        .catch(() => 'system' as const),
     ])
   } catch {
     /* dev renderer without the preload bridge */

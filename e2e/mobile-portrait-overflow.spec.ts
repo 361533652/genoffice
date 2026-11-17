@@ -55,7 +55,9 @@ async function layoutOverflow(page: Page): Promise<string[]> {
       if (r.right > vw + 1 || r.left < -1) {
         if (!inScroller(el)) {
           const cls = (el.className?.toString?.() ?? '').slice(0, 48)
-          offenders.push(`${el.tagName.toLowerCase()}.${cls} [${Math.round(r.left)}..${Math.round(r.right)}]`)
+          offenders.push(
+            `${el.tagName.toLowerCase()}.${cls} [${Math.round(r.left)}..${Math.round(r.right)}]`,
+          )
         }
       }
     }

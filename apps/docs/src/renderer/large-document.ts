@@ -99,8 +99,10 @@ export function deviceBudget(): DeviceBudget {
     memory?: { jsHeapSizeLimit?: number }
   }
   const heapBytes = perf.memory?.jsHeapSizeLimit
-  const heapMB = typeof heapBytes === 'number' && heapBytes > 0 ? Math.round(heapBytes / (1024 * 1024)) : null
-  const memoryGB = typeof nav.deviceMemory === 'number' && nav.deviceMemory > 0 ? nav.deviceMemory : null
+  const heapMB =
+    typeof heapBytes === 'number' && heapBytes > 0 ? Math.round(heapBytes / (1024 * 1024)) : null
+  const memoryGB =
+    typeof nav.deviceMemory === 'number' && nav.deviceMemory > 0 ? nav.deviceMemory : null
   return { heapMB, memoryGB, unknown: heapMB === null && memoryGB === null }
 }
 
@@ -108,7 +110,8 @@ export function deviceBudget(): DeviceBudget {
 export function weightForBudget(budgetMB: number): number {
   // balanced doc: half the weight from blocks, half from characters
   const fixedMB = 300
-  const perUnitMB = (0.5 * 17 * 1024) / (1024 * 1024) + (0.5 * CHARS_PER_BLOCK * 150) / (1024 * 1024)
+  const perUnitMB =
+    (0.5 * 17 * 1024) / (1024 * 1024) + (0.5 * CHARS_PER_BLOCK * 150) / (1024 * 1024)
   const available = Math.max(0, budgetMB - fixedMB)
   return Math.round(available / perUnitMB)
 }

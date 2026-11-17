@@ -18,7 +18,11 @@ test.use({ viewport: PHONE, hasTouch: true, isMobile: true, deviceScaleFactor: 2
 /** A phone starts with the command band collapsed; this spec is about the band. */
 async function expandBand(page: import('@playwright/test').Page): Promise<void> {
   if (await page.locator('.ribbon').first().isVisible()) return
-  await page.locator('.ribbon-tabs button').filter({ hasText: /开始|Home/ }).first().click()
+  await page
+    .locator('.ribbon-tabs button')
+    .filter({ hasText: /开始|Home/ })
+    .first()
+    .click()
   await expect(page.locator('.ribbon').first()).toBeVisible({ timeout: 15_000 })
 }
 
