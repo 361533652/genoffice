@@ -57,6 +57,7 @@ import {
 } from './doc-state'
 import { hfSaveOptions } from './hf-sections'
 import { fetchDocBytes } from './doc-bytes'
+import { convertImportedDocument } from './import-convert'
 import { parseDocxOffThread } from './parse-off-thread'
 import { PHASED_APPEND } from './editor/streaming-tail-guard'
 import { docTextLength, docWeight, openTierForDevice } from './large-document'
@@ -478,10 +479,13 @@ export async function loadFile(
     const bytes = await fetchDocBytes(result.dataUrl)
     // a 0-byte .docx (touch, failed download) is not a corrupt archive but an
     // empty document: open the blank template under the file's own path
-    const parsed = await parseDocxOffThread(
-      bytes.byteLength === 0 ? await blankDocxBytes() : bytes,
-      { owned: true },
-    )
+    // A legacy .doc/.odt import is converted first: a mobile host has no main
+    // process to do it, while the desktop already hands us converted bytes.
+    const openable =
+      bytes.byteLength === 0
+        ? await blankDocxBytes()
+        : await convertImportedDocument(result.name, bytes)
+    const parsed = await parseDocxOffThread(openable, { owned: true })
     if (generation !== openGeneration) return 'superseded'
     // Tiers scale with the device: the desktop constants assume a ~2.2 GB working
     // set, which a phone does not have. Using them here would let the renderer be

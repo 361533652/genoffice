@@ -18,6 +18,7 @@
     "@genoffice/compound-file": "*",
     "@genoffice/docx-engine": "*",
     "cfb": "^1.2.2",
+    "fflate": "^0.8.3",
     "jszip": "^3.10.1"
   },
   "devDependencies": {

@@ -12,7 +12,7 @@
  * warning. Groups contribute their picture and text box children, placed
  * through the group's coordinate space.
  */
-import { inflateSync } from 'node:zlib'
+import { inflateSync } from 'fflate'
 import type { FibInfo } from './fib'
 import type { HeaderFooterStory } from './headers'
 import type { TextBoxStories, TextBoxStory } from './textboxes'
