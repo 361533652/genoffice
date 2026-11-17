@@ -17,6 +17,7 @@ import type { ChartStyleInfo } from '@genoffice/pptx-render'
 import {
   useDismissablePopover,
   useRibbonCollapse,
+  RibbonMoreButton,
   RibbonTabCollapseButton,
   Dropdown,
   THEME_COLORS,
@@ -1883,6 +1884,7 @@ export function Ribbon({
           collapseLabel={t('ribbonCollapse')}
           expandLabel={t('ribbonExpand')}
         />
+        <RibbonMoreButton state={collapse} />
       </div>
 
       <div className="ribbon-body" data-ribbon-body="" ref={bodyRef}>

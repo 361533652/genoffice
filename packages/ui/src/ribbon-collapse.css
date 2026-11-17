@@ -97,3 +97,51 @@
     height: 44px;
   }
 }
+/* "More tools": a phone band shows only its first two command groups; this
+   control (next to the collapse button) reveals the rest, so the remaining
+   tools are a deliberate tap away instead of a long sideways scroll. */
+.ribbon-more-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+}
+
+@media (max-width: 720px) {
+  .ribbon-more-btn {
+    display: inline-flex;
+    position: sticky;
+    inset-inline-end: 0;
+    z-index: 2;
+    background: var(--chrome-bg);
+  }
+
+  .ribbon-more-btn:hover,
+  .ribbon-more-btn:active,
+  .ribbon-more-btn[aria-pressed='true'] {
+    background: var(--hover);
+    color: var(--text);
+  }
+
+  .ribbon-collapsible:not(.ribbon-all-groups) .ribbon-extra-group {
+    display: none;
+  }
+}
+
+@media (max-width: 720px) and (pointer: coarse) {
+  .ribbon-more-btn {
+    width: 44px;
+    height: 44px;
+  }
+}

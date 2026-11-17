@@ -116,4 +116,51 @@ test.describe('grid touch gestures', () => {
     // a pinch must not collapse the chrome (it would hide the zoom readout)
     await expect(page.locator('html')).not.toHaveAttribute('data-mobile-chrome', 'hidden')
   })
+  test('scrolling the tool band horizontally does not hide the chrome', async ({ page }) => {
+    test.setTimeout(120_000)
+    await page.goto(SHEETS_URL, { waitUntil: 'load' })
+    await expect(page.locator('.ribbon-tabs')).toBeVisible({ timeout: 30_000 })
+    await page.waitForTimeout(3_000)
+    // a phone starts with the band closed; open it (the band is what scrolls)
+    await page
+      .locator('.ribbon-tabs button')
+      .filter({ hasText: /开始|Home/ })
+      .first()
+      .click()
+    await expect(page.locator('.ribbon')).toBeVisible({ timeout: 15_000 })
+    // the phone band shows two groups; show them all so there is something to
+    // scroll, which is the gesture under test
+    await page.locator('.ribbon-more-btn').click()
+    await page.waitForTimeout(400)
+
+    const box = await page.locator('.ribbon').boundingBox()
+    expect(box, 'the band has a box').not.toBeNull()
+    const y = box!.y + box!.height / 2
+    const before = await page.evaluate(
+      () => (document.querySelector('.ribbon') as HTMLElement).scrollLeft,
+    )
+
+    const cdp = await page.context().newCDPSession(page)
+    await cdp.send('Input.dispatchTouchEvent', {
+      type: 'touchStart',
+      touchPoints: [{ x: box!.x + box!.width - 40, y }],
+    })
+    for (let i = 1; i <= 8; i++) {
+      await cdp.send('Input.dispatchTouchEvent', {
+        type: 'touchMove',
+        touchPoints: [{ x: box!.x + box!.width - 40 - i * 30, y }],
+      })
+      await page.waitForTimeout(25)
+    }
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
+    await page.waitForTimeout(400)
+
+    const after = await page.evaluate(
+      () => (document.querySelector('.ribbon') as HTMLElement).scrollLeft,
+    )
+    expect(after, 'the band scrolled horizontally').toBeGreaterThan(before)
+    // the reported bug: scrolling the toolbar collapsed the toolbar
+    await expect(page.locator('html')).not.toHaveAttribute('data-mobile-chrome', 'hidden')
+    await expect(page.locator('.ribbon')).toBeVisible()
+  })
 })

@@ -160,4 +160,21 @@ test.describe('mobile chrome', () => {
     expect(gap.bottom).toBeGreaterThanOrEqual(20)
     expect(gap.bottom).toBeLessThanOrEqual(32)
   })
+  test('only the first two command groups show; More reveals the rest', async ({ page }) => {
+    await page.goto(DOCS_URL, { waitUntil: 'load' })
+    await expect(page.locator('.ProseMirror')).toBeVisible({ timeout: 30_000 })
+    await page.waitForTimeout(800)
+    await page.locator('.ribbon-tabs-collapse-btn').click()
+    await expect(page.locator('[data-ribbon-body]')).toBeVisible()
+    await page.waitForTimeout(300)
+
+    const visibleGroups = () => page.locator('.ribbon-group:visible').count()
+    expect(await visibleGroups(), 'a phone band starts with two groups').toBe(2)
+
+    await page.locator('.ribbon-more-btn').click()
+    expect(await visibleGroups(), 'More reveals every group').toBeGreaterThan(2)
+
+    await page.locator('.ribbon-more-btn').click()
+    expect(await visibleGroups(), 'More toggles back to the short band').toBe(2)
+  })
 })

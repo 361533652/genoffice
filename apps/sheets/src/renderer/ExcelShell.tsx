@@ -8,6 +8,7 @@ import {
   ShapePreview,
   useDismissablePopover,
   useRibbonCollapse,
+  RibbonMoreButton,
   RibbonTabCollapseButton,
   aiPanelInitiallyOpen,
   rememberAiPanelOpen,
@@ -997,6 +998,7 @@ export function ExcelShell({
             collapseLabel={t('appRibbonCollapse')}
             expandLabel={t('appRibbonExpand')}
           />
+          <RibbonMoreButton state={collapse} />
         </nav>
 
         <Ribbon

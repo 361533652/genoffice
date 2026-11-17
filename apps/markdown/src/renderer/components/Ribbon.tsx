@@ -6,6 +6,7 @@ import {
   Dropdown,
   RibbonCollapseButton,
   RibbonExpandButton,
+  RibbonMoreButton,
   RibbonTabCollapseButton,
   useDismissablePopover,
   useRibbonCollapse,
@@ -400,6 +401,7 @@ export function Ribbon({
           collapseLabel={t('ribbonCollapse')}
           expandLabel={t('ribbonExpand')}
         />
+        <RibbonMoreButton state={collapse} />
       </div>
 
       <div className="ribbon-body" data-ribbon-body="">

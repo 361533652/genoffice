@@ -258,7 +258,10 @@ adb install -r apps/mobile/app/build/outputs/apk/debug/app-debug.apk
 
 8. **移动端打开老式 Word .doc/.dot 与 .odt/.ott**——桌面主进程一直在打开时先把它们转成 .docx 副本；WebView 没有主进程，渲染器直接拿 docx 解析器去啃 OLE2 复合文件，于是「打开失败」。新增 `apps/docs/src/renderer/import-convert.ts`：按扩展名跑同一套导入过滤器（doc2docx / odf2ooxml），.docx（zip）原样通过，所以桌面路径 no-op。doc2docx 唯一的 Node 依赖（metafile 图片解压 `node:zlib`）换成浏览器可用的 `fflate`。**保存安全**：移动端 bridge 本来就拒绝就地保存、一律走另存为，转换后的文档存成新 .docx，不会把 OOXML 写回 .doc 原件。.hwp/.hwpx 仍不支持（转换器用 node:fs/zlib），现在明确报错。守护 `e2e/mobile-doc-import.spec.ts`（真 .doc 转换后正文出现中英文段落）。
 
-**未做（下一步）**：A4 缩放决策；media URI 打开显示数字 ID（桥接把 content:// 直接当 handle id，违反「末段必须是文件名」契约）；.hwp 移动端导入。
+9. **工具栏只留两组常用工具 + 「更多」**——手机命令带只显示前两个分组（文档是粘贴/字体，表格是剪贴板/字体），其余分组由页签行右端的「⋯」按钮展开/收回（`RibbonMoreButton`，状态在 `useRibbonCollapse` 里，root 加 `ribbon-all-groups`）。分组标记由 hook 里一个 MutationObserver 完成（切换页签会重渲染），**分隔符要两遍扫**——先标分组再标分隔符，一遍会把「下一个分组还没标记」读成 false，留下空的竖线。这样手机不再需要左右滑才能看到工具；桌面不受影响。**「More tools」标签目前是英文**（没加 18 语言的 key），后续可本地化。
+10. **修掉「滑工具栏反而把工具栏藏了」**——自动收起把「起点在工具栏上的拖动」也当成阅读滑动。现在 `pointerdown` 记录起点是否落在 `.ribbon/.ribbon-tabs/.status-bar` 内，是则整个手势不触发收起（横滑命令带只滚动，不收起）。守护：`e2e/mobile-sheets-touch.spec.ts`「scrolling the tool band horizontally does not hide the chrome」（先点「更多」确保有可滚内容）。
+
+**未做（下一步）**：A4 缩放决策；media URI 打开显示数字 ID（桥接把 content:// 直接当 handle id，违反「末段必须是文件名」契约）；.hwp 移动端导入；「More tools」标签本地化。
 
 ## 已知缺陷（未修）
 

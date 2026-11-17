@@ -128,6 +128,10 @@ export interface RibbonCollapse {
    *  call site did not opt in. The touch control uses it so compact stays a
    *  reachable stopping point (interaction-review R6). */
   readonly cycleDensity: () => void
+  /** true when every command group is shown; false shows only the first two */
+  readonly allGroups: boolean
+  /** reveal/hide the groups beyond the first two (the "More tools" control) */
+  readonly toggleAllGroups: () => void
   /** call from every tab button's click handler */
   readonly onTabPress: (wasActive: boolean) => void
   /** double-click on a tab toggles, like Office; attach to the tab row */
@@ -161,6 +165,11 @@ export function useRibbonCollapse(
     return 'full'
   })
   const rootRef = useRef<HTMLDivElement | null>(null)
+  // On a phone the band starts with its first two command groups (paste/font on
+  // a document); everything else lives behind the "More tools" control instead
+  // of a long horizontal scroll. Toggling it back off restores the short band.
+  const [allGroups, setAllGroups] = useState(false)
+  const toggleAllGroups = useCallback(() => setAllGroups((v) => !v), [])
   const collapsed = density === 'collapsed'
   const densityRef = useRef(density)
   densityRef.current = density
@@ -182,6 +191,7 @@ export function useRibbonCollapse(
     // the band control hides the band or brings it back at full size; compact is
     // not a stopping point for it
     const next: RibbonDensity = densityRef.current === 'collapsed' ? 'full' : 'collapsed'
+    if (next === 'collapsed') setAllGroups(false)
     persist(next)
     setDensity(next)
   }, [persist])
@@ -262,6 +272,40 @@ export function useRibbonCollapse(
       : `${labels.collapse} (${RIBBON_TOGGLE_SHORTCUT}) · ${labels.compact} (${RIBBON_COMPACT_SHORTCUT})`
   }
 
+  // Tag the groups beyond the first two so the narrow band can hide them behind
+  // the "More tools" control instead of a long horizontal scroll. The body
+  // re-renders on every tab switch, hence the observer.
+  useEffect(() => {
+    const root = rootRef.current
+    const body = root?.querySelector('[data-ribbon-body]')
+    if (!body) return undefined
+    const COMMON_GROUPS = 2
+    const tag = (): void => {
+      // two passes: groups first, then the separators between them (a separator
+      // is hidden when the group that follows it is hidden; a one-pass version
+      // read the next group's class before it was tagged and left stray rules)
+      const kids = [...body.children] as HTMLElement[]
+      let seen = 0
+      for (const item of kids) {
+        if (!item.classList.contains('ribbon-group')) continue
+        seen += 1
+        item.classList.toggle('ribbon-extra-group', seen > COMMON_GROUPS)
+      }
+      kids.forEach((item, index) => {
+        if (!item.classList.contains('ribbon-sep')) return
+        const next = kids.slice(index + 1).find((c) => c.classList.contains('ribbon-group'))
+        item.classList.toggle(
+          'ribbon-extra-group',
+          !!next?.classList.contains('ribbon-extra-group'),
+        )
+      })
+    }
+    tag()
+    const observer = new MutationObserver(tag)
+    observer.observe(body, { childList: true, subtree: true })
+    return () => observer.disconnect()
+  }, [])
+
   // A tap on the page restores the chrome; on a phone the band starts collapsed,
   // so restoring must also reveal the band instead of leaving a bare tab row.
   // The call is exposed on globalThis because the chrome module knows about
@@ -278,7 +322,7 @@ export function useRibbonCollapse(
     }
   }, [compactEnabled])
 
-  const rootClass = `ribbon-collapsible${collapsed ? ' ribbon-collapsed' : ''}${
+  const rootClass = `ribbon-collapsible${collapsed ? ' ribbon-collapsed' : ''}${allGroups ? ' ribbon-all-groups' : ''}${
     density === 'compact' ? ' ribbon-compact' : ''
   }`
   return {
@@ -290,6 +334,8 @@ export function useRibbonCollapse(
     toggle,
     toggleCompact,
     cycleDensity,
+    allGroups,
+    toggleAllGroups,
     onTabPress,
     onTabsDoubleClick,
     tabClass,
@@ -322,6 +368,35 @@ function ChevronDown() {
         strokeLinejoin="round"
       />
     </svg>
+  )
+}
+
+/**
+ * Narrow-only "More tools" control next to the collapse button: reveals the
+ * command groups beyond the first two. A phone band that only ever scrolled
+ * sideways was the remaining complaint — the first two groups fit on screen and
+ * a deliberate tap exposes the rest.
+ */
+export function RibbonMoreButton({
+  state,
+  label = 'More tools',
+}: {
+  state: RibbonCollapse
+  label?: string
+}) {
+  if (state.collapsed) return null
+  return (
+    <button
+      type="button"
+      className="ribbon-more-btn"
+      data-tip={label}
+      aria-label={label}
+      aria-pressed={state.allGroups}
+      onMouseDown={(e) => e.preventDefault()}
+      onClick={state.toggleAllGroups}
+    >
+      <span aria-hidden="true">⋯</span>
+    </button>
   )
 }
 

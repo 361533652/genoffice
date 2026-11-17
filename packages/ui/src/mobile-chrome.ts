@@ -47,7 +47,7 @@ export function installMobileChrome(doc: Document = document): MobileChromeHandl
   const narrow = typeof matchMedia === 'function' ? matchMedia('(max-width: 720px)') : null
   const cleanups: (() => void)[] = []
 
-  let pointer: { id: number; x: number; y: number; t: number } | null = null
+  let pointer: { id: number; x: number; y: number; t: number; onChrome: boolean } | null = null
   let activePointers = 0
   let multiTouch = false
   let idleTimer: ReturnType<typeof setTimeout> | null = null
@@ -110,7 +110,13 @@ export function installMobileChrome(doc: Document = document): MobileChromeHandl
       idleTimer = null
     }
     if (!event.isPrimary || event.pointerType === 'mouse') return
-    pointer = { id: event.pointerId, x: event.clientX, y: event.clientY, t: Date.now() }
+    // A drag that starts ON the chrome is the user scrolling/using the toolbar
+    // (the band scrolls horizontally), not reading the document. Hiding it there
+    // made the toolbar collapse while the thumb was scrolling it — reported as
+    // "滑动工具栏反而把工具栏藏了".
+    const target = event.target instanceof Element ? event.target : null
+    const onChrome = !!target?.closest('.ribbon, .ribbon-tabs, .status-bar')
+    pointer = { id: event.pointerId, x: event.clientX, y: event.clientY, t: Date.now(), onChrome }
   }
 
   const onPointerMove = (event: PointerEvent): void => {
@@ -118,6 +124,8 @@ export function installMobileChrome(doc: Document = document): MobileChromeHandl
     // pinch/rotate is not a reading scroll; keep the chrome (and its zoom UI)
     if (multiTouch) return
     if (!pointer || event.pointerId !== pointer.id) return
+    // dragging the toolbar (e.g. scrolling the band horizontally) is not reading
+    if (pointer.onChrome) return
     const dx = event.clientX - pointer.x
     const dy = event.clientY - pointer.y
     if (Math.hypot(dx, dy) > DRAG_HIDE_PX) scheduleHide()

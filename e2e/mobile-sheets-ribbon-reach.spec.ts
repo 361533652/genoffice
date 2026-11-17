@@ -17,13 +17,19 @@ test.use({ viewport: PHONE, hasTouch: true, isMobile: true, deviceScaleFactor: 2
 
 /** A phone starts with the command band collapsed; this spec is about the band. */
 async function expandBand(page: import('@playwright/test').Page): Promise<void> {
-  if (await page.locator('.ribbon').first().isVisible()) return
-  await page
-    .locator('.ribbon-tabs button')
-    .filter({ hasText: /开始|Home/ })
-    .first()
-    .click()
-  await expect(page.locator('.ribbon').first()).toBeVisible({ timeout: 15_000 })
+  if (!(await page.locator('.ribbon').first().isVisible())) {
+    await page
+      .locator('.ribbon-tabs button')
+      .filter({ hasText: /开始|Home/ })
+      .first()
+      .click()
+    await expect(page.locator('.ribbon').first()).toBeVisible({ timeout: 15_000 })
+  }
+  // a phone band shows only the first two groups; this spec measures the FULL
+  // band's reachability, so reveal every group first
+  const more = page.locator('.ribbon-more-btn')
+  if (await more.isVisible().catch(() => false)) await more.click()
+  await expect(page.locator('.ribbon-group').last()).toBeVisible({ timeout: 10_000 })
 }
 
 test.describe('sheets ribbon reach on a portrait phone', () => {

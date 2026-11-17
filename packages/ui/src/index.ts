@@ -85,6 +85,7 @@ export {
   useRibbonCollapse,
   RibbonCollapseButton,
   RibbonExpandButton,
+  RibbonMoreButton,
   RibbonTabCollapseButton,
   isRibbonCompactShortcut,
   isRibbonToggleShortcut,

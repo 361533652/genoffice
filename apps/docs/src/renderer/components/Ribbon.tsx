@@ -52,6 +52,7 @@ import {
   useNarrowViewport,
   useRibbonCollapse,
   useScrollWindow,
+  RibbonMoreButton,
   RibbonTabCollapseButton,
 } from '@genoffice/ui'
 import { HIGHLIGHT_CSS } from '../editor/extensions'
@@ -2534,6 +2535,7 @@ function RibbonInner({
           collapseLabel={t('ribbonCollapse')}
           expandLabel={t('ribbonExpand')}
         />
+        <RibbonMoreButton state={collapse} />
       </div>
 
       <div className="ribbon-body" data-ribbon-body="">

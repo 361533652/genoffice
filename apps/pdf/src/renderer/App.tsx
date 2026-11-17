@@ -200,6 +200,7 @@ import {
   useAiSidebarEnabled,
   isNarrowViewport,
   useNarrowViewport,
+  RibbonMoreButton,
   RibbonTabCollapseButton,
 } from '@genoffice/ui'
 import { registerDirtyProbe } from '@genoffice/host'
@@ -8355,6 +8356,7 @@ export default function App() {
             collapseLabel={t('ribbonCollapse')}
             expandLabel={t('ribbonExpand')}
           />
+          <RibbonMoreButton state={collapse} />
         </div>
         <div className="ribbon-body" data-ribbon-body="">
           {ribbonTab === 'home' && (
