@@ -1,5 +1,6 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
+import { fileURLToPath } from 'node:url'
 
 export default defineConfig({
   main: {
@@ -30,5 +31,22 @@ export default defineConfig({
   },
   renderer: {
     plugins: [react()],
+    resolve: {
+      alias: [
+        // The wasm workbook session pulls the gateway's streaming save pipeline
+        // into the renderer. Its Node fallback (fs-node) must not enter the
+        // browser graph: the session configures an in-memory host before any
+        // gateway call, so the stub is never reached at runtime. The mobile
+        // build has had this alias (vite.renderer.config.ts) since the session
+        // landed; the Electron renderer build did not, and every desktop
+        // Release since the session was added failed on node:fs/promises.
+        {
+          find: './fs-node',
+          replacement: fileURLToPath(
+            new URL('../../packages/xlsx-gateway/src/gateway/fs-browser-stub.ts', import.meta.url),
+          ),
+        },
+      ],
+    },
   },
 })
