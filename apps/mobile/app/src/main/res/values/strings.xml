@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">GenOffice</string>
     <string name="chooser_title">GenOffice</string>
+    <string name="unsupported_file">无法打开「%1$s」：请选择文档、表格、幻灯片、PDF 或文本文件</string>
 </resources>

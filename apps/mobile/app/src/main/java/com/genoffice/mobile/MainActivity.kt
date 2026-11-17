@@ -116,9 +116,64 @@ class MainActivity : ComponentActivity() {
             if (uri != null) openUri(uri, recordAndLaunch = true)
         }
 
-    fun launchNativeOpen(requestId: String) {
+    /**
+     * What "打开文件" offers. The previous "any MIME type" filter let the picker
+     * show photos, audio and video; choosing one then fell through to Docs and
+     * the docx parser threw. The list matches [appFor]; octet-stream stays
+     * because some providers label .docx that way (those are still routed by
+     * extension, unknown ones get a toast).
+     */
+    private val documentMimeTypes = arrayOf(
+        "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.ms-excel",
+        "text/csv",
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        "application/vnd.ms-powerpoint",
+        "text/markdown",
+        "text/x-markdown",
+        "text/plain",
+        "text/html",
+        "application/octet-stream",
+    )
+
+    fun launchNativeOpen(requestId: String, kind: String? = null) {
         nativeOpenPending = requestId
-        openDocumentNative.launch(arrayOf("*/*"))
+        // Narrow the picker to what the calling app can actually open: an image
+        // chosen from Docs used to reach the docx parser and throw. Unknown kinds
+        // keep the full document list.
+        openDocumentNative.launch(mimeTypesForKind(kind))
+    }
+
+    /** MIME filters per editor kind; octet-stream stays because providers mislabel. */
+    private fun mimeTypesForKind(kind: String?): Array<String> {
+        val octet = "application/octet-stream"
+        return when (kind) {
+            "docx" -> arrayOf(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "application/msword",
+                "application/vnd.oasis.opendocument.text",
+                octet,
+            )
+            "xlsx" -> arrayOf(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "application/vnd.ms-excel",
+                "text/csv",
+                "text/tab-separated-values",
+                octet,
+            )
+            "pptx" -> arrayOf(
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                "application/vnd.ms-powerpoint",
+                octet,
+            )
+            "pdf" -> arrayOf("application/pdf", octet)
+            "markdown" -> arrayOf("text/markdown", "text/x-markdown", "text/plain", octet)
+            "html" -> arrayOf("text/html", octet)
+            else -> documentMimeTypes
+        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -258,7 +313,14 @@ class MainActivity : ComponentActivity() {
     private fun openUri(uri: Uri, recordAndLaunch: Boolean) {
         val name = displayName(uri) ?: uri.lastPathSegment ?: "document"
         val mime = contentResolver.getType(uri)
+        // A picker can still hand over something we cannot edit (providers label
+        // images as octet-stream, and ACTION_VIEW is not always filtered). Opening
+        // it in an editor made the parser throw "打开失败"; say so and stay home.
         val app = appFor(mime, name)
+        if (app == null) {
+            Toast.makeText(this, getString(R.string.unsupported_file, name), Toast.LENGTH_LONG).show()
+            return
+        }
         val bytes = readUri(uri)
         if (bytes == null) {
             Toast.makeText(this, "无法读取该文件", Toast.LENGTH_SHORT).show()
@@ -272,7 +334,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun appFor(mime: String?, name: String): String {
+    private fun appFor(mime: String?, name: String): String? {
         val ext = name.substringAfterLast('.', "").lowercase()
         return when {
             mime == "application/pdf" || ext == "pdf" -> "pdf"
@@ -282,7 +344,7 @@ class MainActivity : ComponentActivity() {
             mime == "text/html" || ext == "html" || ext == "htm" -> "html"
             mime == "text/markdown" || mime == "text/x-markdown" || ext == "md" || ext == "markdown" -> "markdown"
             ext == "txt" || ext == "log" || mime == "text/plain" -> "markdown"
-            else -> "docs"
+            else -> null
         }
     }
 
@@ -383,7 +445,7 @@ class MainActivity : ComponentActivity() {
         setPadding(dp(12), 0, dp(12), 0)
         background = textButtonBg()
         contentDescription = "打开文件"
-        setOnClickListener { homeOpenPicker.launch(arrayOf("*/*")) }
+        setOnClickListener { homeOpenPicker.launch(documentMimeTypes) }
         addView(ImageView(this@MainActivity).apply {
             setImageResource(R.drawable.home_ic_folder)
             setColorFilter(homeTheme.accent)

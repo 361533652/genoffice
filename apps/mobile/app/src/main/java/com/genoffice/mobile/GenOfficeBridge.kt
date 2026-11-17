@@ -59,7 +59,7 @@ class GenOfficeBridge(
             "alert" -> alert(id, params.optString("message"))
             "getPendingOpen" -> getPendingOpen(id)
             "hasPendingOpen" -> resolve(id, JSONObject().put("ok", true).put("result", PendingOpen.has()))
-            "openDocument" -> activity.launchNativeOpen(id)
+            "openDocument" -> activity.launchNativeOpen(id, params.optString("kind"))
             "saveDocumentAs" -> saveDocumentAs(id, params)
             "saveInPlace" -> saveInPlace(id, params)
             "readDocument" -> readDocument(id, params.optString("handleId"))

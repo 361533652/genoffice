@@ -266,7 +266,9 @@ adb install -r apps/mobile/app/build/outputs/apk/debug/app-debug.apk
 13. **Markdown 手机版式与文件名**——窄屏页边距 72px→18px（390px 屏正文从约 246px 提到 354px）；状态栏文件名先 `decodeURIComponent` 再取末段，SAF 的 `primary%3ADownload%2Fnote.md` 显示为 `note.md`。守护：mobile-text 的版面与文件名用例。
 14. **SAF 句柄改成真正的不透明 id**（根因修复）——原生桥原先把 `content://…` 整个 URI 当 handle id 交给网页，违反「末段必须是文件名」的契约：状态栏出现百分号编码（用户说的「乱码」）、`.md` 因为没有扩展名被判成纯文本而进了源码视图、文件名显示成提供商 token。新增 `SafHandles.kt`：id 形如 `saf/<uuid>/<文件名>`，URI 存在进程内映射里；打开/另存为时注册，Recents/ACTION_VIEW 传来的裸 URI 在消费时归一化。`saveInPlace`/`readDocument` 改走映射（旧裸 URI 仍可解析，兼容历史 id）。真机验证：.md 直接进富文本、状态栏显示 sample.md；工作簿编辑→保存→回读 SAFTEST。
 
-**未做（下一步）**：A4 缩放决策；.hwp 移动端导入；「More tools」标签本地化。
+15. **打开文件只列能编辑的类型**——主页「打开文件」原来用 `*/*`，相册里的 jpg 也出现，选中后路由兜底成 docs，docx 解析器抛错（用户报的「选个 jpg 就报错」）。现在：①主页选择器按 `documentMimeTypes` 过滤（PDF/Word/Excel/CSV/PPT/Markdown/文本/HTML；octet-stream 保留，因部分提供方误标）；②应用内 `launchNativeOpen(kind)` 按当前应用给 MIME（文档/表格/PPT/PDF/文本各自的白名单）；③`appFor` 未知类型返回 null，`openUri` 直接 Toast「无法打开「x」：请选择文档…」并留在主页，不再进编辑器报错。**注意：此条只在 Kotlin 编译层面验证过——改的时候「陀螺」模拟器已关闭，真机点击验证待补。**
+
+**未做（下一步）**：A4 缩放决策；.hwp 移动端导入；「More tools」标签本地化；打开文件过滤的真机验证。
 
 ## 已知缺陷（未修）
 
